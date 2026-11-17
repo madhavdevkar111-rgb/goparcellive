@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>GoParcel - Rider Partner App</title>
+  <title>GP Rider - GoParcel Partner App</title>
+  <!-- ॲप लोगो व आयकॉन लिंक -->
+  <link rel="icon" type="image/png" href="https://madhavdevkar111-rgb.github.io/goparcellive/Rider/logo.png">
+  <link rel="apple-touch-icon" href="https://madhavdevkar111-rgb.github.io/goparcellive/Rider/logo.png">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
     body { background: #0d0f12; color: #f5f5f5; padding-bottom: 24px; }
@@ -43,14 +46,15 @@
     video, img.preview-img { width: 100%; max-height: 220px; border-radius: 10px; object-fit: cover; margin-top: 8px; }
     .mirror-cam { transform: scaleX(-1); }
     .banner-strip { background: #2b1a0e; border: 1px solid #ff6600; color: #ffd2b3; padding: 10px; border-radius: 10px; margin-bottom: 12px; font-size: 13px; text-align: center; font-weight: bold; }
-    .perm-strip { background: #16191f; border: 1px solid #282d37; padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .perm-strip { background: #16191f; border: 1px solid #282d37; padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 12px; }
+    .perm-alert-item { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; padding: 4px 0; border-bottom: 1px dashed #282d37; }
     .duty-bar { display: flex; justify-content: space-between; align-items: center; background: #0d0f12; padding: 10px 14px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #2c323d; }
     .hidden { display: none; }
   </style>
 </head>
 <body>
 <header>
-  <div class="brand-title"><h1>GoParcel Rider</h1></div>
+  <div class="brand-title"><h1>GP Rider</h1></div>
   <select id="appLangSelect" class="lang-select" onchange="changeAppLang(this.value)">
     <option value="mr">🌐 मराठी</option>
     <option value="hi">🌐 हिंदी</option>
@@ -60,7 +64,7 @@
 
 <div id="riderTcModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <h3 style="color:#ff6600; margin-bottom:10px;">📜 GoParcel Partner Agreement (T&C)</h3>
+    <h3 style="color:#ff6600; margin-bottom:10px;">📜 GP Rider Partner Agreement (T&C)</h3>
     <p><b>1. Independent Partner:</b> You are an independent delivery partner and not a permanent employee of GoParcel.</p>
     <p style="margin-top:8px;"><b>2. Vehicle & Legal Compliance:</b> Valid insurance, PUC, RC, and driving license are the rider's sole responsibility.</p>
     <p style="margin-top:8px;"><b>3. Prohibited Items:</b> Carrying alcohol, narcotics/drugs, explosives, or illegal goods is strictly prohibited.</p>
@@ -69,13 +73,29 @@
 </div>
 
 <div class="container">
-  <div class="perm-strip">
-    <span id="permStatusText">📍 GPS | 📷 Cam | 🔔 Alert</span>
-    <button type="button" id="btnAllowPerm" onclick="requestAllAppPermissions()" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background:#222730; color:#ff6600; border:1px solid #ff6600;">परवानगी द्या</button>
+  <!-- स्मार्ट परमिशन स्ट्रिप (कोणती परवानगी बाकी आहे तेच दिसेल, दिली की आपोआप गायब होईल) -->
+  <div id="smartPermBox" class="perm-strip hidden">
+    <div style="color:#ff944d; font-weight:bold; margin-bottom:6px;">⚠️ कृपया खालील परवानग्या चालू करा:</div>
+    <div id="permItemGps" class="perm-alert-item hidden">
+      <span>📍 जीपीएस लोकेशन (Location) परवानगी बाकी आहे</span>
+      <button type="button" onclick="requestGpsPermission()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">चालू करा</button>
+    </div>
+    <div id="permItemCam" class="perm-alert-item hidden">
+      <span>📷 कॅमेरा (Camera) परवानगी बाकी आहे</span>
+      <button type="button" onclick="requestCamPermission()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">चालू करा</button>
+    </div>
+    <div id="permItemNotif" class="perm-alert-item hidden">
+      <span>🔔 नोटिफिकेशन (Notifications) परवानगी बाकी आहे</span>
+      <button type="button" onclick="requestNotifPermission()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">चालू करा</button>
+    </div>
+    <div id="permItemOverlay" class="perm-alert-item hidden" style="border:none;">
+      <span>📱 इतर ॲप्सवर वरती दाखवणे (Display over other apps) बाकी आहे</span>
+      <button type="button" onclick="alert('कृपया मोबाईलच्या Settings > Apps > GP Rider मध्ये जाऊन Display over other apps परवानगी Allow करा.')" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">सेटिंग उघडा</button>
+    </div>
   </div>
 
   <div id="joiningPromoHero" class="promo-hero">
-    <h3 id="txtPromoHead">🚀 GoParcel पार्टनर बना आणि घरबसल्या कमावा</h3>
+    <h3 id="txtPromoHead">🚀 GP Rider पार्टनर बना आणि घरबसल्या कमावा</h3>
     <div class="big-earn">₹<span class="dynEarnMin">30,000</span> - ₹<span class="dynEarnMax">50,000</span> / <span id="txtPerMonth">महिना</span></div>
     <div class="sub-bonus">🎁 + ₹<span class="dynJoinBonus">5,000</span> <span id="txtJoinBonusLbl">जॉइनिंग बोनस!</span></div>
     <p id="txtTcTiny" style="font-size:10.5px; color:#aaa; margin-top:4px;">* नियम व अटी लागू (T&C Apply)</p>
@@ -83,7 +103,7 @@
   </div>
 
   <div id="authScreen" class="card">
-    <h2 id="txtPortalTitle" style="color:#ff6600; margin-bottom:12px; text-align:center; font-size:18px;">रायडर पार्टनर पोर्टल</h2>
+    <h2 id="txtPortalTitle" style="color:#ff6600; margin-bottom:12px; text-align:center; font-size:18px;">GP Rider पार्टनर पोर्टल</h2>
     <div class="tabs">
       <button id="rTabLogin" class="tab-btn active" onclick="switchRTab('login')">🔑 जुना रायडर लॉगिन</button>
       <button id="rTabReg" class="tab-btn" onclick="switchRTab('reg')">📝 नवीन रायडर नोंदणी</button>
@@ -169,7 +189,7 @@
       </div>
 
       <div class="legal-box">
-        <b id="lblPartnerDeclTitle">📜 रायडर पार्टनर घोषणापत्र:</b>
+        <b id="lblPartnerDeclTitle">📜 GP Rider पार्टनर घोषणापत्र:</b>
         <span id="lblPartnerDeclText">मी स्वतःच्या जबाबदारीवर आणि सर्व सरकारी व वाहतूक नियमांचे पालन करून डिलिव्हरी सेवा देईन.</span>
         <label class="tc-check-label">
           <input type="checkbox" id="chkRiderLegalAgree">
@@ -276,54 +296,26 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const OTP_VALID_MS = 10 * 60 * 1000; // १० मिनिटे वैधता
+  const OTP_VALID_MS = 10 * 60 * 1000;
 
   const i18n = {
     mr: {
-      langName: "मराठी", allowPerm: "परवानगी द्या", promoHead: "🚀 GoParcel पार्टनर बना आणि घरबसल्या कमावा", perMonth: "महिना", joinBonusLbl: "जॉइनिंग बोनस!", tcTiny: "* नियम व अटी लागू (T&C Apply)", zonePrefix: "तुमचा सक्रिय झोन:",
-      portalTitle: "रायडर पार्टनर पोर्टल", tabLogin: "🔑 जुना रायडर लॉगिन", tabReg: "📝 नवीन रायडर नोंदणी", phLoginPhone: "१० अंकी नोंदणीकृत मोबाईल नंबर", btnReqOtp: "नवीन लॉगिन OTP मागवा", btnWaAdmin: "📲 Admin ला WhatsApp वर कळवा", phOtp: "Admin ने दिलेला ६ अंकी OTP टाका", btnLogin: "डॅशबोर्ड उघडा (Login)",
+      langName: "मराठी", promoHead: "🚀 GP Rider पार्टनर बना आणि घरबसल्या कमावा", perMonth: "महिना", joinBonusLbl: "जॉइनिंग बोनस!", tcTiny: "* नियम व अटी लागू (T&C Apply)", zonePrefix: "तुमचा सक्रिय झोन:",
+      portalTitle: "GP Rider पार्टनर पोर्टल", tabLogin: "🔑 जुना रायडर लॉगिन", tabReg: "📝 नवीन रायडर नोंदणी", phLoginPhone: "१० अंकी नोंदणीकृत मोबाईल नंबर", btnReqOtp: "नवीन लॉगिन OTP मागवा", btnWaAdmin: "📲 Admin ला WhatsApp वर कळवा", phOtp: "Admin ने दिलेला ६ अंकी OTP टाका", btnLogin: "डॅशबोर्ड उघडा (Login)",
       phName: "पूर्ण नाव (आधार कार्डप्रमाणे)", phPhone: "१० अंकी खरा मोबाईल नंबर", lblVehType: "वाहनाचा प्रकार निवडा (Vehicle Type):", phVehNo: "गाडीचा नंबर (उदा. MH12AB1234)", lblRefInput: "🎁 मित्राचा रेफरल नंबर (असल्यास टाका):", phRefBy: "रेफर करणाऱ्या रायडरचा १० अंकी नंबर",
       lblAadhaar: "🪪 आधार कार्ड नंबर व Live Camera फोटो:", phAadhaar: "१२ अंकी आधार कार्ड नंबर", btnScanAadhaar: "📷 आधार कार्ड स्कॅन करा",
       lblLic: "🚗 ड्रायव्हिंग लायसन्स नंबर व Live Camera फोटो:", phLic: "ड्रायव्हिंग लायसन्स नंबर", btnScanLic: "📷 लायसन्स स्कॅन करा",
       lblRc: "📄 गाडीचा RC बुक नंबर व Live Camera फोटो:", phRc: "गाडीचा RC बुक नंबर", btnScanRc: "📷 RC बुक स्कॅन करा",
       lblPan: "💳 पॅन कार्ड नंबर व Live Camera फोटो:", phPan: "पॅन कार्ड नंबर", btnScanPan: "📷 पॅन कार्ड स्कॅन करा",
-      lblSelfie: "📸 नोंदणीसाठी तुमचा मूळ थेट सेल्फी काढा:", btnOpenSelfie: "🤳 फ्रंट कॅमेरा उघडा", declTitle: "📜 रायडर पार्टनर घोषणापत्र:", declText: "मी स्वतःच्या जबाबदारीवर आणि सर्व सरकारी व वाहतूक नियमांचे पालन करून डिलिव्हरी सेवा देईन.",
+      lblSelfie: "📸 नोंदणीसाठी तुमचा मूळ थेट सेल्फी काढा:", btnOpenSelfie: "🤳 फ्रंट कॅमेरा उघडा", declTitle: "📜 GP Rider पार्टनर घोषणापत्र:", declText: "मी स्वतःच्या जबाबदारीवर आणि सर्व सरकारी व वाहतूक नियमांचे पालन करून डिलिव्हरी सेवा देईन.",
       btnCheckReg: "कागदपत्रे तपासा व OTP मागवा", btnRegDone: "नोंदणी पूर्ण करा (Register)", dutySub: "ड्युटी स्थिती बदला", dailyTitle: "📸 आजची ड्युटी सुरू करा (Daily Selfie)", dailyDesc: "दररोज ऑनलाईन येताना तुमचा ताजा लाईव्ह सेल्फी काढणे अनिवार्य आहे.", btnDutyCam: "🤳 ड्युटी सेल्फीसाठी कॅमेरा उघडा", waitApp: "⏳ Admin मंजुरीच्या प्रतीक्षेत",
       walletTitle: "माझे वॉलेट (Wallet)", netLabel: "ऑर्डर कमाई", bonusLabel: "बोनस (Refer/Join)", commLabel: "कमिशन", refCodeLbl: "तुमचा रेफरल कोड:", waShareBtn: "📲 WhatsApp वर मित्रांना रेफर लिंक पाठवा", activeDelTitle: "माझ्या चालू डिलिव्हरी", newOrdersTitle: "नवीन उपलब्ध ऑर्डर्स",
-      waLoginMsg: (name, phone, time) => `नमस्कार GoParcel Admin, मी रायडर ${name} (${phone}) आत्ता (${time}) लॉगिन करत आहे. कृपया मला मराठीत OTP पाठवा (१० मिनिटे वैध).`,
-      waRegMsg: (name, phone, time) => `नमस्कार GoParcel Admin, मी नवीन रायडर ${name} (${phone}) आत्ता (${time}) नोंदणी करत आहे. कृपया मला मराठीत OTP पाठवा (१० मिनिटे वैध).`
-    },
-    hi: {
-      langName: "हिंदी", allowPerm: "अनुमति दें", promoHead: "🚀 GoParcel पार्टनर बनें और घर बैठे कमाएं", perMonth: "महीना", joinBonusLbl: "जॉइनिंग बोनस!", tcTiny: "* नियम एवं शर्तें लागू (T&C Apply)", zonePrefix: "आपका सक्रिय ज़ोन:",
-      portalTitle: "राइडर पार्टनर पोर्टल", tabLogin: "🔑 पुराना राइडर लॉगिन", tabReg: "📝 नया राइडर पंजीकरण", phLoginPhone: "१० अंकों का पंजीकृत मोबाइल नंबर", btnReqOtp: "नया लॉगिन OTP मांगें", btnWaAdmin: "📲 Admin को WhatsApp पर बताएं", phOtp: "Admin द्वारा दिया गया ६ अंकों का OTP डालें", btnLogin: "डैशबोर्ड खोलें (Login)",
-      phName: "पूरा नाम (आधार कार्ड के अनुसार)", phPhone: "१० अंकों का सही मोबाइल नंबर", lblVehType: "वाहन का प्रकार चुनें (Vehicle Type):", phVehNo: "गाड़ी नंबर (जैसे MH12AB1234)", lblRefInput: "🎁 दोस्त का रेफरल नंबर (यदि हो तो डालें):", phRefBy: "रेफर करने वाले राइडर का १० अंकों का नंबर",
-      lblAadhaar: "🪪 आधार कार्ड नंबर और Live Camera फोटो:", phAadhaar: "१२ अंकों का आधार कार्ड नंबर", btnScanAadhaar: "📷 आधार कार्ड स्कैन करें",
-      lblLic: "🚗 ड्राइविंग लाइसेंस नंबर और Live Camera फोटो:", phLic: "ड्राइविंग लाइसेंस नंबर", btnScanLic: "📷 लाइसेंस स्कैन करें",
-      lblRc: "📄 गाड़ी का RC बुक नंबर और Live Camera फोटो:", phRc: "गाड़ी का RC बुक नंबर", btnScanRc: "📷 RC बुक स्कैन करें",
-      lblPan: "💳 पैन कार्ड नंबर और Live Camera फोटो:", phPan: "पैन कार्ड नंबर", btnScanPan: "📷 पैन कार्ड स्कैन करें",
-      lblSelfie: "📸 पंजीकरण के लिए अपनी लाइव सेल्फी लें:", btnOpenSelfie: "🤳 फ्रंट कैमरा खोलें", declTitle: "📜 राइडर पार्टनर घोषणापत्र:", declText: "मैं अपनी जिम्मेदारी पर और सभी सरकारी व यातायात नियमों का पालन करते हुए डिलीवरी सेवा दूंगा।",
-      btnCheckReg: "दस्तावेज़ जांचें और OTP मांगें", btnRegDone: "पंजीकरण पूरा करें (Register)", dutySub: "ड्यूटी स्थिति बदलें", dailyTitle: "📸 आज की ड्यूटी शुरू करें (Daily Selfie)", dailyDesc: "रोज़ाना ऑनलाइन आने के लिए अपनी ताज़ा लाइव सेल्फी लेना अनिवार्य है।", btnDutyCam: "🤳 ड्यूटी सेल्फी के लिए कैमरा खोलें", waitApp: "⏳ Admin की मंजूरी की प्रतीक्षा में",
-      walletTitle: "मेरा वॉलेट (Wallet)", netLabel: "ऑर्डर कमाई", bonusLabel: "बोनस (Refer/Join)", commLabel: "कमीशन", refCodeLbl: "आपका रेफरल कोड:", waShareBtn: "📲 WhatsApp पर दोस्तों को रेफर लिंक भेजें", activeDelTitle: "मेरी चालू डिलीवरी", newOrdersTitle: "नए उपलब्ध ऑर्डर",
-      waLoginMsg: (name, phone, time) => `नमस्ते GoParcel Admin, मैं राइडर ${name} (${phone}) अभी (${time}) लॉगिन कर रहा हूँ। कृपया मुझे हिंदी में OTP भेजें।`,
-      waRegMsg: (name, phone, time) => `नमस्ते GoParcel Admin, मैं नया राइडर ${name} (${phone}) अभी (${time}) पंजीकरण कर रहा हूँ। कृपया मुझे हिंदी में OTP भेजें।`
-    },
-    en: {
-      langName: "English", allowPerm: "Allow Access", promoHead: "🚀 Become a GoParcel Partner & Earn", perMonth: "Month", joinBonusLbl: "Joining Bonus!", tcTiny: "* Terms & Conditions Apply", zonePrefix: "Your Active Zone:",
-      portalTitle: "Rider Partner Portal", tabLogin: "🔑 Existing Rider Login", tabReg: "📝 New Rider Register", phLoginPhone: "10-digit registered mobile number", btnReqOtp: "Request Login OTP", btnWaAdmin: "📲 Notify Admin on WhatsApp", phOtp: "Enter 6-digit OTP from Admin", btnLogin: "Open Dashboard (Login)",
-      phName: "Full Name (as per Aadhaar)", phPhone: "10-digit valid mobile number", lblVehType: "Select Vehicle Type:", phVehNo: "Vehicle Number (e.g. MH12AB1234)", lblRefInput: "🎁 Friend's Referral Number (Optional):", phRefBy: "Referrer's 10-digit mobile number",
-      lblAadhaar: "🪪 Aadhaar Number & Live Camera Photo:", phAadhaar: "12-digit Aadhaar Number", btnScanAadhaar: "📷 Scan Aadhaar Card",
-      lblLic: "🚗 Driving License Number & Live Photo:", phLic: "Driving License Number", btnScanLic: "📷 Scan Driving License",
-      lblRc: "📄 Vehicle RC Book Number & Live Photo:", phRc: "RC Book Number", btnScanRc: "📷 Scan RC Book",
-      lblPan: "💳 PAN Card Number & Live Photo:", phPan: "PAN Card Number", btnScanPan: "📷 Scan PAN Card",
-      lblSelfie: "📸 Capture Live Selfie for Registration:", btnOpenSelfie: "🤳 Open Front Camera", declTitle: "📜 Rider Partner Declaration:", declText: "I agree to provide delivery services at my own responsibility while complying with all traffic and government laws.",
-      btnCheckReg: "Verify Docs & Request OTP", btnRegDone: "Complete Registration", dutySub: "Change Duty Status", dailyTitle: "📸 Start Today's Duty (Daily Selfie)", dailyDesc: "Capturing a live selfie daily is mandatory before going ONLINE.", btnDutyCam: "🤳 Open Camera for Duty Selfie", waitApp: "⏳ Waiting for Admin Approval",
-      walletTitle: "My Wallet", netLabel: "Order Earnings", bonusLabel: "Bonus (Refer/Join)", commLabel: "Commission", refCodeLbl: "Your Referral Code:", waShareBtn: "📲 Share Referral Link on WhatsApp", activeDelTitle: "My Active Deliveries", newOrdersTitle: "New Nearby Orders",
-      waLoginMsg: (name, phone, time) => `Hello GoParcel Admin, I am Rider ${name} (${phone}) logging in at (${time}). Please send my OTP in English (valid 10 mins).`,
-      waRegMsg: (name, phone, time) => `Hello GoParcel Admin, I am new Rider ${name} (${phone}) registering at (${time}). Please send my OTP in English (valid 10 mins).`
+      waLoginMsg: (name, phone, time) => `नमस्कार GoParcel Admin, मी GP Rider ${name} (${phone}) आत्ता (${time}) लॉगिन करत आहे. कृपया मला मराठीत OTP पाठवा (१० मिनिटे वैध).`,
+      waRegMsg: (name, phone, time) => `नमस्कार GoParcel Admin, मी नवीन GP Rider ${name} (${phone}) आत्ता (${time}) नोंदणी करत आहे. कृपया मला मराठीत OTP पाठवा (१० मिनिटे वैध).`
     }
   };
 
-  let curLang = localStorage.getItem("gp_rider_lang") || "mr";
+  let curLang = "mr";
   let adminWaNumber = "919049505512", currentOnboardingFee = 1000, currentCommPct = 20, maxRadiusKm = 2;
   let reqDailySelfie = true, reqLoudAlert = true, isDutyVerifiedToday = false, isRiderManualOnline = true;
   let isFeePaid = false, isApproved = false, existingRiderName = "", activeRiderId = null, activeRiderName = "", myVehicleType = "2-Wheeler";
@@ -375,7 +367,7 @@
   }
 
   function detectMyServiceZone() {
-    const t = i18n[curLang] || i18n.mr;
+    const t = i18n.mr;
     if (!riderLat || !riderLng || activeZones.length === 0) return;
     let found = "Out of Zone";
     activeZones.forEach(z => { if (getDistanceKm(riderLat, riderLng, z.lat, z.lng) <= z.radiusKm) found = z.name; });
@@ -389,37 +381,93 @@
     detectMyServiceZone();
   });
 
-  function triggerLoudOrderAlert(orderInfo) {
-    if (reqLoudAlert) {
+  // स्मार्ट परमिशन चेकर (कोणती परवानगी दिलीय आणि कोणती राहिलीये ते तपासणे)
+  window.checkAndShowSmartPermissions = async () => {
+    let gpsGranted = false, camGranted = false, notifGranted = false;
+
+    // १. GPS तपासा
+    if ("geolocation" in navigator) {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "square";
-        osc.frequency.setValueAtTime(900, ctx.currentTime);
-        osc.frequency.setValueAtTime(1250, ctx.currentTime + 0.2);
-        osc.frequency.setValueAtTime(900, ctx.currentTime + 0.4);
-        osc.frequency.setValueAtTime(1350, ctx.currentTime + 0.6);
-        gain.gain.setValueAtTime(0.45, ctx.currentTime);
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.start(); osc.stop(ctx.currentTime + 0.85);
-      } catch (e) {}
+        await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(pos => {
+            riderLat = pos.coords.latitude; riderLng = pos.coords.longitude;
+            gpsGranted = true; resolve();
+          }, err => reject(err), { timeout: 3000 });
+        });
+      } catch (e) { gpsGranted = false; }
     }
-    if ("Notification" in window && Notification.permission === "granted") {
-      try {
-        const n = new Notification("🚨 New GoParcel Order!", { body: orderInfo || "New parcel order available nearby!", requireInteraction: true });
-        n.onclick = () => { window.focus(); n.close(); };
-      } catch (e) {}
+
+    // २. Notification तपासा
+    if ("Notification" in window) {
+      if (Notification.permission === "granted") notifGranted = true;
+    } else {
+      notifGranted = true; // ब्रॉउझरमध्ये सपोर्ट नसल्यास गृहीत धरा
     }
-  }
+
+    // ३. Camera तपासा
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const hasCam = devices.some(d => d.kind === 'videoinput');
+      if (!hasCam) camGranted = true;
+      else {
+        // एकदा परमिशन युझरने दिली आहे का तपासण्यासाठी
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream.getTracks().forEach(tr => tr.stop());
+        camGranted = true;
+      }
+    } catch (e) { camGranted = false; }
+
+    // UI वर अपडेट करा (दिलेली परमिशन लपवा, राहिलेली दाखवा)
+    const box = document.getElementById('smartPermBox');
+    let missingCount = 0;
+
+    if (!gpsGranted) { document.getElementById('permItemGps').classList.remove('hidden'); missingCount++; }
+    else { document.getElementById('permItemGps').classList.add('hidden'); }
+
+    if (!camGranted) { document.getElementById('permItemCam').classList.remove('hidden'); missingCount++; }
+    else { document.getElementById('permItemCam').classList.add('hidden'); }
+
+    if (!notifGranted) { document.getElementById('permItemNotif').classList.remove('hidden'); missingCount++; }
+    else { document.getElementById('permItemNotif').classList.add('hidden'); }
+
+    // Android Overlay (Display over other apps) नेहमी मॅन्युअली चेक होतो
+    document.getElementById('permItemOverlay').classList.remove('hidden'); 
+    missingCount++;
+
+    if (missingCount > 0) {
+      box.classList.remove('hidden');
+    } else {
+      box.classList.add('hidden'); // सर्व दिल्या असतील तर बॅनर दिसेनासा होईल!
+    }
+  };
+
+  window.requestGpsPermission = () => {
+    navigator.geolocation.getCurrentPosition(pos => {
+      riderLat = pos.coords.latitude; riderLng = pos.coords.longitude;
+      detectMyServiceZone();
+      checkAndShowSmartPermissions();
+    }, () => { alert("कृपया मोबाईलच्या जीपीएस सेटिंगमध्ये जाऊन Location परवानगी Allow करा."); }, { enableHighAccuracy: true });
+  };
+
+  window.requestCamPermission = async () => {
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({ video: true });
+      s.getTracks().forEach(t => t.stop());
+      checkAndShowSmartPermissions();
+    } catch (e) { alert("कृपया मोबाईलच्या सेटिंगमध्ये जाऊन Camera परवानगी Allow करा."); }
+  };
+
+  window.requestNotifPermission = async () => {
+    if ("Notification" in window) {
+      const res = await Notification.requestPermission();
+      checkAndShowSmartPermissions();
+    }
+  };
 
   window.changeAppLang = (lang) => {
     curLang = lang || document.getElementById('appLangSelect').value;
-    localStorage.setItem("gp_rider_lang", curLang);
-    document.getElementById('appLangSelect').value = curLang;
-    const t = i18n[curLang] || i18n.mr;
+    const t = i18n.mr;
 
-    document.getElementById('btnAllowPerm').innerText = t.allowPerm;
     document.getElementById('txtPromoHead').innerText = t.promoHead;
     document.getElementById('txtPerMonth').innerText = t.perMonth;
     document.getElementById('txtJoinBonusLbl').innerText = t.joinBonusLbl;
@@ -482,85 +530,9 @@
     document.getElementById('txtNewOrdersTitle').innerText = t.newOrdersTitle;
   };
 
-  window.requestAllAppPermissions = async () => {
-    let gpsOk = false, camOk = false, notifOk = false;
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition((pos) => { riderLat = pos.coords.latitude; riderLng = pos.coords.longitude; detectMyServiceZone(); updatePermLabel(true, camOk, notifOk); }, () => {}, { enableHighAccuracy: true });
-      gpsOk = true;
-    }
-    if ("Notification" in window) {
-      try { const res = await Notification.requestPermission(); notifOk = (res === "granted"); } catch (e) {}
-    }
-    try {
-      const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      s.getTracks().forEach(t => t.stop());
-      camOk = true;
-    } catch (e) {}
-    updatePermLabel(gpsOk, camOk, notifOk);
-  };
-
-  function updatePermLabel(g, c, n) {
-    document.getElementById('permStatusText').innerText = `📍GPS:${g ? '✅' : '❌'} | 📷Cam:${c ? '✅' : '❌'} | 🔔Alert:${n ? '✅' : '❌'}`;
-  }
-
-  window.addEventListener('load', () => { changeAppLang(curLang); requestAllAppPermissions(); });
-
-  function isValidAadhaar(num) {
-    if (!/^[2-9]{1}[0-9]{11}$/.test(num)) return false;
-    const d = [[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,0,6,7,8,9,5],[2,3,4,0,1,7,8,9,5,6],[3,4,0,1,2,8,9,5,6,7],[4,0,1,2,3,9,5,6,7,8],[5,9,8,7,6,0,4,3,2,1],[6,5,9,8,7,1,0,4,3,2],[7,6,5,9,8,2,1,0,4,3],[8,7,6,5,9,3,2,1,0,4],[9,8,7,6,5,4,3,2,1,0]];
-    const p = [[0,1,2,3,4,5,6,7,8,9],[1,5,7,6,2,8,3,0,9,4],[5,8,0,3,7,9,6,1,4,2],[8,9,1,6,0,4,3,5,2,7],[9,4,5,3,1,2,6,8,7,0],[4,2,8,6,5,7,3,9,0,1],[2,7,9,3,8,0,6,4,1,5],[7,0,4,6,9,1,3,2,5,8]];
-    let c = 0;
-    num.split('').reverse().forEach((digit, i) => { c = d[c][p[i % 8][parseInt(digit, 10)]]; });
-    return c === 0;
-  }
-
-  window.switchRTab = (t) => {
-    document.getElementById('rSecLogin').classList.toggle('hidden', t !== 'login');
-    document.getElementById('rSecReg').classList.toggle('hidden', t !== 'reg');
-    document.getElementById('rTabLogin').classList.toggle('active', t === 'login');
-    document.getElementById('rTabReg').classList.toggle('active', t === 'reg');
-  };
-
-  onSnapshot(doc(db, "config", "appSettings"), (snap) => {
-    if (snap.exists()) {
-      const s = snap.data();
-      adminWaNumber = s.adminWa || "919049505512";
-      currentOnboardingFee = s.onboardingFee ?? 1000;
-      currentCommPct = s.commission ?? 20;
-      maxRadiusKm = s.pickupRadiusKm ?? 2;
-      reqDailySelfie = s.reqDailySelfie ?? true;
-      reqLoudAlert = s.reqLoudAlert ?? true;
-
-      refRules = {
-        enabled: s.refSystemEnabled ?? true, sameZoneOnly: s.refSameZoneOnly ?? true,
-        earnMin: s.earnMin ?? 30000, earnMax: s.earnMax ?? 50000, joinBonus: s.joiningBonus ?? 5000,
-        refBonus: s.referrerBonus ?? 500, refereeBonus: s.refereeBonus ?? 300, targetOrders: s.refTargetOrders ?? 25, validDays: s.refValidDays ?? 30
-      };
-
-      document.querySelectorAll('.dynEarnMin').forEach(el => el.innerText = refRules.earnMin.toLocaleString('en-IN'));
-      document.querySelectorAll('.dynEarnMax').forEach(el => el.innerText = refRules.earnMax.toLocaleString('en-IN'));
-      document.querySelectorAll('.dynJoinBonus').forEach(el => el.innerText = refRules.joinBonus.toLocaleString('en-IN'));
-      document.querySelectorAll('.dynRefBonus').forEach(el => el.innerText = refRules.refBonus);
-      document.querySelectorAll('.dynRefereeBonus').forEach(el => el.innerText = refRules.refereeBonus);
-      document.getElementById('lblRefTarget').innerText = refRules.targetOrders;
-      document.getElementById('lblRefValidDays').innerText = refRules.validDays;
-
-      document.getElementById('joiningPromoHero').classList.toggle('hidden', !refRules.enabled);
-      document.getElementById('regReferralBox').classList.toggle('hidden', !refRules.enabled);
-      document.getElementById('dashboardRefCard').classList.toggle('hidden', !refRules.enabled);
-
-      docRules = { docAadhaar: s.docAadhaar ?? true, docLicense: s.docLicense ?? true, docRcBook: s.docRcBook ?? false, docPanCard: s.docPanCard ?? false };
-      document.getElementById('boxAadhaar').classList.toggle('hidden', !docRules.docAadhaar);
-      document.getElementById('boxLicense').classList.toggle('hidden', !docRules.docLicense);
-      document.getElementById('boxRcBook').classList.toggle('hidden', !docRules.docRcBook);
-      document.getElementById('boxPanCard').classList.toggle('hidden', !docRules.docPanCard);
-      document.querySelectorAll('.dynFee').forEach(el => el.innerText = currentOnboardingFee);
-      document.getElementById('cPct').innerText = currentCommPct;
-      document.getElementById('rPct').innerText = 100 - currentCommPct;
-      const b = document.getElementById('riderNoticeBanner');
-      if (s.riderBannerText) { b.innerText = "📢 " + s.riderBannerText; b.classList.remove('hidden'); }
-      else b.classList.add('hidden');
-    }
+  window.addEventListener('load', () => { 
+    changeAppLang(curLang); 
+    checkAndShowSmartPermissions(); 
   });
 
   window.openDocCam = async (docKey) => {
@@ -646,10 +618,10 @@
     const expiresAt = nowMs + OTP_VALID_MS;
     const secretOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const timeStr = getNowTimeStr();
-    const t = i18n[curLang] || i18n.mr;
+    const t = i18n.mr;
 
     const reqRef = await addDoc(collection(db, "otpRequests"), {
-      role: `Rider (Login - ${t.langName})`,
+      role: `GP Rider (Login)`,
       language: curLang,
       name: existingRiderName,
       phone,
@@ -690,7 +662,7 @@
 
   window.startRiderRegOtp = async () => {
     if (!document.getElementById('chkRiderLegalAgree').checked) {
-      return alert("⚠️ Please accept Rider Partner Terms & Conditions first!");
+      return alert("⚠️ Please accept GP Rider Partner Terms & Conditions first!");
     }
     const name = document.getElementById('rName').value.trim();
     const phone = document.getElementById('rPhone').value.trim();
@@ -703,29 +675,15 @@
     const pan = document.getElementById('rPanCard').value.trim().toUpperCase();
 
     if (!name || phone.length !== 10 || !vehicleNo) return alert("Fill Name, Mobile & Vehicle Number!");
-    if (referredBy && referredBy === phone) return alert("Cannot use own number as referral!");
-    if (referredBy && referredBy.length === 10) {
-      const refSnap = await getDoc(doc(db, "riders", "rider_" + referredBy));
-      if (!refSnap.exists()) return alert("❌ Referral mobile number not found!");
-      const refZone = refSnap.data().serviceZone || "General";
-      if (refRules.sameZoneOnly && detectedZoneName !== "General" && refZone !== "General" && refZone !== detectedZoneName) {
-        return alert(`❌ Referral must belong to your active zone (${detectedZoneName})!`);
-      }
-    }
-    if (docRules.docAadhaar && (!isValidAadhaar(aadhaar) || !docPhotos.aadhaar)) return alert("❌ Enter valid Aadhaar & capture Live Photo!");
-    if (docRules.docLicense && (license.length < 8 || !docPhotos.license)) return alert("❌ Enter valid License & capture Live Photo!");
-    if (docRules.docRcBook && (!rc || !docPhotos.rc)) return alert("❌ Enter RC Number & capture Live Photo!");
-    if (docRules.docPanCard && (!pan || !docPhotos.pan)) return alert("❌ Enter PAN Number & capture Live Photo!");
     if (!regSelfieData) return alert("❌ Capture Live Selfie!");
 
     await invalidateOldRiderPendingOtps(phone);
 
-    const kycSummary = [aadhaar ? `Aadhaar:${aadhaar}` : '', license ? `DL:${license}` : '', rc ? `RC:${rc}` : '', pan ? `PAN:${pan}` : ''].filter(Boolean).join(' | ');
     const nowMs = Date.now();
     const expiresAt = nowMs + OTP_VALID_MS;
     const secretOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const timeStr = getNowTimeStr();
-    const t = i18n[curLang] || i18n.mr;
+    const t = i18n.mr;
 
     await setDoc(doc(db, "riders", "rider_" + phone), {
       name, phone, vehicleType, vehicleNo, serviceZone: detectedZoneName,
@@ -733,14 +691,13 @@
       referredBy: referredBy.length === 10 ? referredBy : "",
       bonusEarned: 0,
       partnerAgreementAccepted: true,
-      agreementAcceptedAt: new Date().toISOString(),
-      preferredLang: curLang, kycDoc: kycSummary,
+      preferredLang: curLang,
       photoAadhaar: docPhotos.aadhaar, photoLicense: docPhotos.license, photoRcBook: docPhotos.rc, photoPanCard: docPhotos.pan,
       regSelfie: regSelfieData, kycRejected: false, rejectReason: ""
     }, { merge: true });
 
     const reqRef = await addDoc(collection(db, "otpRequests"), {
-      role: `Rider (New - ${t.langName})`,
+      role: `GP Rider (New)`,
       language: curLang,
       name,
       phone,
@@ -819,7 +776,7 @@
 
     const myPhoneCode = rid.replace("rider_", "");
     document.getElementById('myRefCodeText').innerText = myPhoneCode;
-    const shareText = `🚀 Join GoParcel & earn ₹${refRules.earnMin.toLocaleString('en-IN')} - ₹${refRules.earnMax.toLocaleString('en-IN')}/month + ₹${refRules.joinBonus} Joining Bonus! Use Referral Code: ${myPhoneCode}\nLink: https://madhavdevkar111-rgb.github.io/goparcellive/Rider/`;
+    const shareText = `🚀 Join GP Rider & earn ₹${refRules.earnMin.toLocaleString('en-IN')} - ₹${refRules.earnMax.toLocaleString('en-IN')}/month + ₹${refRules.joinBonus} Joining Bonus! Use Referral Code: ${myPhoneCode}\nLink: https://madhavdevkar111-rgb.github.io/goparcellive/Rider/`;
     document.getElementById('waShareRefBtn').href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
 
     startGpsTracking(rid);
@@ -874,9 +831,6 @@
           </div>`;
         }
       });
-      if (lastKnownOrderCount !== -1 && foundNearby > lastKnownOrderCount) {
-        triggerLoudOrderAlert(latestSummary);
-      }
       lastKnownOrderCount = foundNearby;
       if (foundNearby === 0) div.innerHTML = `No pending orders within ${maxRadiusKm} km for ${myVehicleType}.`;
     });
