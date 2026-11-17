@@ -23,6 +23,7 @@
     input[type="text"], input[type="tel"], input[type="number"], select { text-align: left; }
     button { background: linear-gradient(135deg, #ff6600, #ff8533); color: #000; font-weight: 800; border: none; cursor: pointer; }
     a.wa-btn { background: #25D366; color: #000; font-weight: 800; border: none; }
+    .otp-timer-strip { background: #1c2e3d; color: #4db8ff; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; text-align: center; margin: 6px 0; }
     .action-row { display: flex; gap: 8px; margin-top: 8px; }
     a.nav-map-btn { flex: 1; background: #162838; color: #4db8ff; border: 1px solid #3a8fd6; font-size: 13px; padding: 10px; font-weight: 700; margin: 0; }
     a.call-btn { flex: 1; background: #153322; color: #2ecc71; border: 1px solid #2ecc71; font-size: 13px; padding: 10px; font-weight: 700; margin: 0; }
@@ -57,15 +58,13 @@
   </select>
 </header>
 
-<!-- रायडर पार्टनर करार व नियम (Terms & Conditions) पॉप-अप -->
 <div id="riderTcModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <h3 style="color:#ff6600; margin-bottom:10px;">📜 GoParcel रायडर पार्टनर करार (Partner Agreement)</h3>
-    <p><b>१. स्वतंत्र पार्टनर दर्जा:</b> तुम्ही GoParcel चे स्वतंत्र डिलिव्हरी पार्टनर आहात (कंपनीचे कायमस्वरूपी कर्मचारी नाही). तुम्ही तुमच्या सोयीनुसार Online/Offline राहून काम करू शकता.</p>
-    <p style="margin-top:8px;"><b>२. वाहन व कागदपत्रे जबाबदारी:</b> तुमच्या गाडीचा वैध विमा (Insurance), PUC, RC बुक, ड्रायव्हिंग लायसन्स आणि सर्व वाहतूक व सरकारी नियमांचे पालन करण्याची संपूर्ण जबाबदारी तुमची स्वतःची राहील.</p>
-    <p style="margin-top:8px;"><b>३. निषिद्ध वस्तू:</b> कोणत्याही पार्सलमध्ये दारू, ड्रग्ज, स्फोटके किंवा बेकायदेशीर वस्तू असल्याचा संशय आल्यास डिलिव्हरी तात्काळ थांबवून कंपनीला व पोलिसांना कळवणे बंधनकारक आहे.</p>
-    <p style="margin-top:8px;"><b>४. बोनस व कमिशन अटी:</b> जॉइनिंग व रेफरल बोनस कंपनीने ठरवलेल्या ऑर्डर्सच्या संख्येनुसार आणि वेळेच्या मर्यादेत (T&C Apply) दिला जाईल.</p>
-    <button onclick="document.getElementById('riderTcModal').classList.add('hidden')" style="margin-top:14px;">मी समजलो (Close)</button>
+    <h3 style="color:#ff6600; margin-bottom:10px;">📜 GoParcel Partner Agreement (T&C)</h3>
+    <p><b>1. Independent Partner:</b> You are an independent delivery partner and not a permanent employee of GoParcel.</p>
+    <p style="margin-top:8px;"><b>2. Vehicle & Legal Compliance:</b> Valid insurance, PUC, RC, and driving license are the rider's sole responsibility.</p>
+    <p style="margin-top:8px;"><b>3. Prohibited Items:</b> Carrying alcohol, narcotics/drugs, explosives, or illegal goods is strictly prohibited.</p>
+    <button onclick="document.getElementById('riderTcModal').classList.add('hidden')" style="margin-top:14px;">Close</button>
   </div>
 </div>
 
@@ -75,12 +74,11 @@
     <button type="button" id="btnAllowPerm" onclick="requestAllAppPermissions()" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background:#222730; color:#ff6600; border:1px solid #ff6600;">परवानगी द्या</button>
   </div>
 
-  <!-- जॉइनिंग बोनस व मासिक कमाई बॅनर -->
   <div id="joiningPromoHero" class="promo-hero">
     <h3 id="txtPromoHead">🚀 GoParcel पार्टनर बना आणि घरबसल्या कमावा</h3>
     <div class="big-earn">₹<span class="dynEarnMin">30,000</span> - ₹<span class="dynEarnMax">50,000</span> / <span id="txtPerMonth">महिना</span></div>
     <div class="sub-bonus">🎁 + ₹<span class="dynJoinBonus">5,000</span> <span id="txtJoinBonusLbl">जॉइनिंग बोनस!</span></div>
-    <p style="font-size:10.5px; color:#aaa; margin-top:4px;">* नियम व अटी लागू (T&C Apply - ऑर्डर्सच्या संख्येनुसार)</p>
+    <p id="txtTcTiny" style="font-size:10.5px; color:#aaa; margin-top:4px;">* नियम व अटी लागू (T&C Apply)</p>
     <p style="font-size:11px; color:#ccc; margin-top:4px;">📍 <span id="detectedZoneLabel">तुमचा झोन तपासत आहे...</span></p>
   </div>
 
@@ -95,9 +93,11 @@
       <input type="tel" id="rLoginPhone" maxlength="10" placeholder="१० अंकी नोंदणीकृत मोबाईल नंबर">
       <button id="btnReqLoginOtp" onclick="startRiderLoginOtp()">नवीन लॉगिन OTP मागवा</button>
       <div id="rLoginOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #2f3542; padding-top:10px;">
+        <div id="rLoginOtpTimerLabel" class="otp-timer-strip">⏳ वैधता: 10:00</div>
         <a id="rLoginWaLink" href="#" target="_blank" class="wa-btn">📲 Admin ला WhatsApp वर कळवा</a>
         <input type="number" id="rLoginOtpInput" placeholder="Admin ने दिलेला ६ अंकी OTP टाका">
         <button id="btnVerifyLogin" onclick="verifyRiderLoginOtp()" style="background:#2ecc71;">डॅशबोर्ड उघडा (Login)</button>
+        <button type="button" onclick="startRiderLoginOtp()" style="background:#262b36; color:#ff944d; font-size:12px; padding:9px;">🔄 Resend OTP (जुना OTP बाद होईल)</button>
       </div>
     </div>
 
@@ -105,83 +105,85 @@
       <input type="text" id="rName" placeholder="पूर्ण नाव (आधार कार्डप्रमाणे)">
       <input type="tel" id="rPhone" maxlength="10" placeholder="१० अंकी खरा मोबाईल नंबर">
 
-      <label style="font-size:12px; color:#ff6600; display:block; margin-top:6px;">वाहनाचा प्रकार निवडा (Vehicle Type):</label>
+      <label id="lblVehType" style="font-size:12px; color:#ff6600; display:block; margin-top:6px;">वाहनाचा प्रकार निवडा (Vehicle Type):</label>
       <select id="rVehicleType">
-        <option value="2-Wheeler">🏍️ 2-Wheeler (बाईक / स्कूटर)</option>
-        <option value="3-Wheeler">🛺 3-Wheeler (रिक्षा टेम्पो)</option>
-        <option value="Mini Tempo">🚚 Mini Tempo (टाटा एस / मिनी टेम्पो)</option>
+        <option value="2-Wheeler">🏍️ 2-Wheeler (Bike / Scooter)</option>
+        <option value="3-Wheeler">🛺 3-Wheeler (Auto Tempo)</option>
+        <option value="Mini Tempo">🚚 Mini Tempo (Tata Ace / Pickup)</option>
       </select>
 
       <input type="text" id="rVehicle" placeholder="गाडीचा नंबर (उदा. MH12AB1234)">
 
       <div id="regReferralBox" style="background:#102217; border:1px dashed #2ecc71; padding:10px; border-radius:10px; margin:8px 0;">
-        <label style="font-size:12px; color:#2ecc71; display:block; margin-bottom:4px;">🎁 मित्राचा रेफरल नंबर (असल्यास टाका - ₹<span class="dynRefereeBonus">300</span> बोनससाठी):</label>
-        <input type="tel" id="rReferredBy" maxlength="10" placeholder="रेफर करणाऱ्या रायडरचा १० अंकी मोबाईल नंबर" style="margin:0;">
+        <label id="lblRefInput" style="font-size:12px; color:#2ecc71; display:block; margin-bottom:4px;">🎁 मित्राचा रेफरल नंबर (असल्यास टाका):</label>
+        <input type="tel" id="rReferredBy" maxlength="10" placeholder="रेफर करणाऱ्या रायडरचा १० अंकी नंबर" style="margin:0;">
       </div>
 
       <!-- १. आधार कार्ड -->
       <div id="boxAadhaar" class="doc-upload-box">
-        <label style="font-size:12px; color:#4db8ff;">🪪 आधार कार्ड नंबर व Live Camera फोटो:</label>
-        <input type="tel" id="rAadhaar" maxlength="12" placeholder="१२ अंकी अचूक आधार कार्ड नंबर">
+        <label id="lblAadhaarBox" style="font-size:12px; color:#4db8ff;">🪪 आधार कार्ड नंबर व Live Camera फोटो:</label>
+        <input type="tel" id="rAadhaar" maxlength="12" placeholder="१२ अंकी आधार कार्ड नंबर">
         <video id="vid_aadhaar" autoplay playsinline class="hidden"></video>
         <img id="prev_aadhaar" class="preview-img hidden">
-        <button type="button" onclick="openDocCam('aadhaar')" style="background:#162838; color:#4db8ff; border:1px solid #3a8fd6; font-size:13px;">📷 आधार कार्ड स्कॅन करा</button>
-        <button type="button" id="snap_aadhaar" onclick="captureDocCam('aadhaar')" class="hidden" style="background:#2ecc71; font-size:13px;">✅ आधार फोटो क्लिक करा</button>
+        <button type="button" id="btnScanAadhaar" onclick="openDocCam('aadhaar')" style="background:#162838; color:#4db8ff; border:1px solid #3a8fd6; font-size:13px;">📷 आधार कार्ड स्कॅन करा</button>
+        <button type="button" id="snap_aadhaar" onclick="captureDocCam('aadhaar')" class="hidden" style="background:#2ecc71; font-size:13px;">✅ क्लिक करा</button>
       </div>
 
       <!-- २. ड्रायव्हिंग लायसन्स -->
       <div id="boxLicense" class="doc-upload-box">
-        <label style="font-size:12px; color:#f1c40f;">🚗 ड्रायव्हिंग लायसन्स नंबर व Live Camera फोटो:</label>
+        <label id="lblLicBox" style="font-size:12px; color:#f1c40f;">🚗 ड्रायव्हिंग लायसन्स नंबर व Live Camera फोटो:</label>
         <input type="text" id="rLicense" placeholder="ड्रायव्हिंग लायसन्स नंबर">
         <video id="vid_license" autoplay playsinline class="hidden"></video>
         <img id="prev_license" class="preview-img hidden">
-        <button type="button" onclick="openDocCam('license')" style="background:#2b2410; color:#f1c40f; border:1px solid #f1c40f; font-size:13px;">📷 लायसन्स स्कॅन करा</button>
-        <button type="button" id="snap_license" onclick="captureDocCam('license')" class="hidden" style="background:#2ecc71; font-size:13px;">✅ लायसन्स फोटो क्लिक करा</button>
+        <button type="button" id="btnScanLic" onclick="openDocCam('license')" style="background:#2b2410; color:#f1c40f; border:1px solid #f1c40f; font-size:13px;">📷 लायसन्स स्कॅन करा</button>
+        <button type="button" id="snap_license" onclick="captureDocCam('license')" class="hidden" style="background:#2ecc71; font-size:13px;">✅ क्लिक करा</button>
       </div>
 
       <!-- ३. गाडीचा RC बुक -->
       <div id="boxRcBook" class="doc-upload-box hidden">
-        <label style="font-size:12px; color:#bb8fce;">📄 गाडीचा RC बुक नंबर व Live Camera फोटो:</label>
+        <label id="lblRcBox" style="font-size:12px; color:#bb8fce;">📄 गाडीचा RC बुक नंबर व Live Camera फोटो:</label>
         <input type="text" id="rRcBook" placeholder="गाडीचा RC बुक नंबर">
         <video id="vid_rc" autoplay playsinline class="hidden"></video>
         <img id="prev_rc" class="preview-img hidden">
-        <button type="button" onclick="openDocCam('rc')" style="background:#23162b; color:#bb8fce; border:1px solid #bb8fce; font-size:13px;">📷 RC बुक स्कॅन करा</button>
-        <button type="button" id="snap_rc" onclick="captureDocCam('rc')" class="hidden" style="background:#2ecc71; font-size:13px;">✅ RC फोटो क्लिक करा</button>
+        <button type="button" id="btnScanRc" onclick="openDocCam('rc')" style="background:#23162b; color:#bb8fce; border:1px solid #bb8fce; font-size:13px;">📷 RC बुक स्कॅन करा</button>
+        <button type="button" id="snap_rc" onclick="captureDocCam('rc')" class="hidden" style="background:#2ecc71; font-size:13px;">✅ क्लिक करा</button>
       </div>
 
       <!-- ४. पॅन कार्ड -->
       <div id="boxPanCard" class="doc-upload-box hidden">
-        <label style="font-size:12px; color:#eb984e;">💳 पॅन कार्ड नंबर व Live Camera फोटो:</label>
+        <label id="lblPanBox" style="font-size:12px; color:#eb984e;">💳 पॅन कार्ड नंबर व Live Camera फोटो:</label>
         <input type="text" id="rPanCard" placeholder="पॅन कार्ड नंबर">
         <video id="vid_pan" autoplay playsinline class="hidden"></video>
         <img id="prev_pan" class="preview-img hidden">
-        <button type="button" onclick="openDocCam('pan')" style="background:#2b1b10; color:#eb984e; border:1px solid #eb984e; font-size:13px;">📷 पॅन कार्ड स्कॅन करा</button>
-        <button type="button" id="snap_pan" onclick="captureDocCam('pan')" class="hidden" style="background:#2ecc71; font-size:13px;">✅ पॅन फोटो क्लिक करा</button>
+        <button type="button" id="btnScanPan" onclick="openDocCam('pan')" style="background:#2b1b10; color:#eb984e; border:1px solid #eb984e; font-size:13px;">📷 पॅन कार्ड स्कॅन करा</button>
+        <button type="button" id="snap_pan" onclick="captureDocCam('pan')" class="hidden" style="background:#2ecc71; font-size:13px;">✅ क्लिक करा</button>
       </div>
 
       <!-- ५. सेल्फी कॅमेरा -->
       <div class="cam-box">
-        <p style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 नोंदणीसाठी तुमचा मूळ थेट सेल्फी काढा:</p>
+        <p id="lblSelfieTitle" style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 नोंदणीसाठी तुमचा मूळ थेट सेल्फी काढा:</p>
         <video id="regVideo" autoplay playsinline class="hidden mirror-cam"></video>
         <img id="regPreview" class="preview-img hidden mirror-cam">
-        <button type="button" onclick="openCamera('reg')" style="background:#262b36; color:#fff; font-size:13px;">🤳 फ्रंट कॅमेरा उघडा</button>
+        <button type="button" id="btnOpenSelfie" onclick="openCamera('reg')" style="background:#262b36; color:#fff; font-size:13px;">🤳 फ्रंट कॅमेरा उघडा</button>
         <button type="button" id="btnSnapReg" onclick="takeSnapshot()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ सेल्फी फोटो घ्या</button>
       </div>
 
-      <!-- रायडर कायदेशीर करार व अनिवार्य चेकबॉक्स -->
       <div class="legal-box">
-        <b>📜 रायडर पार्टनर घोषणापत्र:</b> मी स्वतःच्या जबाबदारीवर आणि सर्व सरकारी व वाहतूक नियमांचे पालन करून डिलिव्हरी सेवा देईन. माझ्या वाहनाची कागदपत्रे व परवाना वैध आहेत.
+        <b id="lblPartnerDeclTitle">📜 रायडर पार्टनर घोषणापत्र:</b>
+        <span id="lblPartnerDeclText">मी स्वतःच्या जबाबदारीवर आणि सर्व सरकारी व वाहतूक नियमांचे पालन करून डिलिव्हरी सेवा देईन.</span>
         <label class="tc-check-label">
           <input type="checkbox" id="chkRiderLegalAgree">
-          <span>मी <span class="tc-link" onclick="event.preventDefault(); document.getElementById('riderTcModal').classList.remove('hidden');">रायडर नियम व अटी (Partner Terms & Conditions)</span> वाचल्या असून मला त्या पूर्णपणे मान्य आहेत.</span>
+          <span>मी <span class="tc-link" onclick="event.preventDefault(); document.getElementById('riderTcModal').classList.remove('hidden');">रायडर नियम व अटी (T&C)</span> वाचल्या असून मला त्या मान्य आहेत.</span>
         </label>
       </div>
 
       <button id="btnStartReg" onclick="startRiderRegOtp()">कागदपत्रे तपासा व OTP मागवा</button>
       <div id="rRegOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #2f3542; padding-top:10px;">
+        <div id="rRegOtpTimerLabel" class="otp-timer-strip">⏳ वैधता: 10:00</div>
         <a id="rRegWaLink" href="#" target="_blank" class="wa-btn">📲 Admin ला WhatsApp वर कळवा</a>
         <input type="number" id="rRegOtpInput" placeholder="Admin ने दिलेला ६ अंकी OTP टाका">
         <button id="btnVerifyReg" onclick="verifyRiderRegOtp()" style="background:#2ecc71;">नोंदणी पूर्ण करा (Register)</button>
+        <button type="button" onclick="startRiderRegOtp()" style="background:#262b36; color:#ff944d; font-size:12px; padding:9px;">🔄 Resend OTP (जुना OTP बाद होईल)</button>
       </div>
     </div>
   </div>
@@ -196,7 +198,7 @@
     <div class="duty-bar">
       <div>
         <div id="dutyStatusTag" style="color:#e74c3c; font-size:14px; font-weight:800;">● OFFLINE</div>
-        <div style="font-size:11px; color:#888;">ड्युटी स्थिती बदला</div>
+        <div id="txtDutySub" style="font-size:11px; color:#888;">ड्युटी स्थिती बदला</div>
       </div>
       <button id="btnToggleDuty" onclick="toggleRiderDuty()" style="width:auto; padding:8px 16px; margin:0; font-size:12px; background:#2ecc71;">ONLINE या</button>
     </div>
@@ -204,13 +206,12 @@
     <div id="riderNoticeBanner" class="banner-strip hidden"></div>
 
     <div id="rejectedBanner" class="card hidden" style="background:#2b1212; border:2px solid #e74c3c;">
-      <h4 style="color:#ff6b6b;">❌ तुमची कागदपत्रे / KYC नाकारली गेली आहे!</h4>
+      <h4 style="color:#ff6b6b;">❌ KYC Rejected!</h4>
       <p id="rejectReasonText" style="font-size:13px; color:#ddd; margin:6px 0;"></p>
       <div class="doc-upload-box">
-        <label style="font-size:12px; color:#4db8ff;">पुन्हा थेट कॅमेऱ्याने स्पष्ट कागदपत्राचा फोटो काढा:</label>
         <video id="reupVideo" autoplay playsinline class="hidden"></video>
-        <button type="button" onclick="openCamera('reup')" style="background:#3498db; color:#fff; font-size:13px;">📷 कॅमेरा उघडा</button>
-        <button type="button" id="btnSnapReup" onclick="submitReuploadDoc()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ फोटो पाठवा</button>
+        <button type="button" onclick="openCamera('reup')" style="background:#3498db; color:#fff; font-size:13px;">📷 Open Camera</button>
+        <button type="button" id="btnSnapReup" onclick="submitReuploadDoc()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ Submit</button>
       </div>
     </div>
 
@@ -223,7 +224,7 @@
     </div>
 
     <div id="onboardingBanner" class="card" style="background:#261408; border-color:#ff6600;">
-      <h4 style="color:#ff6600;">खाते सक्रिय करा (Onboarding Fee: ₹<span class="dynFee">1000</span>)</h4>
+      <h4 style="color:#ff6600;">Onboarding Fee: ₹<span class="dynFee">1000</span></h4>
       <button onclick="payOnboarding()">₹<span class="dynFee">1000</span> शुल्क जमा करा</button>
     </div>
 
@@ -243,14 +244,14 @@
     <div id="dashboardRefCard" class="ref-share-card">
       <h3 style="color:#2ecc71; font-size:15px;">🎁 तुमच्या झोनमध्ये मित्राला रेफर करा व कमवा ₹<span class="dynRefBonus">500</span>!</h3>
       <p style="font-size:12px; color:#ddd; margin-top:4px;">तुमच्या मित्राने <b id="lblRefValidDays">30</b> दिवसांत <b id="lblRefTarget">25</b> ऑर्डर्स पूर्ण केल्यास तुम्हाला <b>₹<span class="dynRefBonus">500</span></b> आणि मित्राला <b>₹<span class="dynRefereeBonus">300</span></b> बोनस मिळेल!</p>
-      <div class="ref-code-pill">तुमचा रेफरल कोड: <span id="myRefCodeText">----------</span></div>
+      <div class="ref-code-pill"><span id="txtRefCodeLbl">तुमचा रेफरल कोड:</span> <span id="myRefCodeText">----------</span></div>
       <a id="waShareRefBtn" href="#" target="_blank" class="wa-btn">📲 WhatsApp वर मित्रांना रेफर लिंक पाठवा</a>
     </div>
 
     <div class="card"><h3 id="txtActiveDelTitle" style="color:#ff6600; margin-bottom:10px;">माझ्या चालू डिलिव्हरी</h3><div id="myDeliveries">कोणतीही चालू ऑर्डर नाही.</div></div>
 
     <div class="card">
-      <h3 id="txtNewOrdersTitle" style="color:#ff6600; margin-bottom:6px;">नवीन उपलब्ध ऑर्डर्स (२ किमी परिसर)</h3>
+      <h3 id="txtNewOrdersTitle" style="color:#ff6600; margin-bottom:6px;">नवीन उपलब्ध ऑर्डर्स</h3>
       <div id="availableOrders">जवळपासच्या ऑर्डर्स शोधत आहे...</div>
     </div>
   </div>
@@ -260,7 +261,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, doc, setDoc, getDoc, updateDoc, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, doc, setDoc, getDoc, getDocs, updateDoc, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAxfFnHbLimC3PEO5svXvn3sxH7yn9JEAw",
@@ -275,12 +276,58 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const OTP_VALID_MS = 10 * 60 * 1000; // १० मिनिटे वैधता
+
+  const i18n = {
+    mr: {
+      langName: "मराठी", allowPerm: "परवानगी द्या", promoHead: "🚀 GoParcel पार्टनर बना आणि घरबसल्या कमावा", perMonth: "महिना", joinBonusLbl: "जॉइनिंग बोनस!", tcTiny: "* नियम व अटी लागू (T&C Apply)", zonePrefix: "तुमचा सक्रिय झोन:",
+      portalTitle: "रायडर पार्टनर पोर्टल", tabLogin: "🔑 जुना रायडर लॉगिन", tabReg: "📝 नवीन रायडर नोंदणी", phLoginPhone: "१० अंकी नोंदणीकृत मोबाईल नंबर", btnReqOtp: "नवीन लॉगिन OTP मागवा", btnWaAdmin: "📲 Admin ला WhatsApp वर कळवा", phOtp: "Admin ने दिलेला ६ अंकी OTP टाका", btnLogin: "डॅशबोर्ड उघडा (Login)",
+      phName: "पूर्ण नाव (आधार कार्डप्रमाणे)", phPhone: "१० अंकी खरा मोबाईल नंबर", lblVehType: "वाहनाचा प्रकार निवडा (Vehicle Type):", phVehNo: "गाडीचा नंबर (उदा. MH12AB1234)", lblRefInput: "🎁 मित्राचा रेफरल नंबर (असल्यास टाका):", phRefBy: "रेफर करणाऱ्या रायडरचा १० अंकी नंबर",
+      lblAadhaar: "🪪 आधार कार्ड नंबर व Live Camera फोटो:", phAadhaar: "१२ अंकी आधार कार्ड नंबर", btnScanAadhaar: "📷 आधार कार्ड स्कॅन करा",
+      lblLic: "🚗 ड्रायव्हिंग लायसन्स नंबर व Live Camera फोटो:", phLic: "ड्रायव्हिंग लायसन्स नंबर", btnScanLic: "📷 लायसन्स स्कॅन करा",
+      lblRc: "📄 गाडीचा RC बुक नंबर व Live Camera फोटो:", phRc: "गाडीचा RC बुक नंबर", btnScanRc: "📷 RC बुक स्कॅन करा",
+      lblPan: "💳 पॅन कार्ड नंबर व Live Camera फोटो:", phPan: "पॅन कार्ड नंबर", btnScanPan: "📷 पॅन कार्ड स्कॅन करा",
+      lblSelfie: "📸 नोंदणीसाठी तुमचा मूळ थेट सेल्फी काढा:", btnOpenSelfie: "🤳 फ्रंट कॅमेरा उघडा", declTitle: "📜 रायडर पार्टनर घोषणापत्र:", declText: "मी स्वतःच्या जबाबदारीवर आणि सर्व सरकारी व वाहतूक नियमांचे पालन करून डिलिव्हरी सेवा देईन.",
+      btnCheckReg: "कागदपत्रे तपासा व OTP मागवा", btnRegDone: "नोंदणी पूर्ण करा (Register)", dutySub: "ड्युटी स्थिती बदला", dailyTitle: "📸 आजची ड्युटी सुरू करा (Daily Selfie)", dailyDesc: "दररोज ऑनलाईन येताना तुमचा ताजा लाईव्ह सेल्फी काढणे अनिवार्य आहे.", btnDutyCam: "🤳 ड्युटी सेल्फीसाठी कॅमेरा उघडा", waitApp: "⏳ Admin मंजुरीच्या प्रतीक्षेत",
+      walletTitle: "माझे वॉलेट (Wallet)", netLabel: "ऑर्डर कमाई", bonusLabel: "बोनस (Refer/Join)", commLabel: "कमिशन", refCodeLbl: "तुमचा रेफरल कोड:", waShareBtn: "📲 WhatsApp वर मित्रांना रेफर लिंक पाठवा", activeDelTitle: "माझ्या चालू डिलिव्हरी", newOrdersTitle: "नवीन उपलब्ध ऑर्डर्स",
+      waLoginMsg: (name, phone, time) => `नमस्कार GoParcel Admin, मी रायडर ${name} (${phone}) आत्ता (${time}) लॉगिन करत आहे. कृपया मला मराठीत OTP पाठवा (१० मिनिटे वैध).`,
+      waRegMsg: (name, phone, time) => `नमस्कार GoParcel Admin, मी नवीन रायडर ${name} (${phone}) आत्ता (${time}) नोंदणी करत आहे. कृपया मला मराठीत OTP पाठवा (१० मिनिटे वैध).`
+    },
+    hi: {
+      langName: "हिंदी", allowPerm: "अनुमति दें", promoHead: "🚀 GoParcel पार्टनर बनें और घर बैठे कमाएं", perMonth: "महीना", joinBonusLbl: "जॉइनिंग बोनस!", tcTiny: "* नियम एवं शर्तें लागू (T&C Apply)", zonePrefix: "आपका सक्रिय ज़ोन:",
+      portalTitle: "राइडर पार्टनर पोर्टल", tabLogin: "🔑 पुराना राइडर लॉगिन", tabReg: "📝 नया राइडर पंजीकरण", phLoginPhone: "१० अंकों का पंजीकृत मोबाइल नंबर", btnReqOtp: "नया लॉगिन OTP मांगें", btnWaAdmin: "📲 Admin को WhatsApp पर बताएं", phOtp: "Admin द्वारा दिया गया ६ अंकों का OTP डालें", btnLogin: "डैशबोर्ड खोलें (Login)",
+      phName: "पूरा नाम (आधार कार्ड के अनुसार)", phPhone: "१० अंकों का सही मोबाइल नंबर", lblVehType: "वाहन का प्रकार चुनें (Vehicle Type):", phVehNo: "गाड़ी नंबर (जैसे MH12AB1234)", lblRefInput: "🎁 दोस्त का रेफरल नंबर (यदि हो तो डालें):", phRefBy: "रेफर करने वाले राइडर का १० अंकों का नंबर",
+      lblAadhaar: "🪪 आधार कार्ड नंबर और Live Camera फोटो:", phAadhaar: "१२ अंकों का आधार कार्ड नंबर", btnScanAadhaar: "📷 आधार कार्ड स्कैन करें",
+      lblLic: "🚗 ड्राइविंग लाइसेंस नंबर और Live Camera फोटो:", phLic: "ड्राइविंग लाइसेंस नंबर", btnScanLic: "📷 लाइसेंस स्कैन करें",
+      lblRc: "📄 गाड़ी का RC बुक नंबर और Live Camera फोटो:", phRc: "गाड़ी का RC बुक नंबर", btnScanRc: "📷 RC बुक स्कैन करें",
+      lblPan: "💳 पैन कार्ड नंबर और Live Camera फोटो:", phPan: "पैन कार्ड नंबर", btnScanPan: "📷 पैन कार्ड स्कैन करें",
+      lblSelfie: "📸 पंजीकरण के लिए अपनी लाइव सेल्फी लें:", btnOpenSelfie: "🤳 फ्रंट कैमरा खोलें", declTitle: "📜 राइडर पार्टनर घोषणापत्र:", declText: "मैं अपनी जिम्मेदारी पर और सभी सरकारी व यातायात नियमों का पालन करते हुए डिलीवरी सेवा दूंगा।",
+      btnCheckReg: "दस्तावेज़ जांचें और OTP मांगें", btnRegDone: "पंजीकरण पूरा करें (Register)", dutySub: "ड्यूटी स्थिति बदलें", dailyTitle: "📸 आज की ड्यूटी शुरू करें (Daily Selfie)", dailyDesc: "रोज़ाना ऑनलाइन आने के लिए अपनी ताज़ा लाइव सेल्फी लेना अनिवार्य है।", btnDutyCam: "🤳 ड्यूटी सेल्फी के लिए कैमरा खोलें", waitApp: "⏳ Admin की मंजूरी की प्रतीक्षा में",
+      walletTitle: "मेरा वॉलेट (Wallet)", netLabel: "ऑर्डर कमाई", bonusLabel: "बोनस (Refer/Join)", commLabel: "कमीशन", refCodeLbl: "आपका रेफरल कोड:", waShareBtn: "📲 WhatsApp पर दोस्तों को रेफर लिंक भेजें", activeDelTitle: "मेरी चालू डिलीवरी", newOrdersTitle: "नए उपलब्ध ऑर्डर",
+      waLoginMsg: (name, phone, time) => `नमस्ते GoParcel Admin, मैं राइडर ${name} (${phone}) अभी (${time}) लॉगिन कर रहा हूँ। कृपया मुझे हिंदी में OTP भेजें।`,
+      waRegMsg: (name, phone, time) => `नमस्ते GoParcel Admin, मैं नया राइडर ${name} (${phone}) अभी (${time}) पंजीकरण कर रहा हूँ। कृपया मुझे हिंदी में OTP भेजें।`
+    },
+    en: {
+      langName: "English", allowPerm: "Allow Access", promoHead: "🚀 Become a GoParcel Partner & Earn", perMonth: "Month", joinBonusLbl: "Joining Bonus!", tcTiny: "* Terms & Conditions Apply", zonePrefix: "Your Active Zone:",
+      portalTitle: "Rider Partner Portal", tabLogin: "🔑 Existing Rider Login", tabReg: "📝 New Rider Register", phLoginPhone: "10-digit registered mobile number", btnReqOtp: "Request Login OTP", btnWaAdmin: "📲 Notify Admin on WhatsApp", phOtp: "Enter 6-digit OTP from Admin", btnLogin: "Open Dashboard (Login)",
+      phName: "Full Name (as per Aadhaar)", phPhone: "10-digit valid mobile number", lblVehType: "Select Vehicle Type:", phVehNo: "Vehicle Number (e.g. MH12AB1234)", lblRefInput: "🎁 Friend's Referral Number (Optional):", phRefBy: "Referrer's 10-digit mobile number",
+      lblAadhaar: "🪪 Aadhaar Number & Live Camera Photo:", phAadhaar: "12-digit Aadhaar Number", btnScanAadhaar: "📷 Scan Aadhaar Card",
+      lblLic: "🚗 Driving License Number & Live Photo:", phLic: "Driving License Number", btnScanLic: "📷 Scan Driving License",
+      lblRc: "📄 Vehicle RC Book Number & Live Photo:", phRc: "RC Book Number", btnScanRc: "📷 Scan RC Book",
+      lblPan: "💳 PAN Card Number & Live Photo:", phPan: "PAN Card Number", btnScanPan: "📷 Scan PAN Card",
+      lblSelfie: "📸 Capture Live Selfie for Registration:", btnOpenSelfie: "🤳 Open Front Camera", declTitle: "📜 Rider Partner Declaration:", declText: "I agree to provide delivery services at my own responsibility while complying with all traffic and government laws.",
+      btnCheckReg: "Verify Docs & Request OTP", btnRegDone: "Complete Registration", dutySub: "Change Duty Status", dailyTitle: "📸 Start Today's Duty (Daily Selfie)", dailyDesc: "Capturing a live selfie daily is mandatory before going ONLINE.", btnDutyCam: "🤳 Open Camera for Duty Selfie", waitApp: "⏳ Waiting for Admin Approval",
+      walletTitle: "My Wallet", netLabel: "Order Earnings", bonusLabel: "Bonus (Refer/Join)", commLabel: "Commission", refCodeLbl: "Your Referral Code:", waShareBtn: "📲 Share Referral Link on WhatsApp", activeDelTitle: "My Active Deliveries", newOrdersTitle: "New Nearby Orders",
+      waLoginMsg: (name, phone, time) => `Hello GoParcel Admin, I am Rider ${name} (${phone}) logging in at (${time}). Please send my OTP in English (valid 10 mins).`,
+      waRegMsg: (name, phone, time) => `Hello GoParcel Admin, I am new Rider ${name} (${phone}) registering at (${time}). Please send my OTP in English (valid 10 mins).`
+    }
+  };
 
   let curLang = localStorage.getItem("gp_rider_lang") || "mr";
-  let adminWaNumber = "919999999999", currentOnboardingFee = 1000, currentCommPct = 20, maxRadiusKm = 2;
+  let adminWaNumber = "919049505512", currentOnboardingFee = 1000, currentCommPct = 20, maxRadiusKm = 2;
   let reqDailySelfie = true, reqLoudAlert = true, isDutyVerifiedToday = false, isRiderManualOnline = true;
   let isFeePaid = false, isApproved = false, existingRiderName = "", activeRiderId = null, activeRiderName = "", myVehicleType = "2-Wheeler";
-  let rLoginReqId = null, rRegReqId = null, regSelfieData = "", activeStream = null;
+  let rLoginReqId = null, rRegReqId = null, rOtpTimer = null, regSelfieData = "", activeStream = null;
   let docPhotos = { aadhaar: "", license: "", rc: "", pan: "" };
   let riderLat = null, riderLng = null, lastKnownOrderCount = -1, detectedZoneName = "General";
   let activeZones = [];
@@ -290,6 +337,36 @@
   const todayStr = new Date().toISOString().split('T')[0];
   function getNowTimeStr() { return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
 
+  function startRiderOtpTimerUI(expiresAt, labelId) {
+    if (rOtpTimer) clearInterval(rOtpTimer);
+    const el = document.getElementById(labelId);
+    const tick = () => {
+      const rem = expiresAt - Date.now();
+      if (rem <= 0) {
+        el.innerText = "❌ OTP कालबाह्य (Expired)! कृपया Resend OTP दाबा.";
+        el.style.color = "#ff6b6b";
+        clearInterval(rOtpTimer);
+      } else {
+        const m = String(Math.floor(rem / 60000)).padStart(2, '0');
+        const s = String(Math.floor((rem % 60000) / 1000)).padStart(2, '0');
+        el.innerText = `⏳ OTP वैधता बाकी: ${m}:${s}`;
+        el.style.color = "#4db8ff";
+      }
+    };
+    tick();
+    rOtpTimer = setInterval(tick, 1000);
+  }
+
+  async function invalidateOldRiderPendingOtps(phone) {
+    try {
+      const qOld = query(collection(db, "otpRequests"), where("phone", "==", phone), where("status", "==", "Pending"));
+      const snap = await getDocs(qOld);
+      const promises = [];
+      snap.forEach(d => promises.push(updateDoc(doc(db, "otpRequests", d.id), { status: "Expired" })));
+      await Promise.all(promises);
+    } catch (e) {}
+  }
+
   function getDistanceKm(lat1, lon1, lat2, lon2) {
     if (!lat1 || !lon1 || !lat2 || !lon2) return 0;
     const R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLon = (lon2 - lon1) * Math.PI / 180;
@@ -298,11 +375,12 @@
   }
 
   function detectMyServiceZone() {
+    const t = i18n[curLang] || i18n.mr;
     if (!riderLat || !riderLng || activeZones.length === 0) return;
     let found = "Out of Zone";
     activeZones.forEach(z => { if (getDistanceKm(riderLat, riderLng, z.lat, z.lng) <= z.radiusKm) found = z.name; });
     detectedZoneName = found;
-    document.getElementById('detectedZoneLabel').innerText = `तुमचा सक्रिय झोन: ${found}`;
+    document.getElementById('detectedZoneLabel').innerText = `${t.zonePrefix} ${found}`;
   }
 
   onSnapshot(query(collection(db, "serviceZones"), where("active", "==", true)), (snap) => {
@@ -329,16 +407,79 @@
     }
     if ("Notification" in window && Notification.permission === "granted") {
       try {
-        const n = new Notification("🚨 नवीन GoParcel ऑर्डर आली आहे!", { body: orderInfo || "जवळपास नवीन पार्सल ऑर्डर उपलब्ध आहे!", requireInteraction: true });
+        const n = new Notification("🚨 New GoParcel Order!", { body: orderInfo || "New parcel order available nearby!", requireInteraction: true });
         n.onclick = () => { window.focus(); n.close(); };
       } catch (e) {}
     }
   }
 
   window.changeAppLang = (lang) => {
-    curLang = lang;
-    localStorage.setItem("gp_rider_lang", lang);
-    document.getElementById('appLangSelect').value = lang;
+    curLang = lang || document.getElementById('appLangSelect').value;
+    localStorage.setItem("gp_rider_lang", curLang);
+    document.getElementById('appLangSelect').value = curLang;
+    const t = i18n[curLang] || i18n.mr;
+
+    document.getElementById('btnAllowPerm').innerText = t.allowPerm;
+    document.getElementById('txtPromoHead').innerText = t.promoHead;
+    document.getElementById('txtPerMonth').innerText = t.perMonth;
+    document.getElementById('txtJoinBonusLbl').innerText = t.joinBonusLbl;
+    document.getElementById('txtTcTiny').innerText = t.tcTiny;
+    detectMyServiceZone();
+
+    document.getElementById('txtPortalTitle').innerText = t.portalTitle;
+    document.getElementById('rTabLogin').innerText = t.tabLogin;
+    document.getElementById('rTabReg').innerText = t.tabReg;
+    document.getElementById('rLoginPhone').placeholder = t.phLoginPhone;
+    document.getElementById('btnReqLoginOtp').innerText = t.btnReqOtp;
+    document.getElementById('rLoginWaLink').innerText = t.btnWaAdmin;
+    document.getElementById('rLoginOtpInput').placeholder = t.phOtp;
+    document.getElementById('btnVerifyLogin').innerText = t.btnLogin;
+
+    document.getElementById('rName').placeholder = t.phName;
+    document.getElementById('rPhone').placeholder = t.phPhone;
+    document.getElementById('lblVehType').innerText = t.lblVehType;
+    document.getElementById('rVehicle').placeholder = t.phVehNo;
+    document.getElementById('lblRefInput').innerText = t.lblRefInput;
+    document.getElementById('rReferredBy').placeholder = t.phRefBy;
+
+    document.getElementById('lblAadhaarBox').innerText = t.lblAadhaar;
+    document.getElementById('rAadhaar').placeholder = t.phAadhaar;
+    document.getElementById('btnScanAadhaar').innerText = t.btnScanAadhaar;
+
+    document.getElementById('lblLicBox').innerText = t.lblLic;
+    document.getElementById('rLicense').placeholder = t.phLic;
+    document.getElementById('btnScanLic').innerText = t.btnScanLic;
+
+    document.getElementById('lblRcBox').innerText = t.lblRc;
+    document.getElementById('rRcBook').placeholder = t.phRc;
+    document.getElementById('btnScanRc').innerText = t.btnScanRc;
+
+    document.getElementById('lblPanBox').innerText = t.lblPan;
+    document.getElementById('rPanCard').placeholder = t.phPan;
+    document.getElementById('btnScanPan').innerText = t.btnScanPan;
+
+    document.getElementById('lblSelfieTitle').innerText = t.lblSelfie;
+    document.getElementById('btnOpenSelfie').innerText = t.btnOpenSelfie;
+    document.getElementById('lblPartnerDeclTitle').innerText = t.declTitle;
+    document.getElementById('lblPartnerDeclText').innerText = t.declText;
+    document.getElementById('btnStartReg').innerText = t.btnCheckReg;
+    document.getElementById('rRegWaLink').innerText = t.btnWaAdmin;
+    document.getElementById('rRegOtpInput').placeholder = t.phOtp;
+    document.getElementById('btnVerifyReg').innerText = t.btnRegDone;
+
+    document.getElementById('txtDutySub').innerText = t.dutySub;
+    document.getElementById('txtDailySelfieTitle').innerText = t.dailyTitle;
+    document.getElementById('txtDailySelfieDesc').innerText = t.dailyDesc;
+    document.getElementById('btnOpenDutyCam').innerText = t.btnDutyCam;
+    document.getElementById('txtWaitApproval').innerText = t.waitApp;
+    document.getElementById('txtWalletTitle').innerText = t.walletTitle;
+    document.getElementById('txtNetLabel').innerText = t.netLabel;
+    document.getElementById('txtBonusLabel').innerText = t.bonusLabel;
+    document.getElementById('txtCommLabel').innerText = t.commLabel;
+    document.getElementById('txtRefCodeLbl').innerText = t.refCodeLbl;
+    document.getElementById('waShareRefBtn').innerText = t.waShareBtn;
+    document.getElementById('txtActiveDelTitle').innerText = t.activeDelTitle;
+    document.getElementById('txtNewOrdersTitle').innerText = t.newOrdersTitle;
   };
 
   window.requestAllAppPermissions = async () => {
@@ -383,7 +524,7 @@
   onSnapshot(doc(db, "config", "appSettings"), (snap) => {
     if (snap.exists()) {
       const s = snap.data();
-      adminWaNumber = s.adminWa || "919999999999";
+      adminWaNumber = s.adminWa || "919049505512";
       currentOnboardingFee = s.onboardingFee ?? 1000;
       currentCommPct = s.commission ?? 20;
       maxRadiusKm = s.pickupRadiusKm ?? 2;
@@ -429,7 +570,7 @@
       const vid = document.getElementById('vid_' + docKey);
       vid.srcObject = activeStream; vid.classList.remove('hidden');
       document.getElementById('snap_' + docKey).classList.remove('hidden');
-    } catch (e) { alert("कॅमेरा परवानगी (Allow) द्या!"); }
+    } catch (e) { alert("Camera permission required!"); }
   };
 
   window.captureDocCam = (docKey) => {
@@ -451,7 +592,7 @@
       const vid = document.getElementById(vidMap[mode]);
       vid.srcObject = activeStream; vid.classList.remove('hidden');
       document.getElementById(btnMap[mode]).classList.remove('hidden');
-    } catch (err) { alert("कॅमेरा परवानगी (Allow) द्या!"); }
+    } catch (err) { alert("Camera permission required!"); }
   };
 
   function captureBase64(videoEl) {
@@ -470,7 +611,7 @@
     const newDocImg = captureBase64(document.getElementById('reupVideo'));
     document.getElementById('btnSnapReup').classList.add('hidden');
     await updateDoc(doc(db, "riders", activeRiderId), { kycPhoto: newDocImg, kycRejected: false, rejectReason: "" });
-    alert("✅ नवीन कागदपत्रांचा थेट फोटो Admin कडे पाठवला आहे!");
+    alert("✅ Document sent to Admin!");
   };
 
   window.takeSnapshot = () => {
@@ -484,7 +625,7 @@
     const selfieImg = captureBase64(document.getElementById('dutyVideo'));
     document.getElementById('btnSnapDuty').classList.add('hidden');
     await updateDoc(doc(db, "riders", activeRiderId), { dailySelfie: selfieImg, lastDutyDate: todayStr, isOnline: true, lastSelfieTime: serverTimestamp() });
-    alert("✅ आजचा लाईव्ह सेल्फी व्हेरिफाय झाला! आता तुम्ही ONLINE आहात.");
+    alert("✅ Selfie verified! You are now ONLINE.");
   };
 
   window.toggleRiderDuty = async () => {
@@ -494,24 +635,54 @@
 
   window.startRiderLoginOtp = async () => {
     const phone = document.getElementById('rLoginPhone').value.trim();
-    if (phone.length !== 10 || isNaN(phone)) return alert("कृपया १० अंकी मोबाईल नंबर टाका!");
+    if (phone.length !== 10 || isNaN(phone)) return alert("Enter valid 10-digit mobile number!");
     const snap = await getDoc(doc(db, "riders", "rider_" + phone));
-    if (!snap.exists()) { alert("हा नंबर नोंदणीकृत नाही!"); switchRTab('reg'); return; }
+    if (!snap.exists()) { alert("Number not registered!"); switchRTab('reg'); return; }
     existingRiderName = snap.data().name || "Rider";
+
+    await invalidateOldRiderPendingOtps(phone);
+
+    const nowMs = Date.now();
+    const expiresAt = nowMs + OTP_VALID_MS;
     const secretOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const timeStr = getNowTimeStr();
-    const reqRef = await addDoc(collection(db, "otpRequests"), { role: "Rider (Login)", language: curLang, name: existingRiderName, phone, otp: secretOtp, timeStr, status: "Pending", createdAt: Date.now() });
+    const t = i18n[curLang] || i18n.mr;
+
+    const reqRef = await addDoc(collection(db, "otpRequests"), {
+      role: `Rider (Login - ${t.langName})`,
+      language: curLang,
+      name: existingRiderName,
+      phone,
+      otp: secretOtp,
+      timeStr,
+      status: "Pending",
+      createdAt: nowMs,
+      expiresAt: expiresAt
+    });
     rLoginReqId = reqRef.id;
-    document.getElementById('rLoginWaLink').href = `https://wa.me/${adminWaNumber}?text=${encodeURIComponent(`नमस्कार GoParcel Admin, मी रायडर ${existingRiderName} (${phone}) आत्ता (${timeStr}) लॉगिन करत आहे. कृपया OTP पाठवा.`)}`;
+    document.getElementById('rLoginOtpInput').value = "";
+    document.getElementById('rLoginWaLink').href = `https://wa.me/${adminWaNumber}?text=${encodeURIComponent(t.waLoginMsg(existingRiderName, phone, timeStr))}`;
     document.getElementById('rLoginOtpBox').classList.remove('hidden');
+    startRiderOtpTimerUI(expiresAt, 'rLoginOtpTimerLabel');
   };
 
   window.verifyRiderLoginOtp = async () => {
     const phone = document.getElementById('rLoginPhone').value.trim();
     const entered = document.getElementById('rLoginOtpInput').value.trim();
+    if (!rLoginReqId) return alert("Request OTP first!");
     const reqSnap = await getDoc(doc(db, "otpRequests", rLoginReqId));
-    if (!reqSnap.exists() || reqSnap.data().otp !== entered) return alert("चुकीचा OTP!");
+    if (!reqSnap.exists()) return alert("Invalid OTP!");
+    const d = reqSnap.data();
+
+    if (d.status !== "Pending") return alert("❌ हा जुना OTP बाद (Invalid) झाला आहे! नवीन OTP टाका.");
+    if (Date.now() > (d.expiresAt || (d.createdAt + OTP_VALID_MS))) {
+      await updateDoc(doc(db, "otpRequests", rLoginReqId), { status: "Expired" });
+      return alert("⏳ या OTP ची १० मिनिटांची मुदत संपली आहे! कृपया Resend OTP दाबा.");
+    }
+    if (d.otp !== entered) return alert("❌ चुकीचा OTP!");
+
     await updateDoc(doc(db, "otpRequests", rLoginReqId), { status: "Verified" });
+    if (rOtpTimer) clearInterval(rOtpTimer);
     const rid = "rider_" + phone, label = `${existingRiderName} (${phone})`;
     localStorage.setItem("gp_verified_rider_id", rid); localStorage.setItem("gp_verified_rider_name", label);
     startRiderSession(rid, label);
@@ -519,7 +690,7 @@
 
   window.startRiderRegOtp = async () => {
     if (!document.getElementById('chkRiderLegalAgree').checked) {
-      return alert("⚠️ कृपया आधी 'रायडर नियम व अटी (Partner Terms & Conditions)' च्या चेकबॉक्सवर टिक (✓) करा!");
+      return alert("⚠️ Please accept Rider Partner Terms & Conditions first!");
     }
     const name = document.getElementById('rName').value.trim();
     const phone = document.getElementById('rPhone').value.trim();
@@ -531,25 +702,30 @@
     const rc = document.getElementById('rRcBook').value.trim().toUpperCase();
     const pan = document.getElementById('rPanCard').value.trim().toUpperCase();
 
-    if (!name || phone.length !== 10 || !vehicleNo) return alert("कृपया नाव, मोबाईल आणि गाडीचा नंबर भरा!");
-    if (referredBy && referredBy === phone) return alert("तुम्ही स्वतःचाच नंबर रेफरल म्हणून टाकू शकत नाही!");
+    if (!name || phone.length !== 10 || !vehicleNo) return alert("Fill Name, Mobile & Vehicle Number!");
+    if (referredBy && referredBy === phone) return alert("Cannot use own number as referral!");
     if (referredBy && referredBy.length === 10) {
       const refSnap = await getDoc(doc(db, "riders", "rider_" + referredBy));
-      if (!refSnap.exists()) return alert("❌ तुम्ही टाकलेला रेफरल मोबाईल नंबर GoParcel वर नोंदणीकृत नाही!");
+      if (!refSnap.exists()) return alert("❌ Referral mobile number not found!");
       const refZone = refSnap.data().serviceZone || "General";
       if (refRules.sameZoneOnly && detectedZoneName !== "General" && refZone !== "General" && refZone !== detectedZoneName) {
-        return alert(`❌ हा रेफरल कोड दुसऱ्या झोनचा (${refZone}) आहे. नियमनुसार फक्त तुमच्याच झोनमधील (${detectedZoneName}) रायडरचा रेफरल चालेल!`);
+        return alert(`❌ Referral must belong to your active zone (${detectedZoneName})!`);
       }
     }
-    if (docRules.docAadhaar && (!isValidAadhaar(aadhaar) || !docPhotos.aadhaar)) return alert("❌ कृपया अचूक आधार नंबर आणि आधारचा Live Camera फोटो काढा!");
-    if (docRules.docLicense && (license.length < 8 || !docPhotos.license)) return alert("❌ कृपया लायसन्स नंबर आणि लायसन्सचा Live Camera फोटो काढा!");
-    if (docRules.docRcBook && (!rc || !docPhotos.rc)) return alert("❌ कृपया RC बुक नंबर आणि RC चा Live Camera फोटो काढा!");
-    if (docRules.docPanCard && (!pan || !docPhotos.pan)) return alert("❌ कृपया पॅन कार्ड नंबर आणि पॅनचा Live Camera फोटो काढा!");
-    if (!regSelfieData) return alert("❌ कृपया कॅमेऱ्याने तुमचा मूळ सेल्फी फोटो काढा!");
+    if (docRules.docAadhaar && (!isValidAadhaar(aadhaar) || !docPhotos.aadhaar)) return alert("❌ Enter valid Aadhaar & capture Live Photo!");
+    if (docRules.docLicense && (license.length < 8 || !docPhotos.license)) return alert("❌ Enter valid License & capture Live Photo!");
+    if (docRules.docRcBook && (!rc || !docPhotos.rc)) return alert("❌ Enter RC Number & capture Live Photo!");
+    if (docRules.docPanCard && (!pan || !docPhotos.pan)) return alert("❌ Enter PAN Number & capture Live Photo!");
+    if (!regSelfieData) return alert("❌ Capture Live Selfie!");
+
+    await invalidateOldRiderPendingOtps(phone);
 
     const kycSummary = [aadhaar ? `Aadhaar:${aadhaar}` : '', license ? `DL:${license}` : '', rc ? `RC:${rc}` : '', pan ? `PAN:${pan}` : ''].filter(Boolean).join(' | ');
+    const nowMs = Date.now();
+    const expiresAt = nowMs + OTP_VALID_MS;
     const secretOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const timeStr = getNowTimeStr();
+    const t = i18n[curLang] || i18n.mr;
 
     await setDoc(doc(db, "riders", "rider_" + phone), {
       name, phone, vehicleType, vehicleNo, serviceZone: detectedZoneName,
@@ -563,19 +739,42 @@
       regSelfie: regSelfieData, kycRejected: false, rejectReason: ""
     }, { merge: true });
 
-    const reqRef = await addDoc(collection(db, "otpRequests"), { role: "Rider (New)", language: curLang, name, phone, otp: secretOtp, timeStr, status: "Pending", createdAt: Date.now() });
+    const reqRef = await addDoc(collection(db, "otpRequests"), {
+      role: `Rider (New - ${t.langName})`,
+      language: curLang,
+      name,
+      phone,
+      otp: secretOtp,
+      timeStr,
+      status: "Pending",
+      createdAt: nowMs,
+      expiresAt: expiresAt
+    });
     rRegReqId = reqRef.id;
-    document.getElementById('rRegWaLink').href = `https://wa.me/${adminWaNumber}?text=${encodeURIComponent(`नमस्कार GoParcel Admin, मी नवीन रायडर ${name} (${phone}) आत्ता (${timeStr}) नोंदणी करत आहे. कृपया OTP पाठवा.`)}`;
+    document.getElementById('rRegOtpInput').value = "";
+    document.getElementById('rRegWaLink').href = `https://wa.me/${adminWaNumber}?text=${encodeURIComponent(t.waRegMsg(name, phone, timeStr))}`;
     document.getElementById('rRegOtpBox').classList.remove('hidden');
+    startRiderOtpTimerUI(expiresAt, 'rRegOtpTimerLabel');
   };
 
   window.verifyRiderRegOtp = async () => {
     const name = document.getElementById('rName').value.trim();
     const phone = document.getElementById('rPhone').value.trim();
     const entered = document.getElementById('rRegOtpInput').value.trim();
+    if (!rRegReqId) return alert("Request OTP first!");
     const reqSnap = await getDoc(doc(db, "otpRequests", rRegReqId));
-    if (!reqSnap.exists() || reqSnap.data().otp !== entered) return alert("चुकीचा OTP!");
+    if (!reqSnap.exists()) return alert("Invalid OTP!");
+    const d = reqSnap.data();
+
+    if (d.status !== "Pending") return alert("❌ हा जुना OTP बाद (Invalid) झाला आहे! नवीन OTP टाका.");
+    if (Date.now() > (d.expiresAt || (d.createdAt + OTP_VALID_MS))) {
+      await updateDoc(doc(db, "otpRequests", rRegReqId), { status: "Expired" });
+      return alert("⏳ या OTP ची १० मिनिटांची मुदत संपली आहे! कृपया Resend OTP दाबा.");
+    }
+    if (d.otp !== entered) return alert("❌ चुकीचा OTP!");
+
     await updateDoc(doc(db, "otpRequests", rRegReqId), { status: "Verified" });
+    if (rOtpTimer) clearInterval(rOtpTimer);
     const rid = "rider_" + phone;
     await updateDoc(doc(db, "riders", rid), { mobileVerified: true, feePaid: false, approved: false, isOnline: true, createdAt: serverTimestamp() });
     const label = `${name} (${phone})`;
@@ -584,22 +783,22 @@
   };
 
   window.logoutRider = () => { localStorage.removeItem("gp_verified_rider_id"); localStorage.removeItem("gp_verified_rider_name"); location.reload(); };
-  window.payOnboarding = async () => { await updateDoc(doc(db, "riders", activeRiderId), { feePaid: true, paidAmount: currentOnboardingFee }); alert("शुल्क जमा झाले!"); };
+  window.payOnboarding = async () => { await updateDoc(doc(db, "riders", activeRiderId), { feePaid: true, paidAmount: currentOnboardingFee }); alert("Fee Paid!"); };
   window.acceptOrder = async (orderId) => {
-    if (reqDailySelfie && !isDutyVerifiedToday) return alert("आधी आजचा लाईव्ह ड्युटी सेल्फी काढून ONLINE या!");
-    if (!isFeePaid && currentOnboardingFee > 0) return alert(`आधी ₹${currentOnboardingFee} ऑनबोर्डिंग शुल्क भरा!`);
-    if (!isApproved) return alert("तुमच्या खात्याला अजून Admin ची मंजुरी मिळालेली नाही!");
+    if (reqDailySelfie && !isDutyVerifiedToday) return alert("Complete Daily Selfie first!");
+    if (!isFeePaid && currentOnboardingFee > 0) return alert(`Pay ₹${currentOnboardingFee} onboarding fee first!`);
+    if (!isApproved) return alert("Account pending Admin approval!");
     await updateDoc(doc(db, "orders", orderId), { status: "Accepted", riderId: activeRiderId, riderEmail: activeRiderName });
   };
 
   window.completeOrderWithPin = async (orderId, expectedPin) => {
     if (expectedPin) {
-      const enteredPin = prompt("कस्टमरकडून ४-अंकी डिलिव्हरी PIN विचारून टाका:");
+      const enteredPin = prompt("Enter 4-digit Delivery PIN from Customer:");
       if (!enteredPin) return;
-      if (enteredPin.trim() !== expectedPin) return alert("❌ चुकीचा डिलिव्हरी PIN!");
+      if (enteredPin.trim() !== expectedPin) return alert("❌ Incorrect Delivery PIN!");
     }
     await updateDoc(doc(db, "orders", orderId), { status: "Delivered", deliveredAt: serverTimestamp() });
-    alert("🎉 डिलिव्हरी पूर्ण झाली!");
+    alert("🎉 Delivery Completed!");
   };
 
   function startGpsTracking(rid) {
@@ -620,7 +819,7 @@
 
     const myPhoneCode = rid.replace("rider_", "");
     document.getElementById('myRefCodeText').innerText = myPhoneCode;
-    const shareText = `🚀 GoParcel पार्टनर व्हा आणि दरमहा ₹${refRules.earnMin.toLocaleString('en-IN')} ते ₹${refRules.earnMax.toLocaleString('en-IN')} कमवा! नवीन जॉइनिंगवर ₹${refRules.joinBonus} पर्यंत बोनस मिळेल. नोंदणी करताना माझा रेफरल नंबर टाका: ${myPhoneCode}\nलिंक: https://madhavdevkar111-rgb.github.io/goparcellive/Rider/`;
+    const shareText = `🚀 Join GoParcel & earn ₹${refRules.earnMin.toLocaleString('en-IN')} - ₹${refRules.earnMax.toLocaleString('en-IN')}/month + ₹${refRules.joinBonus} Joining Bonus! Use Referral Code: ${myPhoneCode}\nLink: https://madhavdevkar111-rgb.github.io/goparcellive/Rider/`;
     document.getElementById('waShareRefBtn').href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
 
     startGpsTracking(rid);
@@ -637,7 +836,7 @@
 
         document.getElementById('bonusEarnings').innerText = r.bonusEarned || 0;
         document.getElementById('rejectedBanner').classList.toggle('hidden', !r.kycRejected);
-        if (r.kycRejected) document.getElementById('rejectReasonText').innerText = "कारण: " + (r.rejectReason || "कागदपत्र स्पष्ट नाही.");
+        if (r.kycRejected) document.getElementById('rejectReasonText').innerText = r.rejectReason || "Document unclear.";
 
         document.getElementById('dailySelfieCard').classList.toggle('hidden', !needSelfie);
         document.getElementById('onboardingBanner').classList.toggle('hidden', isFeePaid || currentOnboardingFee === 0);
@@ -647,10 +846,10 @@
         const btnDuty = document.getElementById('btnToggleDuty');
         if (!needSelfie && isApproved && isRiderManualOnline) {
           tag.innerText = `● ONLINE (${myVehicleType})`; tag.style.color = "#2ecc71";
-          btnDuty.innerText = "OFFLINE व्हा"; btnDuty.style.background = "#e74c3c"; btnDuty.style.color = "#fff";
+          btnDuty.innerText = "GO OFFLINE"; btnDuty.style.background = "#e74c3c"; btnDuty.style.color = "#fff";
         } else {
           tag.innerText = "● OFFLINE / PENDING"; tag.style.color = "#ff6600";
-          btnDuty.innerText = "ONLINE या"; btnDuty.style.background = "#2ecc71"; btnDuty.style.color = "#000";
+          btnDuty.innerText = "GO ONLINE"; btnDuty.style.background = "#2ecc71"; btnDuty.style.color = "#000";
         }
       }
     });
@@ -658,7 +857,7 @@
     onSnapshot(query(collection(db, "orders"), where("status", "==", "Pending")), (snap) => {
       const div = document.getElementById('availableOrders');
       div.innerHTML = "";
-      if (!isRiderManualOnline) { div.innerHTML = "तुम्ही सध्या OFFLINE आहात."; return; }
+      if (!isRiderManualOnline) { div.innerHTML = "You are currently OFFLINE."; return; }
       let foundNearby = 0, latestSummary = "";
       snap.forEach(d => {
         const o = d.data();
@@ -666,12 +865,12 @@
         if (awayKm <= maxRadiusKm && (!o.vehicle || o.vehicle === myVehicleType)) {
           foundNearby++;
           const net = Math.round(o.fare * ((100 - currentCommPct) / 100));
-          latestSummary = `${o.vehicle} ऑर्डर | कमाई ₹${net} | ${awayKm.toFixed(1)} km दूर`;
+          latestSummary = `${o.vehicle} | Earn ₹${net} | ${awayKm.toFixed(1)} km away`;
           div.innerHTML += `<div class="order-card">
             <div style="display:flex; justify-content:space-between;"><b>${o.vehicle} - ${o.parcel}</b><span style="color:#4db8ff; font-size:12px;">📍 ${awayKm.toFixed(1)} km</span></div>
             <small>🟢 Pickup: ${o.pickup}<br>🔴 Drop: ${o.drop}</small><br>
-            <div style="margin:6px 0; color:#2ecc71;">तुमची कमाई: <b>₹${net}</b> (₹${o.fare})</div>
-            <button onclick="acceptOrder('${d.id}')">ऑर्डर स्वीकारा (Accept)</button>
+            <div style="margin:6px 0; color:#2ecc71;">Earnings: <b>₹${net}</b> (Fare: ₹${o.fare})</div>
+            <button onclick="acceptOrder('${d.id}')">Accept Order</button>
           </div>`;
         }
       });
@@ -679,7 +878,7 @@
         triggerLoudOrderAlert(latestSummary);
       }
       lastKnownOrderCount = foundNearby;
-      if (foundNearby === 0) div.innerHTML = `तुमच्या ${maxRadiusKm} किमी परिसरात (${myVehicleType}) साठी सध्या नवीन ऑर्डर नाही.`;
+      if (foundNearby === 0) div.innerHTML = `No pending orders within ${maxRadiusKm} km for ${myVehicleType}.`;
     });
 
     onSnapshot(query(collection(db, "orders"), where("riderId", "==", rid)), (snap) => {
@@ -694,11 +893,11 @@
         } else {
           const gMapsUrl = o.pickupLat ? `https://www.google.com/maps/dir/?api=1&destination=${o.dropLat},${o.dropLng}&waypoints=${o.pickupLat},${o.pickupLng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.pickup)}`;
           const custPhone = o.customerPhone || o.phone || "";
-          const callHtml = custPhone ? `<a href="tel:${custPhone}" class="call-btn">📞 कस्टमरला कॉल करा</a>` : "";
+          const callHtml = custPhone ? `<a href="tel:${custPhone}" class="call-btn">📞 Call Customer</a>` : "";
           div.innerHTML += `<div class="order-card">
             <b>${o.vehicle} (${o.status})</b> - ₹${o.fare}<br><small>🟢 ${o.pickup} ➔ 🔴 ${o.drop}</small>
-            <div class="action-row"><a href="${gMapsUrl}" target="_blank" class="nav-map-btn">🗺️ रस्ता पहा</a>${callHtml}</div>
-            <button onclick="completeOrderWithPin('${d.id}', '${o.deliveryPin || ''}')" style="background:#2ecc71; margin-top:8px;">🔐 PIN टाकून डिलिव्हरी पूर्ण करा</button>
+            <div class="action-row"><a href="${gMapsUrl}" target="_blank" class="nav-map-btn">🗺️ Navigate</a>${callHtml}</div>
+            <button onclick="completeOrderWithPin('${d.id}', '${o.deliveryPin || ''}')" style="background:#2ecc71; margin-top:8px;">🔐 Complete with PIN</button>
           </div>`;
         }
       });
