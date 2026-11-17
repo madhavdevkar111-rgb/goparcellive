@@ -9,15 +9,14 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
     body { background: #0d0f12; color: #f5f5f5; padding-bottom: 24px; }
     header { background: linear-gradient(135deg, #000000 65%, #261200 100%); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
-    header h1 { color: #ff6600; font-size: 21px; font-weight: 800; letter-spacing: 0.4px; }
+    header h1 { color: #ff6600; font-size: 21px; font-weight: 800; }
     .lang-select { width: auto; padding: 6px 12px; margin: 0; background: #1e2229; color: #ff944d; border: 1px solid #ff6600; border-radius: 20px; font-size: 12px; font-weight: bold; }
-    select, input, button, a.wa-btn { width: 100%; padding: 12px 14px; margin: 7px 0; border-radius: 10px; border: 1px solid #2f3542; background: #1e222b; color: #fff; font-size: 14px; display: block; text-align: center; text-decoration: none; }
-    input { text-align: left; }
-    input:focus, select:focus { outline: none; border-color: #ff6600; }
+    select, input[type="text"], input[type="tel"], input[type="number"], button, a.wa-btn { width: 100%; padding: 12px 14px; margin: 7px 0; border-radius: 10px; border: 1px solid #2f3542; background: #1e222b; color: #fff; font-size: 14px; display: block; text-align: center; text-decoration: none; }
+    input[type="text"], input[type="tel"], input[type="number"], select { text-align: left; }
     button { background: linear-gradient(135deg, #ff6600, #ff8533); color: #000; font-weight: 800; border: none; cursor: pointer; }
     a.wa-btn { background: #25D366; color: #000; font-weight: 800; border: none; font-size: 14px; }
     .container { max-width: 500px; margin: auto; padding: 12px; }
-    .card { background: #16191f; padding: 16px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #282d37; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .card { background: #16191f; padding: 16px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #282d37; }
     .tabs { display: flex; gap: 8px; margin-bottom: 14px; background: #0d0f12; padding: 4px; border-radius: 10px; }
     .tab-btn { flex: 1; padding: 10px; background: transparent; color: #999; border-radius: 8px; font-size: 13px; border: none; margin: 0; font-weight: 600; }
     .tab-btn.active { background: #ff6600; color: #000; font-weight: 800; }
@@ -27,13 +26,18 @@
     .ac-wrap { position: relative; }
     .ac-list { position: absolute; left: 0; right: 0; top: 100%; background: #1e222b; border: 1px solid #ff6600; border-radius: 10px; z-index: 1000; max-height: 190px; overflow-y: auto; }
     .ac-item { padding: 10px 12px; border-bottom: 1px solid #2f3542; font-size: 13px; color: #fff; cursor: pointer; text-align: left; }
-    .ac-item:hover { background: #ff6600; color: #000; font-weight: bold; }
     .vehicles { display: flex; gap: 8px; margin: 10px 0; }
-    .v-card { flex: 1; background: #1e222b; padding: 12px 6px; border-radius: 10px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.2s; }
+    .v-card { flex: 1; background: #1e222b; padding: 12px 6px; border-radius: 10px; text-align: center; border: 2px solid transparent; cursor: pointer; }
     .v-card.active { border-color: #ff6600; background: #29180c; }
     .fare-box { background: #0d0f12; padding: 14px; border-radius: 12px; border: 1px dashed #ff6600; margin: 10px 0; font-size: 13px; }
     .fare-row { display: flex; justify-content: space-between; margin: 5px 0; color: #ccc; }
     .fare-total { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 8px; border-top: 1px solid #2f3542; font-size: 19px; color: #ff6600; font-weight: 800; }
+    .legal-warn-box { background: #261010; border: 1px solid #e74c3c; padding: 11px; border-radius: 10px; margin: 10px 0; font-size: 11.5px; color: #ffb3b3; line-height: 1.45; }
+    .tc-check-label { display: flex; align-items: flex-start; gap: 9px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #522020; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .tc-check-label input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; accent-color: #ff6600; flex-shrink: 0; }
+    .tc-link { color: #4db8ff; text-decoration: underline; cursor: pointer; }
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
+    .modal-box { background: #16191f; border: 1.5px solid #ff6600; border-radius: 14px; padding: 18px; max-width: 460px; width: 100%; max-height: 82vh; overflow-y: auto; font-size: 13px; line-height: 1.6; color: #ddd; }
     .out-zone-box { background: #2b1212; border: 2px solid #e74c3c; padding: 14px; border-radius: 12px; margin: 10px 0; text-align: center; }
     .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; background: #ff6600; color: #000; font-weight: bold; }
     .pin-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 13px; background: #2ecc71; color: #000; font-weight: bold; margin-left: 6px; }
@@ -53,6 +57,17 @@
     <option value="en">🌐 English</option>
   </select>
 </header>
+
+<!-- कस्टमर नियम व अटी (Terms & Conditions) पॉप-अप -->
+<div id="custTcModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <h3 style="color:#ff6600; margin-bottom:10px;">📜 GoParcel कस्टमर नियम व अटी (Terms & Conditions)</h3>
+    <p><b>१. निषिद्ध व बेकायदेशीर वस्तू (Prohibited Items):</b> या प्लॅटफॉर्मद्वारे दारू (Alcohol), अंमली पदार्थ (Drugs/Narcotics), स्फोटके, ज्वलनशील पदार्थ, हत्यारे, चोरीचा माल किंवा भारतीय कायद्याने बंदी घातलेली कोणतीही वस्तू पाठवण्यास सक्त मनाई आहे.</p>
+    <p style="margin-top:8px;"><b>२. कायदेशीर जबाबदारी:</b> पार्सलमधील वस्तूंची संपूर्ण कायदेशीर जबाबदारी पाठवणाऱ्या कस्टमरची राहील. बेकायदेशीर वस्तू आढळल्यास कंपनी व रायडरला ते पार्सल तात्काळ पोलिसांच्या ताब्यात देण्याचा पूर्ण अधिकार असेल व संबंधित कस्टमरवर गुन्हा दाखल केला जाईल.</p>
+    <p style="margin-top:8px;"><b>३. पॅकिंग व डिलिव्हरी PIN:</b> नाजूक वस्तूंचे योग्य पॅकिंग करणे कस्टमरची जबाबदारी आहे. डिलिव्हरी पूर्ण होताच कस्टमरने आपला ४-अंकी सुरक्षा PIN रायडरला सांगणे बंधनकारक आहे.</p>
+    <button onclick="document.getElementById('custTcModal').classList.add('hidden')" style="margin-top:14px;">मी समजलो (Close)</button>
+  </div>
+</div>
 
 <div class="container">
   <div id="authScreen" class="card">
@@ -128,11 +143,14 @@
       </div>
       
       <div id="bookingControlsArea">
+        <label style="font-size:12px; color:#aaa; display:block; margin-top:6px;">📦 पार्सलचा प्रकार निवडा:</label>
         <select id="parcelType">
-          <option value="Documents">कागदपत्रे / Documents</option>
-          <option value="Electronics">इलेक्ट्रॉनिक्स / Electronics</option>
-          <option value="Food/Tiffin">डबा / Food & Groceries</option>
-          <option value="Commercial Goods">व्यावसायिक सामान / Commercial Goods</option>
+          <option value="Documents">📄 कागदपत्रे / Documents</option>
+          <option value="Electronics">📱 इलेक्ट्रॉनिक्स / Electronics</option>
+          <option value="Food/Tiffin">🍱 डबा / Food & Groceries</option>
+          <option value="Clothes/Household">👕 कपडे व घरगुती सामान</option>
+          <option value="Commercial Goods">📦 व्यावसायिक सामान / Commercial Goods</option>
+          <option value="PROHIBITED" disabled style="color:#ff4d4d;">🚫 निषिद्ध: दारू, अंमली पदार्थ (Drugs), स्फोटके (सक्त मनाई - निवडता येणार नाही)</option>
         </select>
         
         <label id="lblSelectVeh" style="font-size:14px; color:#ff6600;">वाहन निवडा (Select Vehicle):</label>
@@ -148,6 +166,15 @@
           <div class="fare-row"><span id="lblTripDist">पिकअप ते ड्रॉप अंतर (Trip):</span><b><span id="tripDistText">0.0</span> km</b></div>
           <div class="fare-row" style="color:#4db8ff;"><span id="lblTotDist">एकूण अंतर (Rider Reach + Trip):</span><b><span id="totalDistText">0.0</span> km</b></div>
           <div class="fare-total"><span id="lblTotFare">एकूण भाडे (Total Fare):</span><span>₹<span id="fareText">30</span></span></div>
+        </div>
+
+        <!-- कायदेशीर ताकीद व अनिवार्य T&C चेकबॉक्स -->
+        <div class="legal-warn-box">
+          <b>⚠️ कायदेशीर सूचना (Legal Warning):</b> पार्सलमध्ये <b>दारू, अंमली पदार्थ (Drugs), स्फोटके, हत्यारे किंवा कोणतीही बेकायदेशीर वस्तू</b> पाठवण्यास सक्त मनाई आहे. असे आढळल्यास कस्टमरवर थेट पोलीस गुन्हा दाखल होईल; याची कोणतीही जबाबदारी GoParcel किंवा रायडरवर राहणार नाही.
+          <label class="tc-check-label">
+            <input type="checkbox" id="chkCustLegalAgree">
+            <span>मी सर्व <span class="tc-link" onclick="event.preventDefault(); document.getElementById('custTcModal').classList.remove('hidden');">नियम व अटी (Terms & Conditions)</span> वाचल्या असून पार्सलमध्ये कोणतीही बेकायदेशीर वस्तू नसल्याची हमी देतो.</span>
+          </label>
         </div>
 
         <button id="btnBook" onclick="bookOrder()">पार्सल बुक करा (Book Now)</button>
@@ -188,38 +215,17 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // ३ भाषांचा शब्दकोश (मराठी, हिंदी, English)
   const i18n = {
     mr: {
       langName: "मराठी",
       welcome: "GoParcel मध्ये स्वागत आहे",
       tabLogin: "🔑 लॉगिन करा (Login)",
       tabReg: "📝 नवीन नोंदणी (Register)",
-      phLoginPhone: "१० अंकी नोंदणीकृत मोबाईल नंबर",
       btnLoginOtp: "नवीन OTP मागवा (Request OTP)",
-      loginOtpAlert: "✅ तुमची OTP विनंती मराठी भाषेत गेली आहे. खालील बटण दाबून WhatsApp वर आलेला ६ अंकी OTP टाका.",
-      waBtn: "📲 Admin ला WhatsApp वर कळवा",
-      phOtp: "आलेला ६ अंकी OTP टाका",
-      btnVerifyLogin: "OTP तपासा व लॉगिन करा",
-      phRegName: "तुमचे पूर्ण नाव (Full Name)",
-      phRegPhone: "१० अंकी खरा मोबाईल नंबर",
       btnRegOtp: "OTP विनंती पाठवा (Verify Mobile)",
-      regOtpAlert: "✅ तुमची नोंदणी विनंती मराठी भाषेत गेली आहे. WhatsApp वर आलेला ६ अंकी OTP टाका.",
-      btnVerifyReg: "OTP तपासा व खाते उघडा",
       trackTitle: "🛵 रायडर लाईव्ह ट्रॅकिंग",
       btnLoc: "📍 माझं आत्ताचं लोकेशन निवडा (Current Location)",
-      lblPickup: "🟢 पिकअप पत्ता (Pickup Location):",
-      phPickup: "पिकअप एरिया टाइप करा...",
-      lblDrop: "🔴 ड्रॉप पत्ता (Drop Location):",
-      phDrop: "ड्रॉप एरिया टाइप करा...",
-      lblVeh: "वाहन निवडा (Select Vehicle):",
-      lblBase: "बेस पे (Base Pay - २ किमी सह):",
-      lblReach: "जवळच्या रायडरचे पिकअप अंतर:",
-      lblTrip: "पिकअप ते ड्रॉप अंतर (Trip):",
-      lblTotD: "एकूण अंतर (Rider Reach + Trip):",
-      lblTotF: "एकूण भाडे (Total Fare):",
       btnBook: "पार्सल बुक करा (Book Now)",
-      voteAsk: "🗳️ दुसऱ्या शहरात GoParcel हवे आहे का?",
       myOrders: "माझ्या ऑर्डर्स (My Orders)",
       waLoginMsg: (name, phone, time) => `नमस्कार GoParcel Admin, मी कस्टमर ${name} (${phone}) आत्ता (${time}) लॉगिन करत आहे. कृपया मला मराठीत OTP पाठवा.`,
       waRegMsg: (name, phone, time) => `नमस्कार GoParcel Admin, मी नवीन कस्टमर ${name} (${phone}) आत्ता (${time}) नोंदणी करत आहे. कृपया मला मराठीत OTP पाठवा.`
@@ -229,31 +235,11 @@
       welcome: "GoParcel में आपका स्वागत है",
       tabLogin: "🔑 लॉगिन करें (Login)",
       tabReg: "📝 नया पंजीकरण (Register)",
-      phLoginPhone: "१० अंकों का पंजीकृत मोबाइल नंबर",
       btnLoginOtp: "नया OTP मांगें (Request OTP)",
-      loginOtpAlert: "✅ आपका OTP अनुरोध हिंदी भाषा में भेजा गया है। WhatsApp पर आया ६ अंकों का OTP डालें।",
-      waBtn: "📲 Admin को WhatsApp पर बताएं",
-      phOtp: "आया हुआ ६ अंकों का OTP डालें",
-      btnVerifyLogin: "OTP जांचें और लॉगिन करें",
-      phRegName: "आपका पूरा नाम (Full Name)",
-      phRegPhone: "१० अंकों का सही मोबाइल नंबर",
       btnRegOtp: "OTP अनुरोध भेजें (Verify Mobile)",
-      regOtpAlert: "✅ आपका पंजीकरण अनुरोध हिंदी भाषा में भेजा गया है। WhatsApp पर आया ६ अंकों का OTP डालें।",
-      btnVerifyReg: "OTP जांचें और खाता खोलें",
       trackTitle: "🛵 राइडर लाइव ट्रैकिंग",
       btnLoc: "📍 मेरी वर्तमान लोकेशन चुनें (Current Location)",
-      lblPickup: "🟢 पिकअप पता (Pickup Location):",
-      phPickup: "पिकअप एरिया टाइप करें...",
-      lblDrop: "🔴 ड्रॉप पता (Drop Location):",
-      phDrop: "ड्रॉप एरिया टाइप करें...",
-      lblVeh: "वाहन चुनें (Select Vehicle):",
-      lblBase: "बेस पे (Base Pay - २ किमी सहित):",
-      lblReach: "नज़दीकी राइडर की पिकअप दूरी:",
-      lblTrip: "पिकअप से ड्रॉप दूरी (Trip):",
-      lblTotD: "कुल दूरी (Rider Reach + Trip):",
-      lblTotF: "कुल किराया (Total Fare):",
       btnBook: "पार्सल बुक करें (Book Now)",
-      voteAsk: "🗳️ क्या दूसरे शहर में GoParcel चाहिए?",
       myOrders: "मेरे ऑर्डर (My Orders)",
       waLoginMsg: (name, phone, time) => `नमस्ते GoParcel Admin, मैं कस्टमर ${name} (${phone}) अभी (${time}) लॉगिन कर रहा हूँ। कृपया मुझे हिंदी में OTP भेजें।`,
       waRegMsg: (name, phone, time) => `नमस्ते GoParcel Admin, मैं नया कस्टमर ${name} (${phone}) अभी (${time}) पंजीकरण कर रहा हूँ। कृपया मुझे हिंदी में OTP भेजें।`
@@ -263,31 +249,11 @@
       welcome: "Welcome to GoParcel",
       tabLogin: "🔑 Login",
       tabReg: "📝 Register",
-      phLoginPhone: "10-digit registered mobile number",
       btnLoginOtp: "Request New OTP",
-      loginOtpAlert: "✅ Your OTP request has been sent in English. Enter the 6-digit OTP received on WhatsApp.",
-      waBtn: "📲 Notify Admin on WhatsApp",
-      phOtp: "Enter 6-digit OTP",
-      btnVerifyLogin: "Verify OTP & Login",
-      phRegName: "Your Full Name",
-      phRegPhone: "10-digit valid mobile number",
       btnRegOtp: "Send OTP Request",
-      regOtpAlert: "✅ Your registration request has been sent in English. Enter the 6-digit OTP received on WhatsApp.",
-      btnVerifyReg: "Verify OTP & Create Account",
       trackTitle: "🛵 Rider Live Tracking",
       btnLoc: "📍 Use My Current Location",
-      lblPickup: "🟢 Pickup Address:",
-      phPickup: "Type pickup area...",
-      lblDrop: "🔴 Drop Address:",
-      phDrop: "Type drop area...",
-      lblVeh: "Select Vehicle:",
-      lblBase: "Base Pay (incl. 2 km pickup):",
-      lblReach: "Nearest Rider Pickup Distance:",
-      lblTrip: "Pickup to Drop Distance (Trip):",
-      lblTotD: "Total Distance (Rider Reach + Trip):",
-      lblTotF: "Total Fare:",
       btnBook: "Book Parcel Now",
-      voteAsk: "🗳️ Want GoParcel in another city?",
       myOrders: "My Orders",
       waLoginMsg: (name, phone, time) => `Hello GoParcel Admin, I am Customer ${name} (${phone}) logging in at (${time}). Please send my OTP in English.`,
       waRegMsg: (name, phone, time) => `Hello GoParcel Admin, I am new Customer ${name} (${phone}) registering at (${time}). Please send my OTP in English.`
@@ -306,45 +272,18 @@
     localStorage.setItem("gp_cust_lang", curLang);
     document.getElementById('langSelect').value = curLang;
     const t = i18n[curLang] || i18n.mr;
-
     document.getElementById('txtWelcome').innerText = t.welcome;
     document.getElementById('tabLogin').innerText = t.tabLogin;
     document.getElementById('tabReg').innerText = t.tabReg;
-    document.getElementById('loginPhone').placeholder = t.phLoginPhone;
     document.getElementById('btnLoginOtp').innerText = t.btnLoginOtp;
-    document.getElementById('txtLoginOtpAlert').innerText = t.loginOtpAlert;
-    document.getElementById('loginWaNotify').innerText = t.waBtn;
-    document.getElementById('loginOtpInput').placeholder = t.phOtp;
-    document.getElementById('btnVerifyLogin').innerText = t.btnVerifyLogin;
-
-    document.getElementById('regName').placeholder = t.phRegName;
-    document.getElementById('regPhone').placeholder = t.phRegPhone;
     document.getElementById('btnRegOtp').innerText = t.btnRegOtp;
-    document.getElementById('txtRegOtpAlert').innerText = t.regOtpAlert;
-    document.getElementById('regWaNotify').innerText = t.waBtn;
-    document.getElementById('regOtpInput').placeholder = t.phOtp;
-    document.getElementById('btnVerifyReg').innerText = t.btnVerifyReg;
-
     document.getElementById('txtTrackTitle').innerText = t.trackTitle;
     document.getElementById('btnCurrentLoc').innerText = t.btnLoc;
-    document.getElementById('lblPickup').innerText = t.lblPickup;
-    document.getElementById('pickupAddr').placeholder = t.phPickup;
-    document.getElementById('lblDrop').innerText = t.lblDrop;
-    document.getElementById('dropAddr').placeholder = t.phDrop;
-    document.getElementById('lblSelectVeh').innerText = t.lblVeh;
-    document.getElementById('lblBasePay').innerText = t.lblBase;
-    document.getElementById('lblReachDist').innerText = t.lblReach;
-    document.getElementById('lblTripDist').innerText = t.lblTrip;
-    document.getElementById('lblTotDist').innerText = t.lblTotD;
-    document.getElementById('lblTotFare').innerText = t.lblTotF;
     document.getElementById('btnBook').innerText = t.btnBook;
-    document.getElementById('txtVoteAsk').innerText = t.voteAsk;
     document.getElementById('txtMyOrders').innerText = t.myOrders;
   };
 
-  window.addEventListener('load', () => {
-    changeLang(curLang);
-  });
+  window.addEventListener('load', () => changeLang(curLang));
 
   window.switchCustTab = (t) => {
     document.getElementById('secLogin').classList.toggle('hidden', t !== 'login');
@@ -412,7 +351,6 @@
 
   function getNowTimeStr() { return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
 
-  // लॉगिन OTP (निवडलेल्या भाषेसह)
   window.startLoginOtp = async () => {
     const phone = document.getElementById('loginPhone').value.trim();
     if (phone.length !== 10 || isNaN(phone)) return alert("कृपया १० अंकी मोबाईल नंबर टाका!");
@@ -422,17 +360,7 @@
     const secretOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const timeStr = getNowTimeStr();
     const t = i18n[curLang] || i18n.mr;
-
-    const reqRef = await addDoc(collection(db, "otpRequests"), {
-      role: `Customer (Login - ${t.langName})`,
-      language: curLang,
-      name: existingCustName,
-      phone,
-      otp: secretOtp,
-      timeStr,
-      status: "Pending",
-      createdAt: Date.now()
-    });
+    const reqRef = await addDoc(collection(db, "otpRequests"), { role: `Customer (Login - ${t.langName})`, language: curLang, name: existingCustName, phone, otp: secretOtp, timeStr, status: "Pending", createdAt: Date.now() });
     activeLoginReqId = reqRef.id;
     document.getElementById('loginWaNotify').href = `https://wa.me/${adminWa}?text=${encodeURIComponent(t.waLoginMsg(existingCustName, phone, timeStr))}`;
     document.getElementById('loginOtpBox').classList.remove('hidden');
@@ -445,13 +373,10 @@
     if (!reqSnap.exists() || reqSnap.data().otp !== entered) return alert("चुकीचा OTP!");
     await updateDoc(doc(db, "otpRequests", activeLoginReqId), { status: "Verified" });
     const cid = "cust_" + phone, label = `✔ ${existingCustName} (${phone})`;
-    localStorage.setItem("gp_ver_cust_id", cid);
-    localStorage.setItem("gp_ver_cust_name", label);
-    localStorage.setItem("gp_ver_cust_phone", phone);
+    localStorage.setItem("gp_ver_cust_id", cid); localStorage.setItem("gp_ver_cust_name", label); localStorage.setItem("gp_ver_cust_phone", phone);
     openCustomerApp(cid, label, phone);
   };
 
-  // नोंदणी OTP (निवडलेल्या भाषेसह)
   window.startRegOtp = async () => {
     const name = document.getElementById('regName').value.trim();
     const phone = document.getElementById('regPhone').value.trim();
@@ -459,17 +384,7 @@
     const secretOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const timeStr = getNowTimeStr();
     const t = i18n[curLang] || i18n.mr;
-
-    const reqRef = await addDoc(collection(db, "otpRequests"), {
-      role: `Customer (New - ${t.langName})`,
-      language: curLang,
-      name,
-      phone,
-      otp: secretOtp,
-      timeStr,
-      status: "Pending",
-      createdAt: Date.now()
-    });
+    const reqRef = await addDoc(collection(db, "otpRequests"), { role: `Customer (New - ${t.langName})`, language: curLang, name, phone, otp: secretOtp, timeStr, status: "Pending", createdAt: Date.now() });
     activeRegReqId = reqRef.id;
     document.getElementById('regWaNotify').href = `https://wa.me/${adminWa}?text=${encodeURIComponent(t.waRegMsg(name, phone, timeStr))}`;
     document.getElementById('regOtpBox').classList.remove('hidden');
@@ -485,18 +400,11 @@
     const cid = "cust_" + phone;
     await setDoc(doc(db, "customers", cid), { name, phone, preferredLang: curLang, verified: true, createdAt: serverTimestamp() });
     const label = `✔ ${name} (${phone})`;
-    localStorage.setItem("gp_ver_cust_id", cid);
-    localStorage.setItem("gp_ver_cust_name", label);
-    localStorage.setItem("gp_ver_cust_phone", phone);
+    localStorage.setItem("gp_ver_cust_id", cid); localStorage.setItem("gp_ver_cust_name", label); localStorage.setItem("gp_ver_cust_phone", phone);
     openCustomerApp(cid, label, phone);
   };
 
-  window.logoutUser = () => {
-    localStorage.removeItem("gp_ver_cust_id");
-    localStorage.removeItem("gp_ver_cust_name");
-    localStorage.removeItem("gp_ver_cust_phone");
-    location.reload();
-  };
+  window.logoutUser = () => { localStorage.removeItem("gp_ver_cust_id"); localStorage.removeItem("gp_ver_cust_name"); localStorage.removeItem("gp_ver_cust_phone"); location.reload(); };
 
   let map = L.map('map').setView([18.5204, 73.8567], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -571,9 +479,7 @@
       checkServiceAvailability();
       calculateFare();
       btn.innerText = "✅ लोकेशन सेट झाले";
-    }, () => {
-      changeLang(curLang);
-    }, { enableHighAccuracy: true });
+    }, () => changeLang(curLang), { enableHighAccuracy: true });
   };
 
   let selectedVehicle = '2-Wheeler', ratePerKm = 10, totalCalcDistance = 1.5, currentFare = 30;
@@ -608,6 +514,12 @@
   };
 
   window.bookOrder = async () => {
+    const parcelVal = document.getElementById('parcelType').value;
+    if (parcelVal === "PROHIBITED") return alert("🚫 निषिद्ध वस्तू निवडता येणार नाहीत!");
+    if (!document.getElementById('chkCustLegalAgree').checked) {
+      return alert("⚠️ कृपया आधी नियम व अटी (Terms & Conditions) आणि पार्सलमध्ये कोणतीही बेकायदेशीर वस्तू नसल्याच्या चेकबॉक्सवर टिक (✓) करा!");
+    }
+
     const pLL = pickupMarker.getLatLng(), dLL = dropMarker.getLatLng();
     const deliveryPin = Math.floor(1000 + Math.random() * 9000).toString();
     await addDoc(collection(db, "orders"), {
@@ -615,14 +527,17 @@
       customerEmail: activeCustLabel,
       customerPhone: activeCustPhone || activeCustId.replace("cust_", ""),
       customerLang: curLang,
+      legalAgreementAccepted: true,
+      legalAcceptedAt: new Date().toISOString(),
       pickup: document.getElementById('pickupAddr').value || `${pLL.lat.toFixed(4)}, ${pLL.lng.toFixed(4)}`,
       drop: document.getElementById('dropAddr').value || `${dLL.lat.toFixed(4)}, ${dLL.lng.toFixed(4)}`,
       pickupLat: pLL.lat, pickupLng: pLL.lng, dropLat: dLL.lat, dropLng: dLL.lng,
-      parcel: document.getElementById('parcelType').value, vehicle: selectedVehicle,
+      parcel: parcelVal, vehicle: selectedVehicle,
       distance: totalCalcDistance, fare: currentFare, deliveryPin,
       status: "Pending", createdAt: serverTimestamp()
     });
-    alert(`ऑर्डर बुक झाली! तुमचा डिलिव्हरी सुरक्षा PIN: ${deliveryPin}`);
+    document.getElementById('chkCustLegalAgree').checked = false;
+    alert(`✅ ऑर्डर बुक झाली! तुमचा डिलिव्हरी सुरक्षा PIN: ${deliveryPin}`);
   };
 
   function trackAssignedRider(order) {
