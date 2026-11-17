@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="mr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>GoParcel - Rider Partner App</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
@@ -25,9 +24,10 @@
     .order-card { background: #222; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #ff6600; }
     .cam-box { background: #000; border: 2px dashed #ff6600; border-radius: 10px; padding: 10px; text-align: center; margin: 10px 0; }
     .doc-upload-box { background: #111; border: 1px solid #444; padding: 10px; border-radius: 8px; margin: 8px 0; }
-    video, img.preview-img { width: 100%; max-height: 220px; border-radius: 8px; object-fit: cover; }
-    video { transform: scaleX(-1); }
+    video, img.preview-img { width: 100%; max-height: 240px; border-radius: 8px; object-fit: cover; margin-top: 6px; }
+    .mirror-cam { transform: scaleX(-1); }
     .banner-strip { background: #2b1d12; border: 1px solid #ff6600; color: #ffd2b3; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; text-align: center; font-weight: bold; }
+    .perm-strip { background: #181818; border: 1px solid #333; padding: 8px 10px; border-radius: 8px; margin-bottom: 12px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
     .hidden { display: none; }
   </style>
 </head>
@@ -37,6 +37,13 @@
   <span id="dutyStatusTag" style="color:#e74c3c; font-size:12px; font-weight:bold;">● OFFLINE</span>
 </header>
 <div class="container">
+
+  <!-- परवानगी स्टेटस पट्टी -->
+  <div class="perm-strip">
+    <span id="permStatusText">📍 GPS | 📷 Camera | 🔔 Alert तपासत आहे...</span>
+    <button type="button" onclick="requestAllAppPermissions()" style="width:auto; padding:5px 10px; margin:0; font-size:11px; background:#333; color:#ff6600; border:1px solid #ff6600;">परवानगी द्या</button>
+  </div>
+
   <div id="authScreen" class="card">
     <h2 style="color:#ff6600; margin-bottom:12px; text-align:center;">रायडर पार्टनर पोर्टल</h2>
     <div class="tabs">
@@ -63,17 +70,22 @@
       <input type="text" id="rRcBook" class="hidden" placeholder="गाडीचा RC बुक नंबर">
       <input type="text" id="rPanCard" class="hidden" placeholder="पॅन कार्ड नंबर">
 
+      <!-- १. डॉक्युमेंटसाठी फक्त थेट कॅमेरा (गॅलरी पूर्णपणे बंद) -->
       <div class="doc-upload-box">
-        <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">📄 आधार कार्ड / लायसन्स कागदपत्राचा स्पष्ट फोटो निवडा:</label>
-        <input type="file" id="docFileInput" accept="image/*" onchange="handleDocPhoto(this)">
-        <img id="docPreview" class="preview-img hidden" style="margin-top:6px;">
+        <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">📄 आधार कार्ड / लायसन्सचा थेट फोटो (फक्त Live Camera):</label>
+        <p style="font-size:11px; color:#aaa; margin-bottom:6px;">* सुरक्षिततेसाठी गॅलरी बंद आहे. कागदपत्र समोर धरून थेट फोटो काढा.</p>
+        <video id="docVideo" autoplay playsinline class="hidden"></video>
+        <img id="docPreview" class="preview-img hidden">
+        <button type="button" onclick="openCamera('doc')" style="background:#1c2e3d; color:#4db8ff; border:1px solid #4db8ff; font-size:13px;">📷 कागदपत्र स्कॅन करा (Live Camera)</button>
+        <button type="button" id="btnSnapDoc" onclick="takeDocSnapshot()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ कागदपत्राचा फोटो क्लिक करा</button>
       </div>
 
+      <!-- २. सेल्फीसाठी थेट फ्रंट कॅमेरा -->
       <div class="cam-box">
-        <p style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 नोंदणीसाठी तुमचा मूळ सेल्फी फोटो काढा:</p>
-        <video id="regVideo" autoplay playsinline class="hidden"></video>
-        <img id="regPreview" class="preview-img hidden" style="transform:scaleX(-1);">
-        <button type="button" onclick="openCamera('reg')" style="background:#333; color:#fff; font-size:13px;">📷 फ्रंट कॅमेरा उघडा</button>
+        <p style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 नोंदणीसाठी तुमचा मूळ थेट सेल्फी काढा:</p>
+        <video id="regVideo" autoplay playsinline class="hidden mirror-cam"></video>
+        <img id="regPreview" class="preview-img hidden mirror-cam">
+        <button type="button" onclick="openCamera('reg')" style="background:#333; color:#fff; font-size:13px;">🤳 फ्रंट कॅमेरा उघडा</button>
         <button type="button" id="btnSnapReg" onclick="takeSnapshot()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ सेल्फी फोटो घ्या</button>
       </div>
 
@@ -94,20 +106,23 @@
 
     <div id="riderNoticeBanner" class="banner-strip hidden"></div>
 
+    <!-- KYC नाकारल्यासही फक्त थेट कॅमेऱ्यानेच पुन्हा फोटो काढता येईल -->
     <div id="rejectedBanner" class="card hidden" style="background:#2b1212; border:2px solid #e74c3c;">
       <h4 style="color:#ff6b6b;">❌ तुमची कागदपत्रे / KYC नाकारली गेली आहे!</h4>
       <p id="rejectReasonText" style="font-size:13px; color:#ddd; margin:6px 0;"></p>
       <div class="doc-upload-box">
-        <label style="font-size:12px; color:#4db8ff;">पुन्हा खरा व स्पष्ट कागदपत्राचा फोटो अपलोड करा:</label>
-        <input type="file" accept="image/*" onchange="reuploadKycDoc(this)">
+        <label style="font-size:12px; color:#4db8ff;">पुन्हा थेट कॅमेऱ्याने स्पष्ट कागदपत्राचा फोटो काढा:</label>
+        <video id="reupVideo" autoplay playsinline class="hidden"></video>
+        <button type="button" onclick="openCamera('reup')" style="background:#3498db; color:#fff; font-size:13px;">📷 कॅमेरा उघडा</button>
+        <button type="button" id="btnSnapReup" onclick="submitReuploadDoc()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ फोटो पाठवा</button>
       </div>
     </div>
 
     <div id="dailySelfieCard" class="card" style="border:2px solid #ff6600; background:#24180e;">
       <h3 style="color:#ff6600;">📸 आजची ड्युटी सुरू करा (Daily Selfie)</h3>
       <p style="font-size:12px; color:#ddd; margin:6px 0;">दररोज ऑनलाईन येताना तुमचा ताजा लाईव्ह सेल्फी काढणे अनिवार्य आहे.</p>
-      <video id="dutyVideo" autoplay playsinline class="hidden"></video>
-      <button onclick="openCamera('duty')" style="background:#3498db; color:#fff;">📷 ड्युटी सेल्फीसाठी कॅमेरा उघडा</button>
+      <video id="dutyVideo" autoplay playsinline class="hidden mirror-cam"></video>
+      <button onclick="openCamera('duty')" style="background:#3498db; color:#fff;">🤳 ड्युटी सेल्फीसाठी कॅमेरा उघडा</button>
       <button id="btnSnapDuty" onclick="submitDailySelfie()" class="hidden" style="background:#2ecc71;">✅ सेल्फी अपलोड करा व ONLINE या</button>
     </div>
 
@@ -135,7 +150,7 @@
   </div>
 </div>
 
-<canvas id="snapCanvas" width="240" height="240" class="hidden"></canvas>
+<canvas id="snapCanvas" width="480" height="480" class="hidden"></canvas>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -163,6 +178,43 @@
 
   const todayStr = new Date().toISOString().split('T')[0];
   function getNowTimeStr() { return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+
+  // ॲप उघडताच GPS, Camera आणि Notification परवानगी मागणे
+  window.requestAllAppPermissions = async () => {
+    let gpsOk = false, camOk = false, notifOk = false;
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => { riderLat = pos.coords.latitude; riderLng = pos.coords.longitude; updatePermLabel(true, camOk, notifOk); },
+        () => { updatePermLabel(false, camOk, notifOk); },
+        { enableHighAccuracy: true }
+      );
+      gpsOk = true;
+    }
+
+    if ("Notification" in window) {
+      try {
+        const res = await Notification.requestPermission();
+        notifOk = (res === "granted");
+      } catch (e) {}
+    }
+
+    try {
+      const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      s.getTracks().forEach(t => t.stop());
+      camOk = true;
+    } catch (e) {}
+
+    updatePermLabel(gpsOk, camOk, notifOk);
+  };
+
+  function updatePermLabel(g, c, n) {
+    document.getElementById('permStatusText').innerText = `📍GPS:${g ? '✅' : '❌'} | 📷Cam:${c ? '✅' : '❌'} | 🔔Alert:${n ? '✅' : '❌'}`;
+  }
+
+  window.addEventListener('load', () => {
+    requestAllAppPermissions();
+  });
 
   function isValidAadhaar(num) {
     if (!/^[2-9]{1}[0-9]{11}$/.test(num)) return false;
@@ -209,58 +261,51 @@
     }
   });
 
-  function compressImageFile(file, callback) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const scale = Math.min(480 / img.width, 480 / img.height, 1);
-        canvas.width = img.width * scale; canvas.height = img.height * scale;
-        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        callback(canvas.toDataURL('image/jpeg', 0.65));
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  window.handleDocPhoto = (input) => {
-    if (input.files && input.files[0]) {
-      compressImageFile(input.files[0], (base64) => {
-        docPhotoData = base64;
-        const prev = document.getElementById('docPreview');
-        prev.src = base64; prev.classList.remove('hidden');
-      });
-    }
-  };
-
-  window.reuploadKycDoc = (input) => {
-    if (input.files && input.files[0] && activeRiderId) {
-      compressImageFile(input.files[0], async (base64) => {
-        await updateDoc(doc(db, "riders", activeRiderId), { kycPhoto: base64, kycRejected: false, rejectReason: "" });
-        alert("✅ नवीन कागदपत्रांचा फोटो Admin कडे पाठवला आहे!");
-      });
-    }
-  };
-
+  // थेट कॅमेरा उघडणे: doc/reup साठी मागचा कॅमेरा (environment) आणि reg/duty साठी समोरचा कॅमेरा (user)
   window.openCamera = async (mode) => {
     try {
       if (activeStream) activeStream.getTracks().forEach(t => t.stop());
-      activeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-      const vid = document.getElementById(mode === 'reg' ? 'regVideo' : 'dutyVideo');
-      vid.srcObject = activeStream; vid.classList.remove('hidden');
-      document.getElementById(mode === 'reg' ? 'btnSnapReg' : 'btnSnapDuty').classList.remove('hidden');
-    } catch (err) { alert("कॅमेरा परवानगी (Allow) द्या!"); }
+      const camFacing = (mode === 'doc' || mode === 'reup') ? { ideal: "environment" } : "user";
+      activeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: camFacing }, audio: false });
+      const vidMap = { reg: 'regVideo', duty: 'dutyVideo', doc: 'docVideo', reup: 'reupVideo' };
+      const btnMap = { reg: 'btnSnapReg', duty: 'btnSnapDuty', doc: 'btnSnapDoc', reup: 'btnSnapReup' };
+      const vid = document.getElementById(vidMap[mode]);
+      vid.srcObject = activeStream;
+      vid.classList.remove('hidden');
+      document.getElementById(btnMap[mode]).classList.remove('hidden');
+    } catch (err) {
+      alert("कॅमेरा परवानगी (Allow) द्या! फोनच्या Settings > Apps > GoParcel Rider > Permissions मध्ये जाऊन Camera चालू करा.");
+    }
   };
 
   function captureBase64(videoEl) {
     const canvas = document.getElementById('snapCanvas');
-    canvas.getContext('2d').drawImage(videoEl, 0, 0, 240, 240);
+    const vw = videoEl.videoWidth || 480;
+    const vh = videoEl.videoHeight || 480;
+    const scale = Math.min(480 / vw, 480 / vh, 1);
+    canvas.width = vw * scale;
+    canvas.height = vh * scale;
+    canvas.getContext('2d').drawImage(videoEl, 0, 0, canvas.width, canvas.height);
     if (activeStream) activeStream.getTracks().forEach(t => t.stop());
     videoEl.classList.add('hidden');
     return canvas.toDataURL('image/jpeg', 0.65);
   }
+
+  window.takeDocSnapshot = () => {
+    docPhotoData = captureBase64(document.getElementById('docVideo'));
+    const prev = document.getElementById('docPreview');
+    prev.src = docPhotoData;
+    prev.classList.remove('hidden');
+    document.getElementById('btnSnapDoc').classList.add('hidden');
+  };
+
+  window.submitReuploadDoc = async () => {
+    if (!activeRiderId) return;
+    const newDocImg = captureBase64(document.getElementById('reupVideo'));
+    document.getElementById('btnSnapReup').classList.add('hidden');
+    await updateDoc(doc(db, "riders", activeRiderId), { kycPhoto: newDocImg, kycRejected: false, rejectReason: "" });
+    alert("✅ नवीन कागदपत्रांचा थेट फोटो Admin कडे पाठवला आहे!");
+  };
 
   window.takeSnapshot = () => {
     regSelfieData = captureBase64(document.getElementById('regVideo'));
@@ -271,6 +316,7 @@
 
   window.submitDailySelfie = async () => {
     const selfieImg = captureBase64(document.getElementById('dutyVideo'));
+    document.getElementById('btnSnapDuty').classList.add('hidden');
     await updateDoc(doc(db, "riders", activeRiderId), { dailySelfie: selfieImg, lastDutyDate: todayStr, lastSelfieTime: serverTimestamp() });
     alert("✅ आजचा लाईव्ह सेल्फी व्हेरिफाय झाला! आता तुम्ही ONLINE आहात.");
   };
@@ -312,7 +358,7 @@
     if (!name || phone.length !== 10 || !vehicleNo) return alert("कृपया नाव, मोबाईल आणि गाडीचा नंबर भरा!");
     if (docRules.docAadhaar && !isValidAadhaar(aadhaar)) return alert("❌ चुकीचा आधार नंबर! कृपया अचूक १२ अंकी खरा आधार नंबर टाका.");
     if (docRules.docLicense && license.length < 8) return alert("❌ चुकीचा ड्रायव्हिंग लायसन्स नंबर!");
-    if (!docPhotoData) return alert("❌ कृपया कागदपत्रांचा (आधार/लायसन्स) स्पष्ट फोटो अपलोड करा!");
+    if (!docPhotoData) return alert("❌ कृपया थेट कॅमेऱ्याने कागदपत्रांचा (आधार/लायसन्स) स्पष्ट फोटो काढा!");
     if (!regSelfieData) return alert("❌ कृपया कॅमेऱ्याने तुमचा मूळ सेल्फी फोटो काढा!");
 
     const btn = document.getElementById('btnStartReg');
@@ -386,6 +432,7 @@
     if ("geolocation" in navigator) {
       navigator.geolocation.watchPosition(async (pos) => {
         riderLat = pos.coords.latitude; riderLng = pos.coords.longitude;
+        updatePermLabel(true, true, Notification.permission === "granted");
         await updateDoc(doc(db, "riders", rid), { lat: riderLat, lng: riderLng, lastSeen: serverTimestamp() });
       }, () => {}, { enableHighAccuracy: true });
     }
