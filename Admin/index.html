@@ -22,7 +22,7 @@
     #zoneMap, #adminMap { height: 340px; width: 100%; border-radius: 12px; margin-top: 10px; z-index: 1; border: 1px solid #3a4150; }
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 15px; }
     label { font-size: 13px; color: #ff6600; display: block; margin-bottom: 4px; font-weight: bold; }
-    input[type="text"], input[type="number"], input[type="tel"], select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #333b48; background: #0d0f12; color: #fff; font-size: 14px; }
+    input[type="text"], input[type="number"], input[type="tel"], input[type="password"], select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #333b48; background: #0d0f12; color: #fff; font-size: 14px; }
     .chk-row { display: flex; align-items: center; gap: 10px; background: #0d0f12; padding: 11px; border-radius: 10px; border: 1px solid #2f3542; margin-bottom: 6px; cursor: pointer; color: #eee; }
     .chk-row input { width: 18px; height: 18px; accent-color: #ff6600; }
     button.save-btn { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #000; font-weight: 800; padding: 13px; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; width: 100%; }
@@ -34,26 +34,72 @@
     .btn-approve { background: #2ecc71; color: #000; }
     .btn-wa { background: #25D366; color: #000; }
     .btn-edit { background: #3498db; color: #fff; }
+    .btn-pdf { background: #9b59b6; color: #fff; }
     .btn-block { background: #e74c3c; color: #fff; }
     .selfie-thumb { width: 46px; height: 46px; border-radius: 8px; object-fit: cover; border: 2px solid #ff6600; cursor: pointer; }
     .badge-req { background: #e74c3c; color: #fff; padding: 2px 7px; border-radius: 10px; font-size: 11px; margin-left: 4px; }
     .lang-pill { background: #1c2e3d; color: #4db8ff; border: 1px solid #4db8ff; padding: 2px 7px; border-radius: 6px; font-size: 11px; font-weight: bold; }
-    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 15px; }
-    .modal-box { background: #16191f; padding: 15px; border-radius: 14px; border: 2px solid #ff6600; max-width: 450px; width: 100%; text-align: center; }
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 15px; }
+    .modal-box { background: #16191f; padding: 20px; border-radius: 14px; border: 2px solid #ff6600; max-width: 480px; width: 100%; text-align: center; max-height: 88vh; overflow-y: auto; }
     .modal-box img { max-width: 100%; max-height: 360px; border-radius: 8px; margin-bottom: 10px; }
-    .hidden { display: none; }
+    .cert-paper { background: #fff; color: #111; padding: 18px; border-radius: 8px; text-align: left; font-size: 13px; line-height: 1.55; margin-bottom: 12px; border: 2px solid #ff6600; }
+    .lock-overlay { position: fixed; inset: 0; background: #090b0e; display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 16px; }
+    .lock-card { background: #16191f; border: 2px solid #ff6600; border-radius: 16px; padding: 24px 20px; max-width: 390px; width: 100%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+    .hidden { display: none !important; }
+    @media print {
+      body * { visibility: hidden; }
+      #certPrintArea, #certPrintArea * { visibility: visible; }
+      #certPrintArea { position: fixed; left: 0; top: 0; width: 100%; }
+    }
   </style>
 </head>
 <body>
+
+<!-- १. Admin सुरक्षा लॉक स्क्रीन -->
+<div id="adminLockScreen" class="lock-overlay">
+  <div class="lock-card">
+    <h2 style="color:#ff6600; margin-bottom:6px;">👑 GoParcel Master Admin</h2>
+    <p style="font-size:12px; color:#aaa; margin-bottom:14px;">सुरुवातीचा पासवर्ड: <b style="color:#2ecc71;">2026</b></p>
+    
+    <div id="loginPinBox">
+      <input type="password" id="adminPinInput" placeholder="Admin PIN टाका" style="text-align:center; font-size:18px; letter-spacing:4px; margin-bottom:10px;">
+      <button class="save-btn" onclick="unlockAdminPanel()" style="background:#ff6600; margin-bottom:10px;">🔓 Admin Panel उघडा</button>
+      <button type="button" onclick="showForgotBox()" style="background:transparent; border:none; color:#4db8ff; font-size:13px; text-decoration:underline; cursor:pointer;">🔑 पासवर्ड विसरलात? (Forgot PIN)</button>
+    </div>
+
+    <div id="forgotPinBox" class="hidden" style="border-top:1px solid #2f3542; padding-top:12px; margin-top:8px;">
+      <p style="font-size:12px; color:#ffd2b3; margin-bottom:8px;">नवीन PIN फक्त तुमच्या अधिकृत Admin मोबाईल नंबरवरच पाठवला जाईल:</p>
+      <input type="tel" id="recoveryPhoneInput" maxlength="10" placeholder="तुमचा १० अंकी Admin मोबाईल नंबर" style="text-align:center; margin-bottom:10px;">
+      <button type="button" class="save-btn" onclick="resetAdminPinViaWhatsapp()" style="background:#25D366; margin-bottom:8px;">📲 WhatsApp वर नवीन PIN पाठवा</button>
+      <button type="button" onclick="hideForgotBox()" style="background:#262b36; color:#fff; border:none; padding:8px 14px; border-radius:8px; font-size:12px; cursor:pointer;">← मागे जा (Back)</button>
+    </div>
+  </div>
+</div>
+
 <header>
   <h1>👑 GoParcel Master Panel</h1>
-  <span style="color:#2ecc71; font-size:13px;">● Full Master Control</span>
+  <div style="display:flex; align-items:center; gap:10px;">
+    <span style="color:#2ecc71; font-size:13px;">● Secured</span>
+    <button onclick="lockAdminNow()" style="background:#e74c3c; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer;">🔒 Lock</button>
+  </div>
 </header>
 
+<!-- फोटो प्रिव्ह्यू पॉप-अप -->
 <div id="imgModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
   <div class="modal-box" onclick="event.stopPropagation()">
     <img id="modalImgSrc" src="">
     <button class="save-btn" onclick="document.getElementById('imgModal').classList.add('hidden')">बंद करा (Close)</button>
+  </div>
+</div>
+
+<!-- अधिकृत PDF / कायदेशीर करारपत्र पॉप-अप -->
+<div id="legalPdfModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div id="certPrintArea" class="cert-paper"></div>
+    <div style="display:flex; gap:8px;">
+      <button class="save-btn" onclick="window.print()" style="background:#9b59b6; color:#fff;">🖨️ Save as PDF / Print</button>
+      <button class="save-btn" onclick="document.getElementById('legalPdfModal').classList.add('hidden')" style="background:#333; color:#fff;">बंद करा</button>
+    </div>
   </div>
 </div>
 
@@ -67,6 +113,7 @@
 
   <div class="nav-tabs">
     <button id="tRiders" class="nav-btn active" onclick="showTab('riders')">🛵 रायडर्स KYC व Live फोटो</button>
+    <button id="tLegal" class="nav-btn" onclick="showTab('legal')">📜 कायदेशीर करार (T&C / PDF)</button>
     <button id="tReferrals" class="nav-btn" onclick="showTab('referrals')">🎁 रेफरल व जॉइनिंग बोनस</button>
     <button id="tOtpLive" class="nav-btn" onclick="showTab('otpLive')">🔔 ताज्या OTP विनंत्या <span id="otpBadge" class="badge-req hidden">0</span></button>
     <button id="tZones" class="nav-btn" onclick="showTab('zones')">🗺️ सर्विस एरिया व शहर व्होटिंग</button>
@@ -84,17 +131,26 @@
     </table>
   </div>
 
-  <!-- २. नवीन रेफरल व जॉइनिंग बोनस ट्रॅकर -->
+  <!-- २. नवीन कायदेशीर करार व PDF पुरावा टॅब -->
+  <div id="secLegal" class="panel-box hidden" style="overflow-x:auto;">
+    <h3 style="color:#ff6600; margin-bottom:6px;">📜 डिजिटल करार व अटी संमती नोंदवही (T&C Agreements & PDF)</h3>
+    <p style="font-size:12px; color:#aaa; margin-bottom:10px;">ज्या कस्टमरने किंवा रायडरने नियम व अटी (Terms & Conditions) मान्य केल्या आहेत, त्यांची अधिकृत PDF प्रत खालील बटनावरून डाउनलोड करा:</p>
+    <table>
+      <thead><tr><th>प्रकार (Role)</th><th>नाव व मोबाईल नंबर</th><th>तपशील (गाडी / पार्सल)</th><th>संमती तारीख व वेळ</th><th>अधिकृत PDF पुरावा</th></tr></thead>
+      <tbody id="legalTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ३. रेफरल व जॉइनिंग बोनस ट्रॅकर -->
   <div id="secReferrals" class="panel-box hidden" style="overflow-x:auto;">
     <h3 style="color:#ff6600; margin-bottom:6px;">🎁 रायडर रेफरल व जॉइनिंग बोनस रिपोर्ट</h3>
-    <p style="font-size:12px; color:#aaa; margin-bottom:10px;">नवीन रायडरने अट (ऑर्डर्स) पूर्ण केल्यावर तुम्ही एका क्लिकवर दोघांच्या वॉलेटमध्ये बोनस जमा करू शकता:</p>
     <table>
       <thead><tr><th>रेफर करणारा (Referrer)</th><th>नवीन जॉईन झालेला मित्र</th><th>पूर्ण ऑर्डर्स / लक्ष्य</th><th>बोनस रक्कम</th><th>बोनस कृती</th></tr></thead>
       <tbody id="referralsTableBody"></tbody>
     </table>
   </div>
 
-  <!-- ३. OTP विनंत्या -->
+  <!-- ४. OTP विनंत्या -->
   <div id="secOtpLive" class="panel-box hidden" style="overflow-x:auto;">
     <h3 style="color:#ff6600; margin-bottom:10px;">निवडलेल्या भाषेनुसार ताज्या OTP विनंत्या</h3>
     <table>
@@ -103,7 +159,7 @@
     </table>
   </div>
 
-  <!-- ४. सर्विस झोन -->
+  <!-- ५. सर्विस झोन -->
   <div id="secZones" class="panel-box hidden">
     <h3 style="color:#ff6600; margin-bottom:6px;">🗺️ सर्विस एरिया मर्यादा ठरवा</h3>
     <div class="form-grid">
@@ -124,11 +180,12 @@
     </div>
   </div>
 
-  <!-- ५. मास्टर कंट्रोल (दर + रेफरल व जॉइनिंग बोनस सेटिंग्ज) -->
+  <!-- ६. मास्टर कंट्रोल -->
   <div id="secMaster" class="panel-box hidden">
-    <h3 style="color:#ff6600; margin-bottom:12px;">🎛️ संपूर्ण ॲपचे दर व मास्टर कंट्रोल</h3>
+    <h3 style="color:#ff6600; margin-bottom:12px;">🎛️ संपूर्ण ॲपचे दर, पासवर्ड व मास्टर कंट्रोल</h3>
     <div class="form-grid">
-      <div><label>Admin WhatsApp नंबर (91 सह)</label><input type="tel" id="setAdminWa" value="919999999999"></div>
+      <div><label>Admin WhatsApp नंबर (91 सह)</label><input type="tel" id="setAdminWa" value="919049505512"></div>
+      <div><label>नवीन Admin Login PIN बदला</label><input type="text" id="setAdminPin" value="2026" maxlength="8"></div>
       <div><label>रायडर पिकअप रेंज (Pickup Radius km)</label><input type="number" id="setPickupRadius" value="2"></div>
       <div><label>रायडर ऑनबोर्डिंग फीस (₹)</label><input type="number" id="setOnboardingFee" value="1000"></div>
       <div><label>प्लॅटफॉर्म कमिशन (%)</label><input type="number" id="setCommission" value="20"></div>
@@ -138,9 +195,8 @@
       <div><label>Mini Tempo दर (₹/km)</label><input type="number" id="setRateTempo" value="25"></div>
     </div>
 
-    <!-- जॉइनिंग व रेफर बोनस कंट्रोल कार्ड -->
     <div class="ref-control-card">
-      <h4 style="color:#ff6600; margin-bottom:8px;">🎁 जॉइनिंग बोनस, मासिक कमाई बॅनर आणि रेफरल बोनस नियम (कमी-जास्त करा)</h4>
+      <h4 style="color:#ff6600; margin-bottom:8px;">🎁 जॉइनिंग बोनस, मासिक कमाई बॅनर आणि रेफरल बोनस नियम</h4>
       <div class="form-grid">
         <div><label>किमान मासिक कमाई आकडा (₹)</label><input type="number" id="setEarnMin" value="30000"></div>
         <div><label>कमाल मासिक कमाई आकडा (₹)</label><input type="number" id="setEarnMax" value="50000"></div>
@@ -173,13 +229,13 @@
     <button class="save-btn" onclick="saveMasterSettings()">🚀 सर्व बदल सेव्ह करा व लागू करा</button>
   </div>
 
-  <!-- ६. लाईव्ह मॅप -->
+  <!-- ७. लाईव्ह मॅप -->
   <div id="secMap" class="panel-box hidden">
     <h3 style="color:#ff6600;">सर्व रायडर्सचे लाईव्ह GPS लोकेशन</h3>
     <div id="adminMap"></div>
   </div>
 
-  <!-- ७. लाईव्ह ऑर्डर्स -->
+  <!-- ८. लाईव्ह ऑर्डर्स -->
   <div id="secOrders" class="panel-box hidden" style="overflow-x:auto;">
     <h3 style="color:#ff6600; margin-bottom:10px;">सर्व ऑर्डर्स, डिलिव्हरी PIN व कमिशन</h3>
     <table>
@@ -207,14 +263,132 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const settingsRef = doc(db, "config", "appSettings");
+
+  const AUTHORIZED_ADMIN_MOBILE = "9049505512";
+  let liveAdminPin = "2026";
+
+  if (sessionStorage.getItem("gp_admin_unlocked") === "yes") {
+    document.getElementById('adminLockScreen').classList.add('hidden');
+  }
+
+  window.unlockAdminPanel = () => {
+    const entered = document.getElementById('adminPinInput').value.trim();
+    if (entered === liveAdminPin) {
+      sessionStorage.setItem("gp_admin_unlocked", "yes");
+      document.getElementById('adminLockScreen').classList.add('hidden');
+    } else {
+      alert("❌ चुकीचा Admin PIN! पुन्हा प्रयत्न करा किंवा Forgot PIN वापरा.");
+    }
+  };
+
+  window.showForgotBox = () => {
+    document.getElementById('loginPinBox').classList.add('hidden');
+    document.getElementById('forgotPinBox').classList.remove('hidden');
+  };
+
+  window.hideForgotBox = () => {
+    document.getElementById('forgotPinBox').classList.add('hidden');
+    document.getElementById('loginPinBox').classList.remove('hidden');
+  };
+
+  window.resetAdminPinViaWhatsapp = async () => {
+    const cleanPhone = document.getElementById('recoveryPhoneInput').value.trim().replace(/\D/g, '').slice(-10);
+    if (cleanPhone !== AUTHORIZED_ADMIN_MOBILE) {
+      return alert("🚫 प्रवेश नाकारला! पासवर्ड रिसेट फक्त अधिकृत मुख्य Admin मोबाईल नंबरवरच उपलब्ध आहे.");
+    }
+    const newGeneratedPin = Math.floor(100000 + Math.random() * 900000).toString();
+    liveAdminPin = newGeneratedPin;
+    await setDoc(settingsRef, { adminPin: newGeneratedPin, adminWa: "91" + AUTHORIZED_ADMIN_MOBILE }, { merge: true });
+    document.getElementById('setAdminPin').value = newGeneratedPin;
+
+    const msg = `👑 GoParcel Master Admin सुरक्षा सूचना:\nतुमचा नवीन Admin Login PIN आहे: ${newGeneratedPin}\nहा PIN कोणालाही शेअर करू नका.`;
+    window.open(`https://wa.me/91${AUTHORIZED_ADMIN_MOBILE}?text=${encodeURIComponent(msg)}`, '_blank');
+    alert(`✅ नवीन Admin PIN (${newGeneratedPin}) तयार झाला असून तुमच्या WhatsApp (${AUTHORIZED_ADMIN_MOBILE}) वर पाठवला आहे!`);
+    hideForgotBox();
+  };
+
+  window.lockAdminNow = () => {
+    sessionStorage.removeItem("gp_admin_unlocked");
+    location.reload();
+  };
+
   let currentCommPercent = 20;
   let refConfig = { referrerBonus: 500, refereeBonus: 300, targetOrders: 25, validDays: 30 };
-  let allRidersMap = {}, riderDeliveredCounts = {};
+  let allRidersMap = {}, allOrdersList = [], riderDeliveredCounts = {};
 
   window.openImgModal = (src) => {
     document.getElementById('modalImgSrc').src = src;
     document.getElementById('imgModal').classList.remove('hidden');
   };
+
+  // कायदेशीर PDF प्रमाणपत्र तयार करून दाखवणे
+  window.openLegalPdfCertificate = (role, name, phone, detail, acceptedAt) => {
+    const formattedDate = acceptedAt ? new Date(acceptedAt).toLocaleString('en-IN') : "Verified Digitally";
+    const termsContent = role === 'Rider'
+      ? `१. मी GoParcel चा स्वतंत्र डिलिव्हरी पार्टनर (Independent Delivery Partner) असून कंपनीचा कायमस्वरूपी कर्मचारी नाही.<br>
+         २. माझ्या वाहनाचा विमा, PUC, RC बुक, ड्रायव्हिंग लायसन्स आणि सर्व सरकारी व वाहतूक नियमांचे पालन करण्याची संपूर्ण जबाबदारी माझी स्वतःची आहे.<br>
+         ३. कोणत्याही पार्सलमध्ये दारू, ड्रग्ज, स्फोटके किंवा बेकायदेशीर वस्तू आढळल्यास मी डिलिव्हरी थांबवून पोलिसांना व कंपनीला कळवेन.`
+      : `१. मी पाठवत असलेल्या पार्सलमध्ये दारू (Alcohol), अंमली पदार्थ (Drugs), स्फोटके, हत्यारे किंवा कोणतीही बेकायदेशीर वस्तू नाही याची मी कायदेशीर हमी देतो.<br>
+         २. पार्सलमधील वस्तूंची संपूर्ण कायदेशीर जबाबदारी माझी (कस्टमरची) राहील. बेकायदेशीर वस्तू आढळल्यास माझ्यावर थेट पोलीस गुन्हा दाखल होईल आणि GoParcel किंवा रायडर जबाबदार राहणार नाही.`;
+
+    document.getElementById('certPrintArea').innerHTML = `
+      <div style="border-bottom:2px solid #ff6600; padding-bottom:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="color:#ff6600; margin:0; font-size:18px;">GoParcel Logistics</h2>
+        <span style="background:#2ecc71; color:#000; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:11px;">DIGITALLY SIGNED</span>
+      </div>
+      <h4 style="margin-bottom:8px; color:#000;">📜 कायदेशीर नियम व अटी संमती प्रमाणपत्र (Legal Agreement Record)</h4>
+      <p><b>भूमिका (Role):</b> ${role === 'Rider' ? 'Delivery Partner (रायडर)' : 'Customer (ग्राहक)'}</p>
+      <p><b>पूर्ण नाव:</b> ${name}</p>
+      <p><b>नोंदणीकृत मोबाईल:</b> ${phone}</p>
+      <p><b>तपशील:</b> ${detail}</p>
+      <p><b>संमती दिल्याची तारीख व वेळ:</b> ${formattedDate}</p>
+      <hr style="margin:10px 0; border:none; border-top:1px dashed #999;">
+      <p style="font-size:12px; color:#222;"><b>मान्य केलेल्या अटी व शर्ती:</b><br>${termsContent}</p>
+      <div style="margin-top:14px; background:#f4f4f4; padding:8px; border-radius:6px; font-size:11px; color:#444;">
+        ✅ सदर व्यक्तीने GoParcel ॲपमधील अनिवार्य चेकबॉक्सवर टिक (✓) करून वरील सर्व नियम व अटी कायदेशीररीत्या मान्य केल्या आहेत.
+      </div>
+    `;
+    document.getElementById('legalPdfModal').classList.remove('hidden');
+  };
+
+  function renderLegalAgreementsTable() {
+    const tbody = document.getElementById('legalTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    // १. रायडर्सचे करार
+    Object.entries(allRidersMap).forEach(([rid, r]) => {
+      if (r.partnerAgreementAccepted) {
+        const dt = r.agreementAcceptedAt ? new Date(r.agreementAcceptedAt).toLocaleString('en-IN') : 'Verified';
+        const detail = `${r.vehicleType || '2-Wheeler'} (${r.vehicleNo || '-'})`;
+        tbody.innerHTML += `<tr>
+          <td><span style="background:#ff6600; color:#000; padding:2px 7px; border-radius:6px; font-weight:bold;">🛵 Rider</span></td>
+          <td><b>${r.name || 'Rider'}</b><br><small>📞 ${r.phone || ''}</small></td>
+          <td>${detail}</td>
+          <td><small>🕒 ${dt}</small></td>
+          <td><button class="btn-sm btn-pdf" onclick="openLegalPdfCertificate('Rider', '${(r.name||'Rider').replace(/'/g,'')}', '${r.phone||''}', '${detail}', '${r.agreementAcceptedAt||''}')">📄 PDF / Print</button></td>
+        </tr>`;
+      }
+    });
+
+    // २. कस्टमरच्या प्रत्येक ऑर्डरचे करार
+    allOrdersList.forEach(o => {
+      if (o.legalAgreementAccepted) {
+        const dt = o.legalAcceptedAt ? new Date(o.legalAcceptedAt).toLocaleString('en-IN') : 'Verified';
+        const cName = (o.customerEmail || 'Customer').replace('✔ ', '');
+        const cPhone = o.customerPhone || '';
+        const detail = `Parcel: ${o.parcel} | ${o.vehicle} | ₹${o.fare}`;
+        tbody.innerHTML += `<tr>
+          <td><span style="background:#3498db; color:#fff; padding:2px 7px; border-radius:6px; font-weight:bold;">📦 Customer</span></td>
+          <td><b>${cName}</b><br><small>📞 ${cPhone}</small></td>
+          <td>${detail}</td>
+          <td><small>🕒 ${dt}</small></td>
+          <td><button class="btn-sm btn-pdf" onclick="openLegalPdfCertificate('Customer', '${cName.replace(/'/g,'')}', '${cPhone}', '${detail.replace(/'/g,'')}', '${o.legalAcceptedAt||''}')">📄 PDF / Print</button></td>
+        </tr>`;
+      }
+    });
+  }
 
   const zoneMap = L.map('zoneMap').setView([18.5204, 73.8567], 11);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(zoneMap);
@@ -232,7 +406,7 @@
   const riderMarkers = {};
 
   window.showTab = (tab) => {
-    ['riders', 'referrals', 'otpLive', 'zones', 'master', 'map', 'orders'].forEach(t => {
+    ['riders', 'legal', 'referrals', 'otpLive', 'zones', 'master', 'map', 'orders'].forEach(t => {
       const cap = t.charAt(0).toUpperCase() + t.slice(1);
       document.getElementById('sec' + cap).classList.toggle('hidden', t !== tab);
       document.getElementById('t' + cap).classList.toggle('active', t === tab);
@@ -275,11 +449,12 @@
     snap.forEach(d => { const v = d.data(); tbody.innerHTML += `<tr><td><b>🏙️ ${v.cityName}</b></td><td><b>${v.votes} Votes</b></td><td><button class="btn-sm btn-approve" onclick="document.getElementById('zoneName').value='${v.cityName}';">➕ झोन सुरू करा</button></td></tr>`; });
   });
 
-  const settingsRef = doc(db, "config", "appSettings");
   onSnapshot(settingsRef, (snap) => {
     if (snap.exists()) {
       const s = snap.data();
-      document.getElementById('setAdminWa').value = s.adminWa ?? "919999999999";
+      liveAdminPin = s.adminPin || "2026";
+      document.getElementById('setAdminPin').value = liveAdminPin;
+      document.getElementById('setAdminWa').value = s.adminWa ?? "919049505512";
       document.getElementById('setPickupRadius').value = s.pickupRadiusKm ?? 2;
       document.getElementById('setOnboardingFee').value = s.onboardingFee ?? 1000;
       document.getElementById('setCommission').value = s.commission ?? 20;
@@ -319,7 +494,10 @@
   });
 
   window.saveMasterSettings = async () => {
+    const newPin = document.getElementById('setAdminPin').value.trim() || "2026";
+    liveAdminPin = newPin;
     await setDoc(settingsRef, {
+      adminPin: newPin,
       adminWa: document.getElementById('setAdminWa').value.trim(),
       pickupRadiusKm: Number(document.getElementById('setPickupRadius').value),
       onboardingFee: Number(document.getElementById('setOnboardingFee').value),
@@ -348,23 +526,16 @@
       custBannerText: document.getElementById('custBannerText').value.trim(),
       riderBannerText: document.getElementById('riderBannerText').value.trim()
     }, { merge: true });
-    alert("✅ सर्व दर, जॉइनिंग बोनस आणि रेफरल बोनस नियम लागू झाले!");
+    alert("✅ सर्व बदल व नवीन Admin PIN सेव्ह झाले!");
   };
 
-  // रेफरल बोनस मॅन्युअली जमा करणे (Credit Bonus)
   window.creditReferralBonus = async (newRiderId, referrerId, rfrAmt, rfeAmt) => {
     if (!confirm(`रेफर करणाऱ्याला ₹${rfrAmt} आणि नवीन रायडरला ₹${rfeAmt} बोनस वॉलेटमध्ये जमा करायचा का?`)) return;
-    await updateDoc(doc(db, "riders", newRiderId), {
-      referralBonusPaid: true,
-      bonusEarned: increment(rfeAmt)
-    });
+    await updateDoc(doc(db, "riders", newRiderId), { referralBonusPaid: true, bonusEarned: increment(rfeAmt) });
     if (referrerId && allRidersMap[referrerId]) {
-      await updateDoc(doc(db, "riders", referrerId), {
-        bonusEarned: increment(rfrAmt),
-        successfulReferrals: increment(1)
-      });
+      await updateDoc(doc(db, "riders", referrerId), { bonusEarned: increment(rfrAmt), successfulReferrals: increment(1) });
     }
-    alert("🎉 दोन्ही रायडर्सच्या वॉलेटमध्ये रेफरल बोनस यशस्वीरित्या जमा झाला!");
+    alert("🎉 दोन्ही रायडर्सच्या वॉलेटमध्ये रेफरल बोनस जमा झाला!");
   };
 
   function renderReferralsTable() {
@@ -456,7 +627,7 @@
       tbody.innerHTML += `<tr>
         <td><b>${r.name || 'Rider'}</b><br><small>📞 ${r.phone || ''}</small>${r.referredBy ? `<br><small style="color:#2ecc71;">🎁 Ref: ${r.referredBy}</small>` : ''}</td>
         <td><div style="display:flex; gap:5px; flex-wrap:wrap;">${thumbs.join('')}</div></td>
-        <td><b>${r.vehicleNo || '-'}</b><br><small>${r.kycDoc || '-'}</small></td>
+        <td><b>${r.vehicleType || ''} - ${r.vehicleNo || '-'}</b><br><small>${r.kycDoc || '-'}</small></td>
         <td>${r.feePaid ? '✅ Paid' : '❌ Unpaid'}<br>${r.kycRejected ? '<b style="color:#e74c3c;">Rejected</b>' : (r.approved ? '<b style="color:#2ecc71;">Approved</b>' : '<b style="color:#ff6600;">Pending</b>')}</td>
         <td>
           <button class="btn-sm btn-approve" onclick="toggleRiderApproval('${d.id}', true)">Approve</button>
@@ -467,6 +638,7 @@
     });
     document.getElementById('approvedRidersCount').innerText = approvedCount;
     renderReferralsTable();
+    renderLegalAgreementsTable();
   });
 
   window.deleteOrder = async (id) => { if (confirm("ऑर्डर डिलीट करायची का?")) await deleteDoc(doc(db, "orders", id)); };
@@ -474,11 +646,11 @@
     const tbody = document.getElementById('adminTableBody'); tbody.innerHTML = "";
     let count = 0, comm = 0;
     riderDeliveredCounts = {};
+    allOrdersList = [];
     snap.forEach(d => {
       const o = d.data(); count++;
-      if (o.status === "Delivered" && o.riderId) {
-        riderDeliveredCounts[o.riderId] = (riderDeliveredCounts[o.riderId] || 0) + 1;
-      }
+      allOrdersList.push(o);
+      if (o.status === "Delivered" && o.riderId) riderDeliveredCounts[o.riderId] = (riderDeliveredCounts[o.riderId] || 0) + 1;
       comm += Math.round(Number(o.fare || 0) * (currentCommPercent / 100));
       tbody.innerHTML += `<tr>
         <td>${o.customerEmail || 'User'}</td><td>${o.pickup} ➔ ${o.drop}</td>
@@ -489,6 +661,7 @@
     document.getElementById('totalOrders').innerText = count;
     document.getElementById('platformComm').innerText = comm;
     renderReferralsTable();
+    renderLegalAgreementsTable();
   });
 </script>
 </body>
