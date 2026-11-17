@@ -42,6 +42,7 @@
     .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; background: #ff6600; color: #000; font-weight: bold; }
     .pin-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 13px; background: #2ecc71; color: #000; font-weight: bold; margin-left: 6px; }
     .info-alert { background: #26160a; border: 1px solid #ff6600; padding: 10px; border-radius: 10px; font-size: 13px; color: #ffd2b3; margin: 8px 0; text-align: left; }
+    .otp-timer-strip { background: #1c2e3d; color: #4db8ff; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; text-align: center; margin: 6px 0; }
     .banner-strip { background: #26160a; border: 1px solid #ff6600; color: #ffd2b3; padding: 10px; border-radius: 10px; margin-bottom: 12px; font-size: 13px; text-align: center; font-weight: bold; }
     .rider-pill { background: #0d1f14; border: 1px solid #2ecc71; padding: 10px; border-radius: 10px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
     .call-btn { background: #2ecc71; color: #000; padding: 8px 14px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 13px; }
@@ -81,10 +82,12 @@
       <input type="tel" id="loginPhone" maxlength="10" placeholder="१० अंकी नोंदणीकृत मोबाईल नंबर">
       <button id="btnLoginOtp" onclick="startLoginOtp()">नवीन OTP मागवा (Request OTP)</button>
       <div id="loginOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #2f3542; padding-top:10px;">
-        <div id="txtLoginOtpAlert" class="info-alert">✅ तुमची नवीन OTP विनंती मराठी भाषेत पाठवली आहे.</div>
+        <div id="txtLoginOtpAlert" class="info-alert">✅ तुमची OTP विनंती गेली आहे. हा OTP फक्त १० मिनिटे वैध राहील.</div>
+        <div id="loginOtpTimerLabel" class="otp-timer-strip">⏳ वैधता: 10:00</div>
         <a id="loginWaNotify" href="#" target="_blank" class="wa-btn">📲 Admin ला WhatsApp वर कळवा</a>
         <input type="number" id="loginOtpInput" placeholder="आलेला ६ अंकी OTP टाका">
         <button id="btnVerifyLogin" onclick="verifyLoginOtp()" style="background:#2ecc71;">OTP तपासा व लॉगिन करा</button>
+        <button type="button" onclick="startLoginOtp()" style="background:#262b36; color:#ff944d; font-size:12px; padding:9px;">🔄 Resend OTP (जुना OTP बाद होईल)</button>
       </div>
     </div>
 
@@ -93,10 +96,12 @@
       <input type="tel" id="regPhone" maxlength="10" placeholder="१० अंकी खरा मोबाईल नंबर">
       <button id="btnRegOtp" onclick="startRegOtp()">OTP विनंती पाठवा (Verify Mobile)</button>
       <div id="regOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #2f3542; padding-top:10px;">
-        <div id="txtRegOtpAlert" class="info-alert">✅ तुमची नवीन नोंदणी विनंती मराठी भाषेत पाठवली आहे.</div>
+        <div id="txtRegOtpAlert" class="info-alert">✅ तुमची नोंदणी विनंती गेली आहे. हा OTP फक्त १० मिनिटे वैध राहील.</div>
+        <div id="regOtpTimerLabel" class="otp-timer-strip">⏳ वैधता: 10:00</div>
         <a id="regWaNotify" href="#" target="_blank" class="wa-btn">📲 Admin ला WhatsApp वर कळवा</a>
         <input type="number" id="regOtpInput" placeholder="आलेला ६ अंकी OTP टाका">
         <button id="btnVerifyReg" onclick="verifyRegOtp()" style="background:#2ecc71;">OTP तपासा व खाते उघडा</button>
+        <button type="button" onclick="startRegOtp()" style="background:#262b36; color:#ff944d; font-size:12px; padding:9px;">🔄 Resend OTP (जुना OTP बाद होईल)</button>
       </div>
     </div>
   </div>
@@ -168,7 +173,6 @@
           <div class="fare-total"><span id="lblTotFare">एकूण भाडे (Total Fare):</span><span>₹<span id="fareText">30</span></span></div>
         </div>
 
-        <!-- कायदेशीर ताकीद व अनिवार्य T&C चेकबॉक्स -->
         <div class="legal-warn-box">
           <b>⚠️ कायदेशीर सूचना (Legal Warning):</b> पार्सलमध्ये <b>दारू, अंमली पदार्थ (Drugs), स्फोटके, हत्यारे किंवा कोणतीही बेकायदेशीर वस्तू</b> पाठवण्यास सक्त मनाई आहे. असे आढळल्यास कस्टमरवर थेट पोलीस गुन्हा दाखल होईल; याची कोणतीही जबाबदारी GoParcel किंवा रायडरवर राहणार नाही.
           <label class="tc-check-label">
@@ -199,7 +203,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, doc, setDoc, getDoc, updateDoc, increment, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, doc, setDoc, getDoc, getDocs, updateDoc, increment, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAxfFnHbLimC3PEO5svXvn3sxH7yn9JEAw",
@@ -214,6 +218,7 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const OTP_VALID_MS = 10 * 60 * 1000; // १० मिनिटे वैधता
 
   const i18n = {
     mr: {
@@ -227,8 +232,8 @@
       btnLoc: "📍 माझं आत्ताचं लोकेशन निवडा (Current Location)",
       btnBook: "पार्सल बुक करा (Book Now)",
       myOrders: "माझ्या ऑर्डर्स (My Orders)",
-      waLoginMsg: (name, phone, time) => `नमस्कार GoParcel Admin, मी कस्टमर ${name} (${phone}) आत्ता (${time}) लॉगिन करत आहे. कृपया मला मराठीत OTP पाठवा.`,
-      waRegMsg: (name, phone, time) => `नमस्कार GoParcel Admin, मी नवीन कस्टमर ${name} (${phone}) आत्ता (${time}) नोंदणी करत आहे. कृपया मला मराठीत OTP पाठवा.`
+      waLoginMsg: (name, phone, time) => `नमस्कार GoParcel Admin, मी कस्टमर ${name} (${phone}) आत्ता (${time}) लॉगिन करत आहे. कृपया मला मराठीत OTP पाठवा (१० मिनिटे वैध).`,
+      waRegMsg: (name, phone, time) => `नमस्कार GoParcel Admin, मी नवीन कस्टमर ${name} (${phone}) आत्ता (${time}) नोंदणी करत आहे. कृपया मला मराठीत OTP पाठवा (१० मिनिटे वैध).`
     },
     hi: {
       langName: "हिंदी",
@@ -255,17 +260,48 @@
       btnLoc: "📍 Use My Current Location",
       btnBook: "Book Parcel Now",
       myOrders: "My Orders",
-      waLoginMsg: (name, phone, time) => `Hello GoParcel Admin, I am Customer ${name} (${phone}) logging in at (${time}). Please send my OTP in English.`,
-      waRegMsg: (name, phone, time) => `Hello GoParcel Admin, I am new Customer ${name} (${phone}) registering at (${time}). Please send my OTP in English.`
+      waLoginMsg: (name, phone, time) => `Hello GoParcel Admin, I am Customer ${name} (${phone}) logging in at (${time}). Please send my OTP in English (valid 10 mins).`,
+      waRegMsg: (name, phone, time) => `Hello GoParcel Admin, I am new Customer ${name} (${phone}) registering at (${time}). Please send my OTP in English (valid 10 mins).`
     }
   };
 
   let curLang = localStorage.getItem("gp_cust_lang") || "mr";
-  let adminWa = "919999999999", existingCustName = "";
-  let activeLoginReqId = null, activeRegReqId = null;
+  let adminWa = "919049505512", existingCustName = "";
+  let activeLoginReqId = null, activeRegReqId = null, otpCountdownInterval = null;
   let activeCustId = null, activeCustLabel = "", activeCustPhone = "";
   let trackMap = null, liveRiderPin = null, trackPickupPin = null, trackDropPin = null, unsubRiderTrack = null;
   let activeRidersList = [], activeZonesList = [], searchTimer = null;
+
+  function startOtpTimerUI(expiresAt, labelId) {
+    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+    const el = document.getElementById(labelId);
+    const tick = () => {
+      const rem = expiresAt - Date.now();
+      if (rem <= 0) {
+        el.innerText = "❌ OTP कालबाह्य (Expired)! कृपया Resend OTP दाबा.";
+        el.style.color = "#ff6b6b";
+        clearInterval(otpCountdownInterval);
+      } else {
+        const m = String(Math.floor(rem / 60000)).padStart(2, '0');
+        const s = String(Math.floor((rem % 60000) / 1000)).padStart(2, '0');
+        el.innerText = `⏳ OTP वैधता बाकी: ${m}:${s}`;
+        el.style.color = "#4db8ff";
+      }
+    };
+    tick();
+    otpCountdownInterval = setInterval(tick, 1000);
+  }
+
+  // या मोबाईल नंबरचे सर्व जुने Pending OTP तात्काळ बाद (Invalidate) करणे
+  async function invalidateOldPendingOtps(phone) {
+    try {
+      const qOld = query(collection(db, "otpRequests"), where("phone", "==", phone), where("status", "==", "Pending"));
+      const snap = await getDocs(qOld);
+      const promises = [];
+      snap.forEach(d => promises.push(updateDoc(doc(db, "otpRequests", d.id), { status: "Expired" })));
+      await Promise.all(promises);
+    } catch (e) {}
+  }
 
   window.changeLang = (lang) => {
     curLang = lang || document.getElementById('langSelect').value;
@@ -296,7 +332,7 @@
   onSnapshot(doc(db, "config", "appSettings"), (snap) => {
     if (snap.exists()) {
       const s = snap.data();
-      adminWa = s.adminWa || "919999999999";
+      adminWa = s.adminWa || "919049505512";
       window.rate2W = s.rate2W ?? 10; window.rate3W = s.rate3W ?? 18; window.rateTempo = s.rateTempo ?? 25;
       window.minFare = s.minFare ?? 30;
       document.getElementById('lbl2W').innerText = window.rate2W;
@@ -357,21 +393,51 @@
     const snap = await getDoc(doc(db, "customers", "cust_" + phone));
     if (!snap.exists()) { alert("हा नंबर नोंदणीकृत नाही! आधी नोंदणी करा."); switchCustTab('reg'); return; }
     existingCustName = snap.data().name || "Customer";
+
+    // जुना OTP बाद करणे
+    await invalidateOldPendingOtps(phone);
+
+    const nowMs = Date.now();
+    const expiresAt = nowMs + OTP_VALID_MS;
     const secretOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const timeStr = getNowTimeStr();
     const t = i18n[curLang] || i18n.mr;
-    const reqRef = await addDoc(collection(db, "otpRequests"), { role: `Customer (Login - ${t.langName})`, language: curLang, name: existingCustName, phone, otp: secretOtp, timeStr, status: "Pending", createdAt: Date.now() });
+
+    const reqRef = await addDoc(collection(db, "otpRequests"), {
+      role: `Customer (Login - ${t.langName})`,
+      language: curLang,
+      name: existingCustName,
+      phone,
+      otp: secretOtp,
+      timeStr,
+      status: "Pending",
+      createdAt: nowMs,
+      expiresAt: expiresAt
+    });
     activeLoginReqId = reqRef.id;
+    document.getElementById('loginOtpInput').value = "";
     document.getElementById('loginWaNotify').href = `https://wa.me/${adminWa}?text=${encodeURIComponent(t.waLoginMsg(existingCustName, phone, timeStr))}`;
     document.getElementById('loginOtpBox').classList.remove('hidden');
+    startOtpTimerUI(expiresAt, 'loginOtpTimerLabel');
   };
 
   window.verifyLoginOtp = async () => {
     const phone = document.getElementById('loginPhone').value.trim();
     const entered = document.getElementById('loginOtpInput').value.trim();
+    if (!activeLoginReqId) return alert("आधी OTP मागवा!");
     const reqSnap = await getDoc(doc(db, "otpRequests", activeLoginReqId));
-    if (!reqSnap.exists() || reqSnap.data().otp !== entered) return alert("चुकीचा OTP!");
+    if (!reqSnap.exists()) return alert("चुकीचा OTP!");
+    const d = reqSnap.data();
+
+    if (d.status !== "Pending") return alert("❌ हा जुना OTP बाद (Invalid) झाला आहे! नवीन OTP टाका.");
+    if (Date.now() > (d.expiresAt || (d.createdAt + OTP_VALID_MS))) {
+      await updateDoc(doc(db, "otpRequests", activeLoginReqId), { status: "Expired" });
+      return alert("⏳ या OTP ची १० मिनिटांची मुदत संपली आहे! कृपया Resend OTP दाबा.");
+    }
+    if (d.otp !== entered) return alert("❌ चुकीचा OTP!");
+
     await updateDoc(doc(db, "otpRequests", activeLoginReqId), { status: "Verified" });
+    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
     const cid = "cust_" + phone, label = `✔ ${existingCustName} (${phone})`;
     localStorage.setItem("gp_ver_cust_id", cid); localStorage.setItem("gp_ver_cust_name", label); localStorage.setItem("gp_ver_cust_phone", phone);
     openCustomerApp(cid, label, phone);
@@ -381,22 +447,52 @@
     const name = document.getElementById('regName').value.trim();
     const phone = document.getElementById('regPhone').value.trim();
     if (!name || phone.length !== 10) return alert("पूर्ण नाव व १० अंकी नंबर भरा!");
+
+    // जुना OTP बाद करणे
+    await invalidateOldPendingOtps(phone);
+
+    const nowMs = Date.now();
+    const expiresAt = nowMs + OTP_VALID_MS;
     const secretOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const timeStr = getNowTimeStr();
     const t = i18n[curLang] || i18n.mr;
-    const reqRef = await addDoc(collection(db, "otpRequests"), { role: `Customer (New - ${t.langName})`, language: curLang, name, phone, otp: secretOtp, timeStr, status: "Pending", createdAt: Date.now() });
+
+    const reqRef = await addDoc(collection(db, "otpRequests"), {
+      role: `Customer (New - ${t.langName})`,
+      language: curLang,
+      name,
+      phone,
+      otp: secretOtp,
+      timeStr,
+      status: "Pending",
+      createdAt: nowMs,
+      expiresAt: expiresAt
+    });
     activeRegReqId = reqRef.id;
+    document.getElementById('regOtpInput').value = "";
     document.getElementById('regWaNotify').href = `https://wa.me/${adminWa}?text=${encodeURIComponent(t.waRegMsg(name, phone, timeStr))}`;
     document.getElementById('regOtpBox').classList.remove('hidden');
+    startOtpTimerUI(expiresAt, 'regOtpTimerLabel');
   };
 
   window.verifyRegOtp = async () => {
     const name = document.getElementById('regName').value.trim();
     const phone = document.getElementById('regPhone').value.trim();
     const entered = document.getElementById('regOtpInput').value.trim();
+    if (!activeRegReqId) return alert("आधी OTP मागवा!");
     const reqSnap = await getDoc(doc(db, "otpRequests", activeRegReqId));
-    if (!reqSnap.exists() || reqSnap.data().otp !== entered) return alert("चुकीचा OTP!");
+    if (!reqSnap.exists()) return alert("चुकीचा OTP!");
+    const d = reqSnap.data();
+
+    if (d.status !== "Pending") return alert("❌ हा जुना OTP बाद (Invalid) झाला आहे! नवीन OTP टाका.");
+    if (Date.now() > (d.expiresAt || (d.createdAt + OTP_VALID_MS))) {
+      await updateDoc(doc(db, "otpRequests", activeRegReqId), { status: "Expired" });
+      return alert("⏳ या OTP ची १० मिनिटांची मुदत संपली आहे! कृपया Resend OTP दाबा.");
+    }
+    if (d.otp !== entered) return alert("❌ चुकीचा OTP!");
+
     await updateDoc(doc(db, "otpRequests", activeRegReqId), { status: "Verified" });
+    if (otpCountdownInterval) clearInterval(otpCountdownInterval);
     const cid = "cust_" + phone;
     await setDoc(doc(db, "customers", cid), { name, phone, preferredLang: curLang, verified: true, createdAt: serverTimestamp() });
     const label = `✔ ${name} (${phone})`;
