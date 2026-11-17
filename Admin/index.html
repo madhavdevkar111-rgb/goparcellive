@@ -6,38 +6,40 @@
   <title>GoParcel - Master Control Admin</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-    body { background: #0f0f0f; color: #fff; }
-    header { background: #000; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; }
-    header h1 { color: #ff6600; font-size: 20px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: #0d0f12; color: #f5f5f5; }
+    header { background: linear-gradient(135deg, #000000 65%, #261200 100%); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; }
+    header h1 { color: #ff6600; font-size: 20px; font-weight: 800; }
     .container { max-width: 1120px; margin: auto; padding: 14px; }
     .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 15px; }
-    .stat-card { background: #1a1a1a; padding: 14px; border-radius: 10px; border-top: 3px solid #ff6600; }
+    .stat-card { background: #16191f; padding: 14px; border-radius: 12px; border-top: 3px solid #ff6600; border: 1px solid #282d37; }
     .stat-card h3 { font-size: 12px; color: #aaa; }
     .stat-card p { font-size: 20px; font-weight: bold; color: #fff; margin-top: 4px; }
     .nav-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 4px; }
-    .nav-btn { padding: 10px 14px; background: #222; color: #ccc; border: 1px solid #333; border-radius: 8px; cursor: pointer; font-weight: bold; white-space: nowrap; }
+    .nav-btn { padding: 10px 14px; background: #1e222b; color: #ccc; border: 1px solid #2f3542; border-radius: 10px; cursor: pointer; font-weight: bold; white-space: nowrap; }
     .nav-btn.active { background: #ff6600; color: #000; border-color: #ff6600; }
-    .panel-box { background: #1a1a1a; padding: 16px; border-radius: 12px; border: 1px solid #2c2c2c; margin-bottom: 15px; }
-    #zoneMap, #adminMap { height: 340px; width: 100%; border-radius: 10px; margin-top: 10px; z-index: 1; border: 1px solid #444; }
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 15px; }
+    .panel-box { background: #16191f; padding: 16px; border-radius: 14px; border: 1px solid #282d37; margin-bottom: 15px; }
+    #zoneMap, #adminMap { height: 340px; width: 100%; border-radius: 12px; margin-top: 10px; z-index: 1; border: 1px solid #3a4150; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 15px; }
     label { font-size: 13px; color: #ff6600; display: block; margin-bottom: 4px; font-weight: bold; }
-    input[type="text"], input[type="number"], input[type="tel"], select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #111; color: #fff; font-size: 14px; }
-    .chk-row { display: flex; align-items: center; gap: 10px; background: #111; padding: 10px; border-radius: 8px; border: 1px solid #333; margin-bottom: 8px; cursor: pointer; }
+    input[type="text"], input[type="number"], input[type="tel"], select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #333b48; background: #0d0f12; color: #fff; font-size: 14px; }
+    .chk-row { display: flex; align-items: center; gap: 10px; background: #0d0f12; padding: 11px; border-radius: 10px; border: 1px solid #2f3542; margin-bottom: 6px; cursor: pointer; color: #eee; }
     .chk-row input { width: 18px; height: 18px; accent-color: #ff6600; }
-    button.save-btn { background: #2ecc71; color: #000; font-weight: bold; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; width: 100%; }
+    button.save-btn { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #000; font-weight: 800; padding: 13px; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; width: 100%; }
+    .ref-control-card { background: #1c160d; border: 1px solid #ff6600; padding: 14px; border-radius: 12px; margin: 14px 0; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #2c2c2c; font-size: 13px; vertical-align: middle; }
+    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #282d37; font-size: 13px; vertical-align: middle; }
     th { background: #ff6600; color: #000; }
     .btn-sm { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; margin: 2px; display: inline-block; text-decoration: none; }
     .btn-approve { background: #2ecc71; color: #000; }
     .btn-wa { background: #25D366; color: #000; }
     .btn-edit { background: #3498db; color: #fff; }
     .btn-block { background: #e74c3c; color: #fff; }
-    .selfie-thumb { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 2px solid #ff6600; cursor: pointer; }
+    .selfie-thumb { width: 46px; height: 46px; border-radius: 8px; object-fit: cover; border: 2px solid #ff6600; cursor: pointer; }
     .badge-req { background: #e74c3c; color: #fff; padding: 2px 7px; border-radius: 10px; font-size: 11px; margin-left: 4px; }
-    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 15px; }
-    .modal-box { background: #1a1a1a; padding: 15px; border-radius: 12px; border: 2px solid #ff6600; max-width: 450px; width: 100%; text-align: center; }
+    .lang-pill { background: #1c2e3d; color: #4db8ff; border: 1px solid #4db8ff; padding: 2px 7px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 15px; }
+    .modal-box { background: #16191f; padding: 15px; border-radius: 14px; border: 2px solid #ff6600; max-width: 450px; width: 100%; text-align: center; }
     .modal-box img { max-width: 100%; max-height: 360px; border-radius: 8px; margin-bottom: 10px; }
     .hidden { display: none; }
   </style>
@@ -64,33 +66,46 @@
   </div>
 
   <div class="nav-tabs">
-    <button id="tRiders" class="nav-btn active" onclick="showTab('riders')">🛵 रायडर्स KYC व फोटो तपासणी</button>
+    <button id="tRiders" class="nav-btn active" onclick="showTab('riders')">🛵 रायडर्स KYC व Live फोटो</button>
+    <button id="tReferrals" class="nav-btn" onclick="showTab('referrals')">🎁 रेफरल व जॉइनिंग बोनस</button>
     <button id="tOtpLive" class="nav-btn" onclick="showTab('otpLive')">🔔 ताज्या OTP विनंत्या <span id="otpBadge" class="badge-req hidden">0</span></button>
     <button id="tZones" class="nav-btn" onclick="showTab('zones')">🗺️ सर्विस एरिया व शहर व्होटिंग</button>
-    <button id="tMaster" class="nav-btn" onclick="showTab('master')">🎛️ दर व मास्टर कंट्रोल</button>
+    <button id="tMaster" class="nav-btn" onclick="showTab('master')">🎛️ दर, बोनस व नियम कंट्रोल</button>
     <button id="tMap" class="nav-btn" onclick="showTab('map')">📍 लाईव्ह रायडर मॅप</button>
     <button id="tOrders" class="nav-btn" onclick="showTab('orders')">📦 लाईव्ह ऑर्डर्स</button>
   </div>
 
+  <!-- १. रायडर्स KYC -->
   <div id="secRiders" class="panel-box" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:6px;">रायडर कागदपत्रे (फोटो), मूळ सेल्फी व ड्युटी सेल्फी पडताळणी</h3>
-    <p style="font-size:12px; color:#aaa; margin-bottom:10px;">फोटोवर क्लिक करून मोठा पहा; चुकीचे कागदपत्र असल्यास Reject करा:</p>
+    <h3 style="color:#ff6600; margin-bottom:6px;">रायडर Live Camera कागदपत्रे, मूळ सेल्फी व ड्युटी सेल्फी पडताळणी</h3>
     <table>
-      <thead><tr><th>रायडर व मोबाईल</th><th>मूळ सेल्फी | आजचा सेल्फी | दस्तऐवज फोटो</th><th>गाडी व KYC नंबर</th><th>फी व स्टेटस</th><th>अधिकार (Actions)</th></tr></thead>
+      <thead><tr><th>रायडर व मोबाईल</th><th>सेल्फी व Live Camera दस्तऐवज</th><th>गाडी व KYC नंबर</th><th>फी व स्टेटस</th><th>अधिकार (Actions)</th></tr></thead>
       <tbody id="ridersTableBody"></tbody>
     </table>
   </div>
 
-  <div id="secOtpLive" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:10px;">प्रत्येक लॉगिन/नोंदणीच्या ताज्या OTP विनंत्या (वेळेसह)</h3>
+  <!-- २. नवीन रेफरल व जॉइनिंग बोनस ट्रॅकर -->
+  <div id="secReferrals" class="panel-box hidden" style="overflow-x:auto;">
+    <h3 style="color:#ff6600; margin-bottom:6px;">🎁 रायडर रेफरल व जॉइनिंग बोनस रिपोर्ट</h3>
+    <p style="font-size:12px; color:#aaa; margin-bottom:10px;">नवीन रायडरने अट (ऑर्डर्स) पूर्ण केल्यावर तुम्ही एका क्लिकवर दोघांच्या वॉलेटमध्ये बोनस जमा करू शकता:</p>
     <table>
-      <thead><tr><th>वेळ (Time)</th><th>प्रकार</th><th>नाव व मोबाईल</th><th>नवीन OTP</th><th>स्टेटस</th><th>कृती</th></tr></thead>
+      <thead><tr><th>रेफर करणारा (Referrer)</th><th>नवीन जॉईन झालेला मित्र</th><th>पूर्ण ऑर्डर्स / लक्ष्य</th><th>बोनस रक्कम</th><th>बोनस कृती</th></tr></thead>
+      <tbody id="referralsTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ३. OTP विनंत्या -->
+  <div id="secOtpLive" class="panel-box hidden" style="overflow-x:auto;">
+    <h3 style="color:#ff6600; margin-bottom:10px;">निवडलेल्या भाषेनुसार ताज्या OTP विनंत्या</h3>
+    <table>
+      <thead><tr><th>वेळ (Time)</th><th>प्रकार व भाषा</th><th>नाव व मोबाईल</th><th>नवीन OTP</th><th>स्टेटस</th><th>कृती</th></tr></thead>
       <tbody id="otpLiveTableBody"></tbody>
     </table>
   </div>
 
+  <!-- ४. सर्विस झोन -->
   <div id="secZones" class="panel-box hidden">
-    <h3 style="color:#ff6600; margin-bottom:6px;">🗺️ सर्विस एरिया मर्यादा ठरवा (कुठपर्यंत डिलिव्हरी चालेल)</h3>
+    <h3 style="color:#ff6600; margin-bottom:6px;">🗺️ सर्विस एरिया मर्यादा ठरवा</h3>
     <div class="form-grid">
       <div><label>एरिया / शहराचे नाव</label><input type="text" id="zoneName" placeholder="उदा. Pune Central / Hingoli"></div>
       <div><label>सर्विस रेंज (Radius in km)</label><input type="number" id="zoneRadius" value="10" min="1" max="100"></div>
@@ -99,20 +114,19 @@
     </div>
     <button class="save-btn" onclick="addServiceZone()">✅ हा सर्विस एरिया मॅपवर जोडा / अपडेट करा</button>
     <div id="zoneMap"></div>
-
     <div style="overflow-x:auto; margin-top:15px;">
       <h4 style="color:#4db8ff; margin-bottom:6px;">चालू असलेले सर्विस एरिया:</h4>
       <table><thead><tr><th>एरिया</th><th>रेंज (km)</th><th>स्टेटस</th><th>कृती</th></tr></thead><tbody id="zonesTableBody"></tbody></table>
     </div>
-
     <div style="overflow-x:auto; margin-top:20px; border-top:1px solid #333; padding-top:15px;">
       <h4 style="color:#2ecc71; margin-bottom:6px;">🗳️ नवीन शहरांसाठी कस्टमर व्होटिंग:</h4>
       <table><thead><tr><th>शहर / एरिया</th><th>एकूण व्होट्स</th><th>कृती</th></tr></thead><tbody id="votesTableBody"></tbody></table>
     </div>
   </div>
 
+  <!-- ५. मास्टर कंट्रोल (दर + रेफरल व जॉइनिंग बोनस सेटिंग्ज) -->
   <div id="secMaster" class="panel-box hidden">
-    <h3 style="color:#ff6600; margin-bottom:12px;">🎛️ संपूर्ण ॲपचे मास्टर कंट्रोल</h3>
+    <h3 style="color:#ff6600; margin-bottom:12px;">🎛️ संपूर्ण ॲपचे दर व मास्टर कंट्रोल</h3>
     <div class="form-grid">
       <div><label>Admin WhatsApp नंबर (91 सह)</label><input type="tel" id="setAdminWa" value="919999999999"></div>
       <div><label>रायडर पिकअप रेंज (Pickup Radius km)</label><input type="number" id="setPickupRadius" value="2"></div>
@@ -123,14 +137,35 @@
       <div><label>3-Wheeler दर (₹/km)</label><input type="number" id="setRate3W" value="18"></div>
       <div><label>Mini Tempo दर (₹/km)</label><input type="number" id="setRateTempo" value="25"></div>
     </div>
-    <h4 style="color:#4db8ff; margin:12px 0 8px;">रायडर नोंदणी कागदपत्रे व सुरक्षा नियम:</h4>
-    <div class="form-grid">
-      <label class="chk-row"><input type="checkbox" id="docAadhaar" checked> आधार कार्ड अनिवार्य</label>
-      <label class="chk-row"><input type="checkbox" id="docLicense" checked> ड्रायव्हिंग लायसन्स अनिवार्य</label>
-      <label class="chk-row"><input type="checkbox" id="docRcBook"> RC बुक अनिवार्य</label>
-      <label class="chk-row"><input type="checkbox" id="docPanCard"> पॅन कार्ड अनिवार्य</label>
-      <label class="chk-row"><input type="checkbox" id="reqDailySelfie" checked> दररोज ड्युटी Live Selfie अनिवार्य</label>
+
+    <!-- जॉइनिंग व रेफर बोनस कंट्रोल कार्ड -->
+    <div class="ref-control-card">
+      <h4 style="color:#ff6600; margin-bottom:8px;">🎁 जॉइनिंग बोनस, मासिक कमाई बॅनर आणि रेफरल बोनस नियम (कमी-जास्त करा)</h4>
+      <div class="form-grid">
+        <div><label>किमान मासिक कमाई आकडा (₹)</label><input type="number" id="setEarnMin" value="30000"></div>
+        <div><label>कमाल मासिक कमाई आकडा (₹)</label><input type="number" id="setEarnMax" value="50000"></div>
+        <div><label>नवीन रायडर जॉइनिंग बोनस (₹/महिना पर्यंत)</label><input type="number" id="setJoiningBonus" value="5000"></div>
+        <div><label>रेफर करणाऱ्याला बोनस (Referrer ₹)</label><input type="number" id="setReferrerBonus" value="500"></div>
+        <div><label>नवीन मित्राला रेफर बोनस (Referee ₹)</label><input type="number" id="setRefereeBonus" value="300"></div>
+        <div><label>बोनससाठी आवश्यक ऑर्डर्स (Target Orders)</label><input type="number" id="setRefTargetOrders" value="25"></div>
+        <div><label>बोनस पूर्ण करण्याची मुदत (दिवस / Days)</label><input type="number" id="setRefValidDays" value="30"></div>
+      </div>
+      <div class="form-grid" style="margin-bottom:0;">
+        <label class="chk-row"><input type="checkbox" id="refSystemEnabled" checked> ✅ रेफरल व जॉइनिंग बोनस योजना चालू ठेवा</label>
+        <label class="chk-row"><input type="checkbox" id="refSameZoneOnly" checked> 📍 फक्त त्याच झोनमध्ये रेफर केल्यावर बोनस द्या</label>
+      </div>
     </div>
+
+    <h4 style="color:#4db8ff; margin:14px 0 8px;">📷 रायडर Live Camera मधून कोणते डॉक्युमेंट्स अनिवार्य करायचे ते निवडा:</h4>
+    <div class="form-grid">
+      <label class="chk-row"><input type="checkbox" id="docAadhaar" checked> 🪪 आधार कार्ड (Live Camera + नंबर)</label>
+      <label class="chk-row"><input type="checkbox" id="docLicense" checked> 🚗 ड्रायव्हिंग लायसन्स (Live Camera + नंबर)</label>
+      <label class="chk-row"><input type="checkbox" id="docRcBook"> 📄 गाडीचा RC बुक (Live Camera + नंबर)</label>
+      <label class="chk-row"><input type="checkbox" id="docPanCard"> 💳 पॅन कार्ड (Live Camera + नंबर)</label>
+      <label class="chk-row"><input type="checkbox" id="reqDailySelfie" checked> 🤳 दररोज ड्युटी Live Selfie अनिवार्य</label>
+      <label class="chk-row"><input type="checkbox" id="reqLoudAlert" checked> 🔔 नवीन ऑर्डर सायरन अलर्ट चालू</label>
+    </div>
+
     <div class="form-grid">
       <div><label>कस्टमर ॲप ऑफर बॅनर</label><input type="text" id="custBannerText" placeholder="उदा. आज ₹20 सूट!"></div>
       <div><label>रायडर ॲप बोनस बॅनर</label><input type="text" id="riderBannerText" placeholder="उदा. ५ ऑर्डरवर ₹100 बोनस!"></div>
@@ -138,11 +173,13 @@
     <button class="save-btn" onclick="saveMasterSettings()">🚀 सर्व बदल सेव्ह करा व लागू करा</button>
   </div>
 
+  <!-- ६. लाईव्ह मॅप -->
   <div id="secMap" class="panel-box hidden">
     <h3 style="color:#ff6600;">सर्व रायडर्सचे लाईव्ह GPS लोकेशन</h3>
     <div id="adminMap"></div>
   </div>
 
+  <!-- ७. लाईव्ह ऑर्डर्स -->
   <div id="secOrders" class="panel-box hidden" style="overflow-x:auto;">
     <h3 style="color:#ff6600; margin-bottom:10px;">सर्व ऑर्डर्स, डिलिव्हरी PIN व कमिशन</h3>
     <table>
@@ -155,7 +192,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, increment, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAxfFnHbLimC3PEO5svXvn3sxH7yn9JEAw",
@@ -171,6 +208,8 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   let currentCommPercent = 20;
+  let refConfig = { referrerBonus: 500, refereeBonus: 300, targetOrders: 25, validDays: 30 };
+  let allRidersMap = {}, riderDeliveredCounts = {};
 
   window.openImgModal = (src) => {
     document.getElementById('modalImgSrc').src = src;
@@ -193,7 +232,7 @@
   const riderMarkers = {};
 
   window.showTab = (tab) => {
-    ['riders', 'otpLive', 'zones', 'master', 'map', 'orders'].forEach(t => {
+    ['riders', 'referrals', 'otpLive', 'zones', 'master', 'map', 'orders'].forEach(t => {
       const cap = t.charAt(0).toUpperCase() + t.slice(1);
       document.getElementById('sec' + cap).classList.toggle('hidden', t !== tab);
       document.getElementById('t' + cap).classList.toggle('active', t === tab);
@@ -248,14 +287,34 @@
       document.getElementById('setRate2W').value = s.rate2W ?? 10;
       document.getElementById('setRate3W').value = s.rate3W ?? 18;
       document.getElementById('setRateTempo').value = s.rateTempo ?? 25;
+
+      document.getElementById('setEarnMin').value = s.earnMin ?? 30000;
+      document.getElementById('setEarnMax').value = s.earnMax ?? 50000;
+      document.getElementById('setJoiningBonus').value = s.joiningBonus ?? 5000;
+      document.getElementById('setReferrerBonus').value = s.referrerBonus ?? 500;
+      document.getElementById('setRefereeBonus').value = s.refereeBonus ?? 300;
+      document.getElementById('setRefTargetOrders').value = s.refTargetOrders ?? 25;
+      document.getElementById('setRefValidDays').value = s.refValidDays ?? 30;
+      document.getElementById('refSystemEnabled').checked = s.refSystemEnabled ?? true;
+      document.getElementById('refSameZoneOnly').checked = s.refSameZoneOnly ?? true;
+
       document.getElementById('docAadhaar').checked = s.docAadhaar ?? true;
       document.getElementById('docLicense').checked = s.docLicense ?? true;
       document.getElementById('docRcBook').checked = s.docRcBook ?? false;
       document.getElementById('docPanCard').checked = s.docPanCard ?? false;
       document.getElementById('reqDailySelfie').checked = s.reqDailySelfie ?? true;
+      document.getElementById('reqLoudAlert').checked = s.reqLoudAlert ?? true;
       document.getElementById('custBannerText').value = s.custBannerText ?? "";
       document.getElementById('riderBannerText').value = s.riderBannerText ?? "";
+
       currentCommPercent = Number(s.commission ?? 20);
+      refConfig = {
+        referrerBonus: Number(s.referrerBonus ?? 500),
+        refereeBonus: Number(s.refereeBonus ?? 300),
+        targetOrders: Number(s.refTargetOrders ?? 25),
+        validDays: Number(s.refValidDays ?? 30)
+      };
+      renderReferralsTable();
     }
   });
 
@@ -269,16 +328,72 @@
       rate2W: Number(document.getElementById('setRate2W').value),
       rate3W: Number(document.getElementById('setRate3W').value),
       rateTempo: Number(document.getElementById('setRateTempo').value),
+
+      earnMin: Number(document.getElementById('setEarnMin').value),
+      earnMax: Number(document.getElementById('setEarnMax').value),
+      joiningBonus: Number(document.getElementById('setJoiningBonus').value),
+      referrerBonus: Number(document.getElementById('setReferrerBonus').value),
+      refereeBonus: Number(document.getElementById('setRefereeBonus').value),
+      refTargetOrders: Number(document.getElementById('setRefTargetOrders').value),
+      refValidDays: Number(document.getElementById('setRefValidDays').value),
+      refSystemEnabled: document.getElementById('refSystemEnabled').checked,
+      refSameZoneOnly: document.getElementById('refSameZoneOnly').checked,
+
       docAadhaar: document.getElementById('docAadhaar').checked,
       docLicense: document.getElementById('docLicense').checked,
       docRcBook: document.getElementById('docRcBook').checked,
       docPanCard: document.getElementById('docPanCard').checked,
       reqDailySelfie: document.getElementById('reqDailySelfie').checked,
+      reqLoudAlert: document.getElementById('reqLoudAlert').checked,
       custBannerText: document.getElementById('custBannerText').value.trim(),
       riderBannerText: document.getElementById('riderBannerText').value.trim()
     }, { merge: true });
-    alert("सर्व मास्टर बदल लागू झाले!");
+    alert("✅ सर्व दर, जॉइनिंग बोनस आणि रेफरल बोनस नियम लागू झाले!");
   };
+
+  // रेफरल बोनस मॅन्युअली जमा करणे (Credit Bonus)
+  window.creditReferralBonus = async (newRiderId, referrerId, rfrAmt, rfeAmt) => {
+    if (!confirm(`रेफर करणाऱ्याला ₹${rfrAmt} आणि नवीन रायडरला ₹${rfeAmt} बोनस वॉलेटमध्ये जमा करायचा का?`)) return;
+    await updateDoc(doc(db, "riders", newRiderId), {
+      referralBonusPaid: true,
+      bonusEarned: increment(rfeAmt)
+    });
+    if (referrerId && allRidersMap[referrerId]) {
+      await updateDoc(doc(db, "riders", referrerId), {
+        bonusEarned: increment(rfrAmt),
+        successfulReferrals: increment(1)
+      });
+    }
+    alert("🎉 दोन्ही रायडर्सच्या वॉलेटमध्ये रेफरल बोनस यशस्वीरित्या जमा झाला!");
+  };
+
+  function renderReferralsTable() {
+    const tbody = document.getElementById('referralsTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    Object.entries(allRidersMap).forEach(([rid, r]) => {
+      if (r.referredBy) {
+        const refId = "rider_" + r.referredBy.replace(/[^0-9]/g, '');
+        const refRider = allRidersMap[refId];
+        const refLabel = refRider ? `${refRider.name} (${r.referredBy})` : r.referredBy;
+        const doneOrders = riderDeliveredCounts[rid] || 0;
+        const isEligible = doneOrders >= refConfig.targetOrders;
+        tbody.innerHTML += `<tr>
+          <td><b>${refLabel}</b></td>
+          <td><b>${r.name || 'Rider'}</b><br><small>📞 ${r.phone}</small></td>
+          <td><b style="color:${isEligible ? '#2ecc71' : '#ff6600'};">${doneOrders} / ${refConfig.targetOrders} ऑर्डर्स</b><br><small>मुदत: ${refConfig.validDays} दिवस</small></td>
+          <td>Referrer: <b>₹${refConfig.referrerBonus}</b><br>Friend: <b>₹${refConfig.refereeBonus}</b></td>
+          <td>${r.referralBonusPaid ? '<span style="color:#2ecc71; font-weight:bold;">✅ बोनस दिला</span>' : `<button class="btn-sm btn-approve" onclick="creditReferralBonus('${rid}', '${refId}', ${refConfig.referrerBonus}, ${refConfig.refereeBonus})">💰 बोनस जमा करा</button>`}</td>
+        </tr>`;
+      }
+    });
+  }
+
+  function buildLocalizedOtpMessage(lang, name, otp, timeStr) {
+    if (lang === 'hi') return `नमस्ते ${name}, आपका GoParcel OTP कोड है: ${otp} (समय: ${timeStr})। कृपया इसे किसी के साथ साझा न करें।`;
+    if (lang === 'en') return `Hello ${name}, your GoParcel verification OTP code is: ${otp} (Time: ${timeStr}). Do not share it with anyone.`;
+    return `नमस्कार ${name}, तुमचा GoParcel पडताळणी OTP कोड आहे: ${otp} (वेळ: ${timeStr}). हा कोणालाही सांगू नका.`;
+  }
 
   onSnapshot(query(collection(db, "otpRequests"), orderBy("createdAt", "desc")), (snap) => {
     const tbody = document.getElementById('otpLiveTableBody'); tbody.innerHTML = "";
@@ -286,13 +401,17 @@
     snap.forEach(d => {
       const r = d.data();
       const isPending = r.status === "Pending"; if (isPending) pendingCount++;
-      const waUrl = `https://wa.me/91${r.phone}?text=${encodeURIComponent(`नमस्कार ${r.name}, तुमचा GoParcel OTP कोड आहे: ${r.otp} (वेळ: ${r.timeStr})`)}`;
+      const reqLang = r.language || "mr";
+      const langLabel = reqLang === 'hi' ? 'हिंदी' : (reqLang === 'en' ? 'English' : 'मराठी');
+      const waMsg = buildLocalizedOtpMessage(reqLang, r.name, r.otp, r.timeStr);
+      const waUrl = `https://wa.me/91${r.phone}?text=${encodeURIComponent(waMsg)}`;
       tbody.innerHTML += `<tr style="${isPending ? 'background:#291a10;' : ''}">
-        <td><b>🕒 ${r.timeStr || ''}</b></td><td>${r.role || ''}</td>
+        <td><b>🕒 ${r.timeStr || ''}</b></td>
+        <td>${r.role || ''}<br><span class="lang-pill">🌐 ${langLabel}</span></td>
         <td><b>${r.name}</b><br><small>📞 ${r.phone}</small></td>
         <td><b style="color:#ff6600; font-size:17px;">${r.otp}</b></td>
         <td>${isPending ? '<span style="background:#e74c3c;color:#fff;padding:2px 6px;border-radius:8px;font-size:11px;">NEW</span>' : '<span style="color:#2ecc71;">Verified</span>'}</td>
-        <td>${isPending ? `<a href="${waUrl}" target="_blank" class="btn-sm btn-wa">📲 OTP पाठवा</a>` : '-'}</td>
+        <td>${isPending ? `<a href="${waUrl}" target="_blank" class="btn-sm btn-wa">📲 ${langLabel} OTP पाठवा</a>` : '-'}</td>
       </tr>`;
     });
     const badge = document.getElementById('otpBadge');
@@ -306,30 +425,37 @@
   };
 
   window.rejectRiderKyc = async (riderId) => {
-    const reason = prompt("कागदपत्रे का नाकारत आहात? कारण लिहा:", "कागदपत्राचा फोटो अस्पष्ट आहे, पुन्हा अपलोड करा.");
+    const reason = prompt("कागदपत्रे का नाकारत आहात? कारण लिहा:", "कागदपत्राचा फोटो अस्पष्ट आहे, पुन्हा Live Camera ने काढा.");
     if (reason) {
       await updateDoc(doc(db, "riders", riderId), { approved: false, kycRejected: true, rejectReason: reason });
-      alert("रायडरला कागदपत्रे पुन्हा अपलोड करण्याचा संदेश पाठवला आहे.");
+      alert("रायडरला कागदपत्रे पुन्हा स्कॅन करण्याचा संदेश पाठवला आहे.");
     }
   };
 
   onSnapshot(collection(db, "riders"), (snap) => {
     const tbody = document.getElementById('ridersTableBody'); tbody.innerHTML = "";
     let approvedCount = 0;
+    allRidersMap = {};
     snap.forEach(d => {
       const r = d.data();
+      allRidersMap[d.id] = r;
       if (r.approved) approvedCount++;
       if (r.lat && r.lng) {
         if (riderMarkers[d.id]) riderMarkers[d.id].setLatLng([r.lat, r.lng]);
         else riderMarkers[d.id] = L.marker([r.lat, r.lng]).addTo(adminMap).bindPopup(`🛵 ${r.name}`);
       }
-      const regImg = r.regSelfie ? `<img src="${r.regSelfie}" class="selfie-thumb" onclick="openImgModal('${r.regSelfie}')" title="मूळ सेल्फी">` : '';
-      const dutyImg = r.dailySelfie ? `<img src="${r.dailySelfie}" class="selfie-thumb" style="border-color:#2ecc71;" onclick="openImgModal('${r.dailySelfie}')" title="आजचा ड्युटी सेल्फी">` : '';
-      const docImg = r.kycPhoto ? `<img src="${r.kycPhoto}" class="selfie-thumb" style="border-color:#4db8ff;" onclick="openImgModal('${r.kycPhoto}')" title="कागदपत्र फोटो">` : '';
+      const thumbs = [];
+      if (r.regSelfie) thumbs.push(`<img src="${r.regSelfie}" class="selfie-thumb" onclick="openImgModal('${r.regSelfie}')" title="मूळ सेल्फी">`);
+      if (r.dailySelfie) thumbs.push(`<img src="${r.dailySelfie}" class="selfie-thumb" style="border-color:#2ecc71;" onclick="openImgModal('${r.dailySelfie}')" title="आजचा ड्युटी सेल्फी">`);
+      if (r.kycPhoto) thumbs.push(`<img src="${r.kycPhoto}" class="selfie-thumb" style="border-color:#4db8ff;" onclick="openImgModal('${r.kycPhoto}')" title="कागदपत्र फोटो">`);
+      if (r.photoAadhaar) thumbs.push(`<img src="${r.photoAadhaar}" class="selfie-thumb" style="border-color:#4db8ff;" onclick="openImgModal('${r.photoAadhaar}')" title="आधार कार्ड">`);
+      if (r.photoLicense) thumbs.push(`<img src="${r.photoLicense}" class="selfie-thumb" style="border-color:#f1c40f;" onclick="openImgModal('${r.photoLicense}')" title="लायसन्स">`);
+      if (r.photoRcBook) thumbs.push(`<img src="${r.photoRcBook}" class="selfie-thumb" style="border-color:#9b59b6;" onclick="openImgModal('${r.photoRcBook}')" title="RC बुक">`);
+      if (r.photoPanCard) thumbs.push(`<img src="${r.photoPanCard}" class="selfie-thumb" style="border-color:#e67e22;" onclick="openImgModal('${r.photoPanCard}')" title="पॅन कार्ड">`);
 
       tbody.innerHTML += `<tr>
-        <td><b>${r.name || 'Rider'}</b><br><small>📞 ${r.phone || ''}</small></td>
-        <td><div style="display:flex; gap:5px;">${regImg} ${dutyImg} ${docImg}</div></td>
+        <td><b>${r.name || 'Rider'}</b><br><small>📞 ${r.phone || ''}</small>${r.referredBy ? `<br><small style="color:#2ecc71;">🎁 Ref: ${r.referredBy}</small>` : ''}</td>
+        <td><div style="display:flex; gap:5px; flex-wrap:wrap;">${thumbs.join('')}</div></td>
         <td><b>${r.vehicleNo || '-'}</b><br><small>${r.kycDoc || '-'}</small></td>
         <td>${r.feePaid ? '✅ Paid' : '❌ Unpaid'}<br>${r.kycRejected ? '<b style="color:#e74c3c;">Rejected</b>' : (r.approved ? '<b style="color:#2ecc71;">Approved</b>' : '<b style="color:#ff6600;">Pending</b>')}</td>
         <td>
@@ -340,14 +466,19 @@
       </tr>`;
     });
     document.getElementById('approvedRidersCount').innerText = approvedCount;
+    renderReferralsTable();
   });
 
   window.deleteOrder = async (id) => { if (confirm("ऑर्डर डिलीट करायची का?")) await deleteDoc(doc(db, "orders", id)); };
   onSnapshot(collection(db, "orders"), (snap) => {
     const tbody = document.getElementById('adminTableBody'); tbody.innerHTML = "";
     let count = 0, comm = 0;
+    riderDeliveredCounts = {};
     snap.forEach(d => {
       const o = d.data(); count++;
+      if (o.status === "Delivered" && o.riderId) {
+        riderDeliveredCounts[o.riderId] = (riderDeliveredCounts[o.riderId] || 0) + 1;
+      }
       comm += Math.round(Number(o.fare || 0) * (currentCommPercent / 100));
       tbody.innerHTML += `<tr>
         <td>${o.customerEmail || 'User'}</td><td>${o.pickup} ➔ ${o.drop}</td>
@@ -357,8 +488,8 @@
     });
     document.getElementById('totalOrders').innerText = count;
     document.getElementById('platformComm').innerText = comm;
+    renderReferralsTable();
   });
 </script>
 </body>
 </html>
-
