@@ -107,17 +107,17 @@
       <button id="rTabReg" class="tab-btn" onclick="switchRTab('reg')">📝 नवीन रायडर नोंदणी</button>
     </div>
 
+    <!-- जुना रायडर लॉगिन -->
     <div id="rSecLogin">
       <input type="tel" id="rLoginPhone" maxlength="10" placeholder="१० अंकी नोंदणीकृत मोबाईल नंबर">
-      <button id="btnReqLoginOtp" onclick="startRiderLoginOtp()">नवीन लॉगिन OTP मागवा</button>
+      <button id="btnReqLoginOtp" onclick="startRiderLoginOtp()">लॉगिन OTP मागवा</button>
       <div id="rLoginOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #2f3542; padding-top:10px;">
-        <div id="rLoginOtpTimerLabel" class="otp-timer-strip">⏳ वैधता: 10:00</div>
-        <a id="rLoginWaLink" href="#" target="_blank" class="wa-btn">📲 Admin ला WhatsApp वर कळवा</a>
-        <input type="number" id="rLoginOtpInput" placeholder="Admin ने दिलेला ६ अंकी OTP टाका">
+        <input type="number" id="rLoginOtpInput" placeholder="६ अंकी OTP टाका">
         <button id="btnVerifyLogin" onclick="verifyRiderLoginOtp()" style="background:#2ecc71;">डॅशबोर्ड उघडा (Login)</button>
       </div>
     </div>
 
+    <!-- नवीन रायडर नोंदणी -->
     <div id="rSecReg" class="hidden">
       <input type="text" id="rName" placeholder="पूर्ण नाव (आधार कार्डप्रमाणे)">
       <input type="tel" id="rPhone" maxlength="10" placeholder="१० अंकी खरा मोबाईल नंबर">
@@ -139,7 +139,7 @@
       <!-- आधार कार्ड नंबर -->
       <input type="tel" id="rAadhaar" maxlength="12" placeholder="१२ अंकी आधार कार्ड नंबर">
 
-      <!-- आधार कार्ड फ्रंट साईड (समोरील बाजू) -->
+      <!-- आधार कार्ड फ्रंट साईड -->
       <div class="doc-upload-box">
         <label style="font-size:12px; color:#4db8ff;">🪪 आधार कार्ड (समोरील बाजू - Front):</label>
         <input type="file" accept="image/*" capture="environment" id="aadhaarFrontInput" onchange="previewDocImage(event, 'aadhaarFront')" style="display:none;">
@@ -147,7 +147,7 @@
         <button type="button" onclick="document.getElementById('aadhaarFrontInput').click()" style="background:#162838; color:#4db8ff; border:1px solid #3a8fd6; font-size:12px;">📷 आधार फ्रंट साईड फोटो काढा</button>
       </div>
 
-      <!-- आधार कार्ड बॅक साईड (मागील बाजू) -->
+      <!-- आधार कार्ड बॅक साईड -->
       <div class="doc-upload-box">
         <label style="font-size:12px; color:#4db8ff;">🪪 आधार कार्ड (मागील बाजू - Back):</label>
         <input type="file" accept="image/*" capture="environment" id="aadhaarBackInput" onchange="previewDocImage(event, 'aadhaarBack')" style="display:none;">
@@ -172,15 +172,15 @@
         </label>
       </div>
 
-      <button id="btnStartReg" onclick="startRiderRegOtp()">कागदपत्रे तपासा व OTP मागवा</button>
+      <button id="btnStartReg" onclick="startRiderRegOtp()">नोंदणी पूर्ण करा व डेटा पाठवा</button>
     </div>
   </div>
 
   <!-- रायडर डॅशबोर्ड -->
   <div id="riderScreen" class="hidden">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <span id="riderLabel" style="font-size:13px; color:#bbb; font-weight:600;"></span>
-      <button onclick="logoutRider()" style="width:auto; padding:6px 12px; background:#262b36; color:#fff; font-size:12px; margin:0;">Logout</button>
+      <span id="riderLabel" style="font-size:13px; color:#bbb; font-weight:600;">स्वागत आहे, रायडर!</span>
+      <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#262b36; color:#fff; font-size:12px; margin:0;">Logout</button>
     </div>
 
     <div class="duty-bar">
@@ -210,7 +210,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAxfFnHbLimC3PEO5svXvn3sxH7yn9JEAw",
@@ -221,6 +221,7 @@
     messagingSenderId: "263428109251",
     appId: "1:263428109251:web:12f001ac4c4e9d71c84376"
   };
+  
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
@@ -228,6 +229,7 @@
   window.capturedAadhaarBack = "";
   window.capturedRegSelfie = "";
 
+  // डॉक्युमेंट फोटो प्रीव्ह्यू आणि सेव्ह करणे
   window.previewDocImage = (event, type) => {
     const file = event.target.files[0];
     if (file) {
@@ -257,27 +259,65 @@
     document.getElementById('ownerDetailsBox').classList.toggle('hidden', vehType === '2-Wheeler');
   };
 
-  window.startRiderRegOtp = () => {
+  // नवीन रायडर नोंदणी व डेटा थेट फायरबेसमध्ये पाठवणे (जो ॲडमिनला दिसेल)
+  window.startRiderRegOtp = async () => {
     const name = document.getElementById('rName').value;
     const phone = document.getElementById('rPhone').value;
     const aadhaar = document.getElementById('rAadhaar').value;
+    const vehicleType = document.getElementById('rVehicleType').value;
+    const vehicleNo = document.getElementById('rVehicle').value;
+
     if(!name || !phone || !aadhaar) {
       alert("कृपया नाव, मोबाईल नंबर आणि आधार नंबर भरा!");
       return;
     }
-    alert("✅ कागदपत्रे व माहिती स्वीकारली! OTP पडताळणी सुरू होत आहे.");
+
+    if(phone.length < 10) {
+      alert("कृपया १० अंकी वैध मोबाईल नंबर टाका!");
+      return;
+    }
+
+    try {
+      // फायरबेसच्या 'pending_riders' मध्ये डेटा सेव्ह होतो
+      await addDoc(collection(db, "pending_riders"), {
+        name: name,
+        phone: phone,
+        aadhaarNo: aadhaar,
+        vehicleType: vehicleType,
+        vehicleNo: vehicleNo,
+        aadhaarFront: window.capturedAadhaarFront || "",
+        aadhaarBack: window.capturedAadhaarBack || "",
+        selfie: window.capturedRegSelfie || "",
+        createdAt: new Date(),
+        status: "Pending"
+      });
+
+      alert("🎉 नोंदणी यशस्वी! तुमची माहिती व कागदपत्रे ॲडमिनकडे पाठवली आहेत.");
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('riderScreen').classList.remove('hidden');
+    } catch (error) {
+      console.error("Firebase Error: ", error);
+      alert("❌ डेटा सेव्ह करताना एरर आली: " + error.message);
+    }
   };
 
   window.startRiderLoginOtp = () => {
     const phone = document.getElementById('rLoginPhone').value;
     if(!phone || phone.length < 10) {
-      alert("कृपया १० अंकी वैध नंबर टाка!");
+      alert("कृपया १० अंकी नोंदणीकृत मोबाईल नंबर टाका!");
       return;
     }
-    alert("✅ लॉगिन OTP पाठवला आहे.");
+    document.getElementById('rLoginOtpBox').classList.remove('hidden');
+    alert("✅ लॉगिनसाठी OTP पाठवला आहे. (सिम्युलेशन OTP: 123456)");
   };
 
   window.verifyRiderLoginOtp = () => {
+    const otp = document.getElementById('rLoginOtpInput').value;
+    if(!otp) {
+      alert("कृपया OTP टाका!");
+      return;
+    }
+    alert("🎉 लॉगिन यशस्वी झाले!");
     document.getElementById('authScreen').classList.add('hidden');
     document.getElementById('riderScreen').classList.remove('hidden');
   };
