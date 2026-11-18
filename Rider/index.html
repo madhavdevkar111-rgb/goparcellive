@@ -65,6 +65,7 @@
 </div>
 
 <div class="container">
+  <!-- परवानग्यांची स्मार्ट स्ट्रिप (आता सर्व भाषांमध्ये बदलेल) -->
   <div id="smartPermBox" class="perm-strip">
     <div id="txtPermHead" style="color:#ff944d; font-weight:bold; margin-bottom:6px;">⚠️ ॲपच्या परवानग्या व सेटिंग्ज तपासा:</div>
     
@@ -258,7 +259,7 @@
 
   let currentRiderVehicleType = "2-Wheeler";
 
-  // 🌐 संपूर्ण भाषा शब्दकोश (Full Translation Dictionary for Placeholders & Text)
+  // 🌐 संपूर्ण परवानग्या आणि फॉर्मसह भाषा शब्दकोश
   const translations = {
     mr: {
       portalTitle: "GP Rider पार्टनर पोर्टल",
@@ -302,7 +303,17 @@
       commLabel: "कमिशन",
       activeDelTitle: "माझ्या चालू डिलिव्हरी",
       newOrdersTitle: "नवीन उपलब्ध ऑर्डर्स",
-      permHead: "⚠️ ॲपच्या परवानग्या व सेटिंग्ज तपासा:"
+      permHead: "⚠️ ॲपच्या परवानग्या व सेटिंग्ज तपासा:",
+      permGpsText: "📍 जीपीएस लोकेशन (GPS Location)",
+      permGpsBtn: "चालू करा",
+      permOverlayText: "📱 इतर ॲप्सवर वरती दाखवणे (Display over other apps)",
+      permOverlayBtn: "सेटिंग उघडा",
+      permBatteryText: "🔋 अनरिस्ट्रिक्टेड बॅटरी (Battery Optimization)",
+      permBatteryBtn: "बॅटरी सेटिंग",
+      permNotifText: "🔔 पुश नोटिफिकेशन (Notifications)",
+      permNotifBtn: "परवानगी द्या",
+      permCamText: "📷 कॅमेरा व स्टोरेज (Camera & Storage)",
+      permCamBtn: "तपासा"
     },
     hi: {
       portalTitle: "GP Rider पार्टनर पोर्टल",
@@ -346,7 +357,17 @@
       commLabel: "कमीशन",
       activeDelTitle: "मेरी चालू डिलीवरी",
       newOrdersTitle: "नई उपलब्ध ऑर्डर्स",
-      permHead: "⚠️ ऐप की अनुमतियां और सेटिंग्स जांचें:"
+      permHead: "⚠️ ऐप की अनुमतियां और सेटिंग्स जांचें:",
+      permGpsText: "📍 जीपीएस लोकेशन (GPS Location)",
+      permGpsBtn: "चालू करें",
+      permOverlayText: "📱 अन्य ऐप्स के ऊपर दिखाना (Display over other apps)",
+      permOverlayBtn: "सेटिंग खोलें",
+      permBatteryText: "🔋 अनरिस्ट्रिक्टेड बैटरी (Battery Optimization)",
+      permBatteryBtn: "बैटरी सेटिंग",
+      permNotifText: "🔔 पुश नोटिफिकेशन (Notifications)",
+      permNotifBtn: "अनुमति दें",
+      permCamText: "📷 कैमरा और स्टोरेज (Camera & Storage)",
+      permCamBtn: "जांचें"
     },
     en: {
       portalTitle: "GP Rider Partner Portal",
@@ -390,7 +411,17 @@
       commLabel: "Commission",
       activeDelTitle: "My Active Deliveries",
       newOrdersTitle: "New Available Orders",
-      permHead: "⚠️ Check App Permissions & Settings:"
+      permHead: "⚠️ Check App Permissions & Settings:",
+      permGpsText: "📍 GPS Location",
+      permGpsBtn: "Turn On",
+      permOverlayText: "📱 Display over other apps",
+      permOverlayBtn: "Open Settings",
+      permBatteryText: "🔋 Unrestricted Battery",
+      permBatteryBtn: "Battery Settings",
+      permNotifText: "🔔 Push Notifications",
+      permNotifBtn: "Allow",
+      permCamText: "📷 Camera & Storage",
+      permCamBtn: "Check"
     }
   };
 
@@ -442,6 +473,19 @@
     document.getElementById('txtCommLabel').innerText = t.commLabel;
     document.getElementById('txtActiveDelTitle').innerText = t.activeDelTitle;
     document.getElementById('txtNewOrdersTitle').innerText = t.newOrdersTitle;
+
+    // परवानग्यांच्या स्ट्रिपमधील भाषा बदलणे
+    document.getElementById('txtPermHead').innerText = t.permHead;
+    document.getElementById('txtPermGps').innerText = t.permGpsText;
+    document.getElementById('btnPermGps').innerText = t.permGpsBtn;
+    document.getElementById('txtPermOverlay').innerText = t.permOverlayText;
+    document.getElementById('btnPermOverlay').innerText = t.permOverlayBtn;
+    document.getElementById('txtPermBattery').innerText = t.permBatteryText;
+    document.getElementById('btnPermBattery').innerText = t.permBatteryBtn;
+    document.getElementById('txtPermNotif').innerText = t.permNotifText;
+    document.getElementById('btnPermNotif').innerText = t.permNotifBtn;
+    document.getElementById('txtPermCam').innerText = t.permCamText;
+    document.getElementById('btnPermCam').innerText = t.permCamBtn;
   };
 
   window.toggleOwnerDetails = (vehType) => {
@@ -506,16 +550,19 @@
     }, 1000);
   };
 
-  // 📱 बॅकग्राउंड परवानग्या व ओव्हरले सेटिंग उघडण्यासाठी मजबूत Intents
+  // 📱 परवानग्या आणि सेटिंग्स उघडण्यासाठी अधिकृत WebView / Android Intents
   window.openOverlaySettings = () => {
-    alert("कृपया फोनच्या Settings > Apps > GP Rider मध्ये जाऊन 'Display over other apps' परवानगी Allow करा.");
+    alert("कृपया फोनच्या Settings > Apps > GP Rider मध्ये जाऊन 'Display over other apps' (इतर ॲप्सवर वरती दाखवणे) परवानगी Allow करा.");
     try {
-      window.location.href = "intent://settings/application_details?package=" + window.location.hostname + "#Intent;scheme=package;end;";
-    } catch(e) {}
+      // Android package manager setting intent
+      window.location.href = "intent:#Intent;action=android.settings.action.MANAGE_OVERLAY_PERMISSION;end;";
+    } catch(e) {
+      try { window.location.href = "app-settings:"; } catch(err){}
+    }
   };
 
   window.openBatterySettings = () => {
-    alert("कृपया फोनच्या Settings > Apps > GP Rider > Battery मध्ये जाऊन 'Unrestricted' किंवा 'No restriction' निवडा.");
+    alert("कृपया फोनच्या Settings > Apps > GP Rider > Battery मध्ये जाऊन 'Unrestricted' (अनरिस्ट्रिक्टेड) निवडा.");
     try {
       window.location.href = "intent:#Intent;action=android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS;end;";
     } catch(e) {}
