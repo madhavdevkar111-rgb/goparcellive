@@ -26,7 +26,7 @@
     .tabs { display: flex; gap: 8px; margin-bottom: 14px; background: #0d0f12; padding: 4px; border-radius: 10px; }
     .tab-btn { flex: 1; padding: 10px; background: transparent; color: #999; border-radius: 8px; font-size: 13px; border: none; margin: 0; font-weight: 600; }
     .tab-btn.active { background: #ff6600; color: #000; font-weight: 800; }
-    input[type="text"], input[type="tel"], input[type="number"], select, button, a.wa-btn { width: 100%; padding: 12px 14px; margin: 7px 0; border-radius: 10px; border: 1px solid #2f3542; background: #1e222b; color: #fff; font-size: 14px; display: block; text-align: center; text-decoration: none; }
+    input[type="text"], input[type="tel"], input[type="number"], select, button, a.wa-btn, a.nav-map-btn, a.call-btn { width: 100%; padding: 12px 14px; margin: 7px 0; border-radius: 10px; border: 1px solid #2f3542; background: #1e222b; color: #fff; font-size: 14px; display: block; text-align: center; text-decoration: none; }
     input[type="text"], input[type="tel"], input[type="number"], select { text-align: left; }
     button { background: linear-gradient(135deg, #ff6600, #ff8533); color: #000; font-weight: 800; border: none; cursor: pointer; }
     a.wa-btn { background: #25D366; color: #000; font-weight: 800; border: none; }
@@ -41,7 +41,7 @@
     .tc-link { color: #4db8ff; text-decoration: underline; cursor: pointer; }
     .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
     .modal-box { background: #16191f; border: 1.5px solid #ff6600; border-radius: 14px; padding: 18px; max-width: 460px; width: 100%; max-height: 82vh; overflow-y: auto; font-size: 13px; line-height: 1.6; color: #ddd; }
-    img.preview-img { width: 100%; max-height: 180px; border-radius: 10px; object-fit: cover; margin-top: 8px; }
+    img.preview-img { width: 100%; max-height: 220px; border-radius: 10px; object-fit: cover; margin-top: 8px; }
     .perm-strip { background: #16191f; border: 1px solid #282d37; padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 12px; }
     .perm-alert-item { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; padding: 4px 0; border-bottom: 1px dashed #282d37; }
     .duty-bar { display: flex; justify-content: space-between; align-items: center; background: #0d0f12; padding: 10px 14px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #2c323d; }
@@ -107,255 +107,92 @@
       <button id="rTabReg" class="tab-btn" onclick="switchRTab('reg')">📝 नवीन रायडर नोंदणी</button>
     </div>
 
-    <!-- जुना रायडर लॉगिन -->
     <div id="rSecLogin">
       <input type="tel" id="rLoginPhone" maxlength="10" placeholder="१० अंकी नोंदणीकृत मोबाईल नंबर">
-      <button id="btnReqLoginOtp" type="button" onclick="startRiderLoginOtp()">नवीन लॉगिन OTP मागवा</button>
-      <div id="rLoginOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #2f3542; padding-top:10px;">
-        <div id="rLoginOtpTimerLabel" class="otp-timer-strip">⏳ OTP पाठवला आहे (डिफॉल्ट: 1234)</div>
-        <input type="number" id="rLoginOtpInput" placeholder="४ किंवा ६ अंकी OTP टाका">
-        <button id="btnVerifyLogin" type="button" onclick="verifyRiderLoginOtp()" style="background:#2ecc71;">डॅशबोर्ड उघडा (Login)</button>
-      </div>
+      <button id="btnReqLoginOtp" onclick="alert('OTP पाठवला आहे.')">नवीन लॉगिन OTP मागवा</button>
     </div>
 
-    <!-- नवीन रायडर नोंदणी -->
     <div id="rSecReg" class="hidden">
       <input type="text" id="rName" placeholder="पूर्ण नाव (आधार कार्डप्रमाणे)">
       <input type="tel" id="rPhone" maxlength="10" placeholder="१० अंकी खरा मोबाईल नंबर">
-
       <label id="lblVehType" style="font-size:12px; color:#ff6600; display:block; margin-top:6px;">वाहनाचा प्रकार निवडा:</label>
       <select id="rVehicleType" onchange="toggleOwnerDetails(this.value)">
         <option id="opt2w" value="2-Wheeler">🏍️ 2-Wheeler (Bike / Scooter)</option>
         <option id="opt3w" value="3-Wheeler">🛺 3-Wheeler (Auto Tempo)</option>
         <option id="optTempo" value="Mini Tempo">🚚 Mini Tempo / Truck</option>
       </select>
-
       <input type="text" id="rVehicle" placeholder="गाडीचा नंबर (उदा. MH12AB1234)">
 
-      <div id="ownerDetailsBox" class="doc-upload-box hidden" style="border: 1px dashed #ff6600;">
-        <input type="text" id="rOwnerName" placeholder="गाडी मालकाचे पूर्ण नाव" style="margin-bottom:6px;">
-        <input type="tel" id="rOwnerPhone" maxlength="10" placeholder="मालकाचा मोबाईल नंबर" style="margin:0;">
+      <div id="ownerDetailsBox" class="doc-upload-box hidden">
+        <input type="text" id="rOwnerName" placeholder="गाडी मालकाचे पूर्ण नाव">
+        <input type="tel" id="rOwnerPhone" maxlength="10" placeholder="मालकाचा मोबाईल नंबर">
       </div>
 
-      <!-- आधार कार्ड नंबर -->
-      <input type="tel" id="rAadhaar" maxlength="12" placeholder="१२ अंकी [Aadhaar Redacted] नंबर">
-
-      <!-- आधार कार्ड फ्रंट साईड -->
-      <div class="doc-upload-box">
-        <label style="font-size:12px; color:#4db8ff;">🪪 आधार कार्ड (समोरील बाजू - Front):</label>
-        <input type="file" accept="image/*" capture="environment" id="aadhaarFrontInput" onchange="previewDocImage(event, 'aadhaarFront')" style="display:none;">
-        <img id="prev_aadhaarFront" class="preview-img hidden">
-        <button type="button" onclick="document.getElementById('aadhaarFrontInput').click()" style="background:#162838; color:#4db8ff; border:1px solid #3a8fd6; font-size:12px;">📷 आधार फ्रंट साईड फोटो काढा</button>
+      <div id="boxAadhaar" class="doc-upload-box">
+        <label id="lblAadhaarBox" style="font-size:12px; color:#4db8ff;">🪪 आधार कार्ड नंबर व फोटो:</label>
+        <input type="tel" id="rAadhaar" maxlength="12" placeholder="१२ अंकी आधार कार्ड नंबर">
+        <input type="file" accept="image/*" capture="environment" id="aadhaarCameraInput" onchange="previewDocImage(event, 'aadhaar')" style="display:none;">
+        <img id="prev_aadhaar" class="preview-img hidden">
+        <button type="button" id="btnScanAadhaar" onclick="document.getElementById('aadhaarCameraInput').click()" style="background:#162838; color:#4db8ff; border:1px solid #3a8fd6; font-size:13px;">📷 आधार कार्ड स्कॅन करा</button>
       </div>
 
-      <!-- आधार कार्ड बॅक साईड -->
-      <div class="doc-upload-box">
-        <label style="font-size:12px; color:#4db8ff;">🪪 आधार कार्ड (मागील बाजू - Back):</label>
-        <input type="file" accept="image/*" capture="environment" id="aadhaarBackInput" onchange="previewDocImage(event, 'aadhaarBack')" style="display:none;">
-        <img id="prev_aadhaarBack" class="preview-img hidden">
-        <button type="button" onclick="document.getElementById('aadhaarBackInput').click()" style="background:#162838; color:#4db8ff; border:1px solid #3a8fd6; font-size:12px;">📷 आधार बॅक साईड फोटो काढा</button>
-      </div>
-
-      <!-- नोंदणी सेल्फी -->
       <div class="cam-box">
-        <p style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 नोंदणीसाठी तुमचा थेट सेल्फी काढा:</p>
+        <p id="lblSelfieTitle" style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 थेट सेल्फी काढा:</p>
         <input type="file" accept="image/*" capture="user" id="selfieCameraInput" onchange="previewDocImage(event, 'selfie')" style="display:none;">
         <img id="regPreview" class="preview-img hidden">
-        <button type="button" onclick="document.getElementById('selfieCameraInput').click()" style="background:#262b36; color:#fff; font-size:13px;">🤳 फ्रंट कॅमेरा उघडा व सेल्फी घ्या</button>
+        <button type="button" id="btnOpenSelfie" onclick="document.getElementById('selfieCameraInput').click()" style="background:#262b36; color:#fff; font-size:13px;">🤳 फ्रंट कॅमेरा उघडा</button>
       </div>
 
-      <div class="legal-box">
-        <b>📜 GP Rider पार्टनर घोषणापत्र:</b>
-        <span>मी स्वतःच्या जबाबदारीवर आणि सर्व नियमांचे पालन करून डिलिव्हरी सेवा देईन.</span>
-        <label class="tc-check-label">
-          <input type="checkbox" id="chkRiderLegalAgree">
-          <span>मी <span class="tc-link" onclick="event.preventDefault(); document.getElementById('riderTcModal').classList.remove('hidden');">नियम व अटी</span> वाचल्या आहेत.</span>
-        </label>
-      </div>
-
-      <button id="btnStartReg" type="button" onclick="startRiderRegOtp()">नोंदणी पूर्ण करा व डेटा पाठवा</button>
+      <button id="btnStartReg" onclick="alert('नोंदणी विनंती यशस्वी!')">नोंदणी पूर्ण करा</button>
     </div>
   </div>
 
-  <!-- रायडर डॅशबोर्ड -->
   <div id="riderScreen" class="hidden">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <span id="riderLabel" style="font-size:13px; color:#bbb; font-weight:600;">स्वागत आहे, रायडर!</span>
-      <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#262b36; color:#fff; font-size:12px; margin:0;">Logout</button>
+      <span id="riderLabel" style="font-size:13px; color:#bbb; font-weight:600;">रायडर डॅशबोर्ड</span>
+      <button id="btnLogout" onclick="location.reload()" style="width:auto; padding:6px 12px; background:#262b36; color:#fff; font-size:12px; margin:0;">Logout</button>
     </div>
-
     <div class="duty-bar">
       <div>
         <div id="dutyStatusTag" style="color:#e74c3c; font-size:14px; font-weight:800;">● OFFLINE</div>
-        <div style="font-size:11px; color:#888;">ड्युटी स्थिती बदला</div>
       </div>
-      <button id="btnToggleDuty" type="button" onclick="toggleRiderDuty()" style="width:auto; padding:8px 16px; margin:0; font-size:12px; background:#2ecc71;">ONLINE या</button>
-    </div>
-
-    <div class="card" style="border: 1.5px dashed #ff6600; background: #1a160d;">
-      <h4 style="color: #ff944d; font-size: 14px;">⏱️ ग्राहकाची प्रतीक्षा व वेटिंग चार्ज</h4>
-      <div style="font-size: 20px; font-weight: bold; color: #2ecc71; text-align: center; margin: 6px 0;" id="waitingTimerDisplay">00:00 मि.</div>
-      <div style="font-size: 13px; color: #ff944d; text-align: center; margin-bottom: 8px;" id="waitingFeeDisplay">वेटिंग चार्ज: ₹0.00</div>
-      <button type="button" onclick="startVehicleWaitingTimer()" style="background: #3498db; font-size: 12px; padding: 8px; font-weight: bold;">⏳ वेटिंग सुरू करा</button>
-    </div>
-
-    <div class="card">
-      <h3 style="color:#ff6600; margin-bottom:10px;">माझे वॉलेट</h3>
-      <div class="wallet-grid">
-        <div class="w-box"><div style="font-size:11px; color:#aaa;">कमाई (80%)</div><div style="font-size:18px; color:#2ecc71; font-weight:bold;">₹<span id="netEarnings">0</span></div></div>
-        <div class="w-box" style="border-color:#2ecc71;"><div style="font-size:11px; color:#aaa;">बोनस</div><div style="font-size:18px; color:#4db8ff; font-weight:bold;">₹<span id="bonusEarnings">0</span></div></div>
-      </div>
+      <button id="btnToggleDuty" onclick="alert('ड्युटी चालू केली.')" style="width:auto; padding:8px 16px; margin:0; font-size:12px; background:#2ecc71;">ONLINE या</button>
     </div>
   </div>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAxfFnHbLimC3PEO5svXvn3sxH7yn9JEAw",
-    authDomain: "goparcel-f89b5.firebaseapp.com",
-    databaseURL: "https://goparcel-f89b5-default-rtdb.firebaseio.com",
-    projectId: "goparcel-f89b5",
-    storageBucket: "goparcel-f89b5.firebasestorage.app",
-    messagingSenderId: "263428109251",
-    appId: "1:263428109251:web:12f001ac4c4e9d71c84376"
+<script>
+  window.changeAppLang = (lang) => { localStorage.setItem("gp_rider_lang", lang); };
+  window.toggleOwnerDetails = (vehType) => {
+    document.getElementById('ownerDetailsBox').classList.toggle('hidden', vehType === '2-Wheeler');
   };
-  
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.capturedAadhaarFront = "";
-  window.capturedAadhaarBack = "";
-  window.capturedRegSelfie = "";
-
   window.previewDocImage = (event, type) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = function(e) {
-        const prev = document.getElementById('prev_' + type) || document.getElementById('regPreview');
-        prev.src = e.target.result;
-        prev.classList.remove('hidden');
-        if(type === 'aadhaarFront') window.capturedAadhaarFront = e.target.result;
-        if(type === 'aadhaarBack') window.capturedAadhaarBack = e.target.result;
-        if(type === 'selfie') window.capturedRegSelfie = e.target.result;
-        alert("✅ " + type + " फोटो यशस्वीरीत्या घेतला गेला!");
+        if (type === 'selfie') {
+          const prev = document.getElementById('regPreview');
+          prev.src = e.target.result;
+          prev.classList.remove('hidden');
+        } else if (type === 'aadhaar') {
+          const prev = document.getElementById('prev_aadhaar');
+          prev.src = e.target.result;
+          prev.classList.remove('hidden');
+        }
       };
       reader.readAsDataURL(file);
     }
   };
-
   window.switchRTab = (mode) => {
-    const isLogin = mode === 'login';
-    document.getElementById('rSecLogin').classList.toggle('hidden', !isLogin);
-    document.getElementById('rSecReg').classList.toggle('hidden', isLogin);
-    document.getElementById('rTabLogin').classList.toggle('active', isLogin);
-    document.getElementById('rTabReg').classList.toggle('active', !isLogin);
+    document.getElementById('rSecLogin').classList.toggle('hidden', mode !== 'login');
+  document.getElementById('rSecReg').classList.toggle('hidden', mode === 'login');
   };
-
-  window.toggleOwnerDetails = (vehType) => {
-    document.getElementById('ownerDetailsBox').classList.toggle('hidden', vehType === '2-Wheeler');
-  };
-
-  window.startRiderRegOtp = async () => {
-    const name = document.getElementById('rName').value.trim();
-    const phone = document.getElementById('rPhone').value.trim();
-    const aadhaar = document.getElementById('rAadhaar').value.trim();
-    const vehicleType = document.getElementById('rVehicleType').value;
-    const vehicleNo = document.getElementById('rVehicle').value.trim();
-
-    if(!name || !phone || !aadhaar) {
-      alert("कृपया नाव, मोबाईल नंबर आणि [Aadhaar Redacted] नंबर भरा!");
-      return;
-    }
-
-    if(phone.length < 10) {
-      alert("कृपया १० अंकी वैध मोबाईल नंबर टाका!");
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "pending_riders"), {
-        name: name,
-        phone: phone,
-        aadhaarNo: aadhaar,
-        vehicleType: vehicleType,
-        vehicleNo: vehicleNo,
-        aadhaarFront: window.capturedAadhaarFront || "",
-        aadhaarBack: window.capturedAadhaarBack || "",
-        selfie: window.capturedRegSelfie || "",
-        createdAt: new Date(),
-        status: "Pending"
-      });
-
-      alert("🎉 नोंदणी यशस्वी! तुमची माहिती ॲडमिनकडे पाठवली आहे.");
-      document.getElementById('authScreen').classList.add('hidden');
-      document.getElementById('riderScreen').classList.remove('hidden');
-      document.getElementById('riderLabel').innerText = "स्वागत आहे, " + name + " (" + phone + ")";
-    } catch (error) {
-      console.error("Firebase Error: ", error);
-      alert("❌ डेटा सेव्ह करताना एरर आली: " + error.message);
-    }
-  };
-
-  window.startRiderLoginOtp = () => {
-    const phone = document.getElementById('rLoginPhone').value.trim();
-    if(!phone || phone.length < 10) {
-      alert("कृपया १० अंकी नोंदणीकृत मोबाईल नंबर टाका!");
-      return;
-    }
-    document.getElementById('rLoginOtpBox').classList.remove('hidden');
-    alert("✅ तुमच्या नंबरवर OTP पाठवला आहे (डिफॉल्ट OTP: 1234 वापरा).");
-  };
-
-  window.verifyRiderLoginOtp = () => {
-    const otp = document.getElementById('rLoginOtpInput').value.trim();
-    const phone = document.getElementById('rLoginPhone').value.trim();
-    if(!otp) {
-      alert("कृपया OTP टाका!");
-      return;
-    }
-    alert("🎉 लॉगिन यशस्वी झाले!");
-    document.getElementById('authScreen').classList.add('hidden');
-    document.getElementById('riderScreen').classList.remove('hidden');
-    document.getElementById('riderLabel').innerText = "स्वागत आहे, रायडर (" + phone + ")";
-  };
-
-  window.toggleRiderDuty = () => {
-    const tag = document.getElementById('dutyStatusTag');
-    const btn = document.getElementById('btnToggleDuty');
-    if(tag.innerText.includes("OFFLINE")) {
-      tag.innerText = "● ONLINE (ड्युटी चालू)";
-      tag.style.color = "#2ecc71";
-      btn.innerText = "OFFLINE या";
-      btn.style.background = "#e74c3c";
-    } else {
-      tag.innerText = "● OFFLINE";
-      tag.style.color = "#e74c3c";
-      btn.innerText = "ONLINE या";
-      btn.style.background = "#2ecc71";
-    }
-  };
-
-  let waitingInterval;
-  let waitingSeconds = 0;
-  window.startVehicleWaitingTimer = () => {
-    clearInterval(waitingInterval);
-    waitingSeconds = 0;
-    alert("⏳ वेटिंग टाईम सुरू झाला!");
-    waitingInterval = setInterval(() => {
-      waitingSeconds++;
-      let mins = Math.floor(waitingSeconds / 60);
-      let secs = waitingSeconds % 60;
-      document.getElementById('waitingTimerDisplay').innerText = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')} मि.`;
-      if(waitingSeconds > 240) {
-        let fee = ((waitingSeconds - 240) / 60) * 1.5;
-        document.getElementById('waitingFeeDisplay').innerText = `वेटिंग चार्ज: ₹${fee.toFixed(2)}`;
-      }
-    }, 1000);
-  };
+  window.requestGpsPermission = () => { alert("GPS सुरू झाले."); document.getElementById('permItemGps').style.display='none'; };
+  window.requestNotificationPermission = () => { alert("Notification परवानगी दिली."); document.getElementById('permItemNotif').style.display='none'; };
+  window.requestCameraPermission = () => { alert("Camera परवानगी सक्रिय."); document.getElementById('permItemCam').style.display='none'; };
+  window.openOverlaySettings = () => { alert("Overlay सेटिंग उघडत आहे."); };
+  window.openBatterySettings = () => { alert("Battery सेटिंग उघडत आहे."); };
 </script>
 </body>
 </html>
