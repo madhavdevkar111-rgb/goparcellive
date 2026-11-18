@@ -73,7 +73,7 @@
 </div>
 
 <div class="container">
-  <!-- स्मार्ट परमिशन स्ट्रिप (Display over other apps आणि Battery Optimization डायरेक्ट उघडण्यासाठी बटणे) -->
+  <!-- स्मार्ट परमिशन स्ट्रिप -->
   <div id="smartPermBox" class="perm-strip hidden">
     <div style="color:#ff944d; font-weight:bold; margin-bottom:6px;">⚠️ कृपया रायडर ॲपसाठी खालील परवानग्या चालू करा:</div>
     <div id="permItemGps" class="perm-alert-item hidden">
@@ -122,13 +122,21 @@
       <input type="tel" id="rPhone" maxlength="10" placeholder="१० अंकी खरा मोबाईल नंबर">
 
       <label id="lblVehType" style="font-size:12px; color:#ff6600; display:block; margin-top:6px;">वाहनाचा प्रकार निवडा (Vehicle Type):</label>
-      <select id="rVehicleType">
-        <option value="2-Wheeler">🏍️ 2-Wheeler (Bike / Scooter)</option>
+      <select id="rVehicleType" onchange="toggleOwnerDetails(this.value)">
+        <option value="2-Wheeler">🏍️ 2-Wheeler (Bike / Scooter - स्वतःची गाडी)</option>
         <option value="3-Wheeler">🛺 3-Wheeler (Auto Tempo)</option>
-        <option value="Mini Tempo">🚚 Mini Tempo (Tata Ace / Pickup)</option>
+        <option value="Mini Tempo">🚚 Mini Tempo / Truck (टाटा एसी / मालट्रक)</option>
       </select>
 
       <input type="text" id="rVehicle" placeholder="गाडीचा नंबर (उदा. MH12AB1234)">
+
+      <!-- वाहन मालक तपशील बॉक्स (2-Wheeler साठी लपलेला असेल, इतरांसाठी दिसेल) -->
+      <div id="ownerDetailsBox" class="doc-upload-box hidden" style="border: 1px dashed #ff6600; background: #16191f;">
+        <label style="font-size:12px; color:#ff944d; display:block; margin-bottom:6px;">👤 वाहन मालक तपशील (Vehicle Owner Details):</label>
+        <p style="font-size: 11px; color: #aaa; margin-bottom: 6px;">ही व्यावसायिक गाडी असल्यामुळे मालक व ड्रायव्हर वेगळे असू शकतात.</p>
+        <input type="text" id="rOwnerName" placeholder="गाडी मालकाचे पूर्ण नाव (Owner Name)" style="margin-bottom:6px;">
+        <input type="tel" id="rOwnerPhone" maxlength="10" placeholder="मालकाचा १० अंकी मोबाईल नंबर" style="margin:0;">
+      </div>
 
       <div id="regReferralBox" style="background:#102217; border:1px dashed #2ecc71; padding:10px; border-radius:10px; margin:8px 0;">
         <label id="lblRefInput" style="font-size:12px; color:#2ecc71; display:block; margin-bottom:4px;">🎁 मित्राचा रेफरल नंबर (असल्यास टाका):</label>
@@ -143,16 +151,6 @@
         <img id="prev_aadhaar" class="preview-img hidden">
         <button type="button" id="btnScanAadhaar" onclick="openDocCam('aadhaar')" style="background:#162838; color:#4db8ff; border:1px solid #3a8fd6; font-size:13px;">📷 आधार कार्ड स्कॅन करा</button>
         <button type="button" id="snap_aadhaar" onclick="captureDocCam('aadhaar')" class="hidden" style="background:#2ecc71; font-size:13px;">✅ क्लिक करा</button>
-      </div>
-
-      <!-- २. ड्रायव्हिंग लायसन्स -->
-      <div id="boxLicense" class="doc-upload-box">
-        <label id="lblLicBox" style="font-size:12px; color:#f1c40f;">🚗 ड्रायव्हिंग लायसन्स नंबर व Live Camera फोटो:</label>
-        <input type="text" id="rLicense" placeholder="ड्रायव्हिंग लायसन्स नंबर">
-        <video id="vid_license" autoplay playsinline class="hidden"></video>
-        <img id="prev_license" class="preview-img hidden">
-        <button type="button" id="btnScanLic" onclick="openDocCam('license')" style="background:#2b2410; color:#f1c40f; border:1px solid #f1c40f; font-size:13px;">📷 लायसन्स स्कॅन करा</button>
-        <button type="button" id="snap_license" onclick="captureDocCam('license')" class="hidden" style="background:#2ecc71; font-size:13px;">✅ क्लिक करा</button>
       </div>
 
       <!-- सेल्फी कॅमेरा -->
@@ -199,6 +197,24 @@
       <button id="btnToggleDuty" onclick="toggleRiderDuty()" style="width:auto; padding:8px 16px; margin:0; font-size:12px; background:#2ecc71;">ONLINE या</button>
     </div>
 
+    <!-- वाहननिहाय वेटिंग टाईम व चार्ज कार्ड -->
+    <div id="waitingSection" class="card" style="border: 1.5px dashed #ff6600; background: #1a160d;">
+      <h4 style="color: #ff944d; font-size: 14px;">⏱️ ग्राहकाची प्रतीक्षा व वेटिंग चार्ज</h4>
+      <p style="font-size: 12px; color: #ccc; margin: 4px 0;" id="waitingRuleDesc">वाहन प्रकारानुसार मोफत वेळ व चार्ज लागू होईल.</p>
+      
+      <div style="font-size: 20px; font-weight: bold; color: #2ecc71; text-align: center; margin: 6px 0;" id="waitingTimerDisplay">
+        00:00 मि. (प्रतीक्षेत)
+      </div>
+      
+      <div style="font-size: 13px; color: #ff944d; text-align: center; margin-bottom: 8px;" id="waitingFeeDisplay">
+        वेटिंग चार्ज: ₹0.00
+      </div>
+      
+      <button type="button" onclick="startVehicleWaitingTimer()" style="background: #3498db; font-size: 12px; padding: 8px; font-weight: bold;">
+        ⏳ लोकेशनवर पोहोचलो - वेटिंग सुरू करा
+      </button>
+    </div>
+
     <div id="dailySelfieCard" class="card" style="border:2px solid #ff6600; background:#22150b;">
       <h3 id="txtDailySelfieTitle" style="color:#ff6600; margin-bottom:6px;">📸 आजची ड्युटी सुरू करा (Daily Selfie)</h3>
       <p id="txtDailySelfieDesc" style="font-size:12px; color:#ddd; margin-bottom:8px;">दररोज ऑनलाईन येताना तुमचा ताजा लाईव्ह सेल्फी काढणे अनिवार्य आहे.</p>
@@ -241,34 +257,94 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // थेट फोनच्या सेटिंग पेजवर नेण्यासाठी फंक्शन्स (Direct Settings Intents)
-  window.openOverlaySettings = () => {
-    if (window.Capacitor && window.Capacitor.Plugins.App) {
-      window.Capacitor.Plugins.App.openSettings();
+  let currentRiderVehicleType = "2-Wheeler";
+
+  // वाहन मालक तपशील बॉक्स ऑन/ऑफ करणे
+  window.toggleOwnerDetails = (vehType) => {
+    const ownerBox = document.getElementById('ownerDetailsBox');
+    if (vehType === '2-Wheeler') {
+      ownerBox.classList.add('hidden');
+      document.getElementById('rOwnerName').value = "";
+      document.getElementById('rOwnerPhone').value = "";
     } else {
-      alert("कृपया मोबाईलच्या Settings > Apps > GP Rider मध्ये जाऊन 'Display over other apps' परवानगी Allow करा.");
+      ownerBox.classList.remove('hidden');
     }
+  };
+
+  // वाहननिहाय वेटिंग नियम (Free seconds & rate per minute)
+  function getVehicleWaitingRules(vehicleType) {
+    if (vehicleType === "3-Wheeler") {
+      return { freeSec: 360, ratePerMin: 2.00, desc: "३-व्हीलर: पहिली ६ मिनिटे मोफत, नंतर ₹२/मिनिट" };
+    } else if (vehicleType === "Mini Tempo") {
+      return { freeSec: 600, ratePerMin: 3.50, desc: "मिनी टेम्पो/ट्रक: पहिली १० मिनिटे मोफत, नंतर ₹३.५/मिनिट" };
+    } else {
+      return { freeSec: 240, ratePerMin: 1.50, desc: "२-व्हीलर: पहिली ४ मिनिटे मोफत, नंतर ₹१.५/मिनिट" };
+    }
+  }
+
+  let waitingInterval;
+  let waitingSeconds = 0;
+
+  window.startVehicleWaitingTimer = () => {
+    clearInterval(waitingInterval);
+    waitingSeconds = 0;
+    
+    const rules = getVehicleWaitingRules(currentRiderVehicleType);
+    document.getElementById('waitingRuleDesc').innerText = rules.desc;
+    alert(`⏳ वेटिंग टाईम सुरू झाला आहे! ${rules.desc}`);
+    
+    waitingInterval = setInterval(() => {
+      waitingSeconds++;
+      let mins = Math.floor(waitingSeconds / 60);
+      let secs = waitingSeconds % 60;
+      let timerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')} मि.`;
+      let fee = 0;
+      
+      const timerDisplay = document.getElementById('waitingTimerDisplay');
+      const feeDisplay = document.getElementById('waitingFeeDisplay');
+      
+      if (waitingSeconds <= rules.freeSec) {
+        if(timerDisplay) {
+          timerDisplay.innerText = `${timerText} (मोफत वेळ चालू)`;
+          timerDisplay.style.color = "#2ecc71";
+        }
+        if(feeDisplay) feeDisplay.innerText = "वेटिंग चार्ज: ₹0.00 (मोफत)";
+      } else {
+        let extraMinutesDecimal = (waitingSeconds - rules.freeSec) / 60;
+        fee = extraMinutesDecimal * rules.ratePerMin;
+        
+        if(timerDisplay) {
+          timerDisplay.innerText = `${timerText} (चार्ज लागू!)`;
+          timerDisplay.style.color = "#e74c3c";
+        }
+        if(feeDisplay) {
+          feeDisplay.innerText = `वेटिंग चार्ज: ₹${fee.toFixed(2)} (₹${rules.ratePerMin}/मिनिट)`;
+        }
+      }
+    }, 1000);
+  };
+
+  // सेटिंग्स ओपन करण्यासाठीचे फंक्शन्स
+  window.openOverlaySettings = () => {
+    alert("कृपया फोनच्या Settings > Apps > GP Rider मध्ये जाऊन 'Display over other apps' परवानगी चालू करा.");
   };
 
   window.openBatterySettings = () => {
-    if (window.Capacitor && window.Capacitor.Plugins.App) {
-      window.Capacitor.Plugins.App.openSettings();
-    } else {
-      alert("कृपया मोबाईलच्या Settings > Apps > GP Rider > Battery मध्ये जाऊन 'Unrestricted' किंवा 'No restriction' निवडा.");
-    }
+    alert("कृपया फोनच्या Settings > Apps > GP Rider > Battery मध्ये जाऊन 'Unrestricted' निवडा.");
   };
 
   window.requestGpsPermission = () => {
-    navigator.geolocation.getCurrentPosition(pos => {
-      alert("✅ जीपीएस लोकेशन परवानगी सुरू झाली!");
-      document.getElementById('smartPermBox').classList.add('hidden');
-    }, () => { alert("कृपया मोबाईलच्या जीपीएस सेटिंगमध्ये जाऊन Location परवानगी Allow करा."); }, { enableHighAccuracy: true });
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        alert("✅ जीपीएस लोकेशन परवानगी सुरू झाली!");
+        document.getElementById('smartPermBox').classList.add('hidden');
+      }, () => { alert("कृपया जीपीएस सेटिंगमध्ये जाऊन Location परवानगी Allow करा."); }, { enableHighAccuracy: true });
+    }
   };
 
-  // ॲप लोड झाल्यावर परवानग्या तपासणे
   window.addEventListener('load', () => {
     const box = document.getElementById('smartPermBox');
-    box.classList.remove('hidden'); // रायडरला सर्व महत्त्वाच्या सेटिंग्स पटापट दिसाव्यात म्हणून स्ट्रिप दाबली आहे
+    if(box) box.classList.remove('hidden');
   });
 </script>
 </body>
