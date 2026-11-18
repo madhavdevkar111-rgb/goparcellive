@@ -1,311 +1,332 @@
 <!DOCTYPE html>
 <html lang="mr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>GP Rider - GoParcel Partner App</title>
-  <link rel="icon" type="image/png" href="https://madhavdevkar111-rgb.github.io/goparcellive/Rider/logo.png">
-  <meta name="theme-color" content="#ff6600">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoParcel Rider - रायडर पार्टनर ॲप</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-    body { background: #0d0f12; color: #f5f5f5; padding-bottom: 24px; }
-    header { background: linear-gradient(135deg, #000000 65%, #261200 100%); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
-    .brand-title h1 { color: #ff6600; font-size: 19px; font-weight: 800; }
-    .container { max-width: 500px; margin: auto; padding: 14px; }
-    .promo-hero { background: linear-gradient(135deg, #2b1505 0%, #14261a 100%); border: 1.5px solid #ff6600; border-radius: 14px; padding: 14px; margin-bottom: 14px; text-align: center; }
-    .card { background: #16191f; padding: 16px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #282d37; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 14px; background: #0d0f12; padding: 4px; border-radius: 10px; }
-    .tab-btn { flex: 1; padding: 10px; background: transparent; color: #999; border-radius: 8px; font-size: 13px; border: none; font-weight: 600; cursor: pointer; }
-    .tab-btn.active { background: #ff6600; color: #000; font-weight: 800; }
-    input[type="text"], input[type="tel"], input[type="number"], select, button, a.wa-btn { width: 100%; padding: 12px 14px; margin: 7px 0; border-radius: 10px; border: 1px solid #2f3542; background: #1e222b; color: #fff; font-size: 14px; display: block; text-align: center; text-decoration: none; }
-    input[type="text"], input[type="tel"], input[type="number"], select { text-align: left; }
-    button { background: linear-gradient(135deg, #ff6600, #ff8533); color: #000; font-weight: 800; border: none; cursor: pointer; }
-    a.wa-btn { background: #25D366; color: #000; font-weight: 800; border: none; }
-    .otp-timer-strip { background: #1c2e3d; color: #4db8ff; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; text-align: center; margin: 6px 0; }
-    .wallet-grid { display: flex; gap: 8px; text-align: center; }
-    .w-box { flex: 1; background: #0d0f12; padding: 12px 6px; border-radius: 12px; border: 1px solid #ff6600; }
-    .cam-box { background: #0d0f12; border: 2px dashed #ff6600; border-radius: 12px; padding: 12px; text-align: center; margin: 10px 0; }
-    .doc-upload-box { background: #101318; border: 1px solid #333b48; padding: 12px; border-radius: 12px; margin: 8px 0; }
-    img.preview-img { width: 100%; max-height: 180px; border-radius: 10px; object-fit: cover; margin-top: 8px; }
-    .perm-strip { background: #16191f; border: 1px solid #282d37; padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 12px; }
-    .perm-alert-item { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; padding: 4px 0; border-bottom: 1px dashed #282d37; }
-    .duty-bar { display: flex; justify-content: space-between; align-items: center; background: #0d0f12; padding: 10px 14px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #2c323d; }
+    :root { --bg: #0d0d0d; --card: #1a1a1a; --orange: #ff6600; --text: #fff; --green: #00c853; --red: #ff3d00; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
+    header { background: #000; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--orange); }
+    .logo { font-size: 20px; font-weight: bold; color: var(--orange); }
+    .container { max-width: 600px; margin: auto; padding: 12px; }
+    .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 14px; border: 1px solid #2c2c2c; }
+    input, select, button { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #222; color: #fff; font-size: 14px; margin-top: 8px; }
+    button { background: var(--orange); color: #000; font-weight: bold; border: none; cursor: pointer; }
+    .btn-green { background: var(--green); color: #000; }
+    .btn-red { background: var(--red); color: #fff; }
+    .status-pill { padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; }
+    .online { background: var(--green); color: #000; }
+    .offline { background: #444; color: #fff; }
+    .timer-box { background: #331100; border: 2px solid var(--orange); padding: 10px; border-radius: 8px; text-align: center; font-size: 18px; font-weight: bold; color: var(--orange); margin-bottom: 10px; }
+    .tabs { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; border-top: 1px solid #333; }
+    .tab-btn { flex: 1; padding: 12px; text-align: center; color: #aaa; cursor: pointer; font-size: 13px; }
+    .tab-btn.active { color: var(--orange); font-weight: bold; border-top: 2px solid var(--orange); }
     .hidden { display: none; }
+    #riderMap { height: 200px; border-radius: 10px; margin-top: 10px; }
   </style>
 </head>
 <body>
+
 <header>
-  <div class="brand-title"><h1>GP Rider - पार्टनर पोर्टल</h1></div>
+  <div class="logo">GoParcel <span style="color:#fff;">RIDER</span></div>
+  <div id="onlineToggle" class="status-pill offline" onclick="toggleOnline()">OFFLINE</div>
 </header>
 
 <div class="container">
-  <div class="perm-strip">
-    <div style="color:#ff944d; font-weight:bold; margin-bottom:6px;">⚠️ ॲप परवानग्या व सेन्सर्स:</div>
-    <div class="perm-alert-item">
-      <span>📍 जीपीएस लाईव्ह ट्रॅकिंग (GPS Tracking)</span>
-      <button type="button" onclick="alert('✅ जीपीएस सेवा सुरू आहे!')" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">तपासा</button>
+
+  <!-- Step 1: Registration / Login & KYC -->
+  <div id="riderAuthCard" class="card">
+    <h3 style="color: var(--orange);">रायडर नोंदणी / लॉगिन</h3>
+    <input type="text" id="rName" placeholder="पूर्ण नाव (आधार कार्डनुसार)" />
+    <input type="tel" id="rPhone" placeholder="मोबाईल नंबर" />
+    <select id="rCity">
+      <option value="Pune">पुणे (Pune)</option>
+    </select>
+    <select id="rVehicle">
+      <option value="2-Wheeler">2-Wheeler (बाईक / स्कूटर)</option>
+      <option value="3-Wheeler">3-Wheeler (रिक्षा / टेम्पो)</option>
+      <option value="Mini Tempo">Mini Tempo</option>
+    </select>
+    <input type="text" id="rVehNum" placeholder="गाडीचा नंबर (उदा. MH 12 AB 1234)" />
+    <input type="text" id="rLicense" placeholder="ड्रायव्हिंग लायसन्स नंबर" />
+    <input type="text" id="rAadhaar" placeholder="आधार कार्ड नंबर" />
+    <input type="text" id="rReferBy" placeholder="रेफरल कोड (असल्यास टाका)" />
+
+    <div style="background:#111; padding:10px; border-radius:8px; margin-top:10px; font-size:13px;">
+      <p style="color:var(--orange); font-weight:bold;">सहमती पत्र (Consent Agreement):</p>
+      <p id="riderConsentText" style="color:#ccc; margin:6px 0;">मी GoParcel चे सर्व वाहतूक आणि डिलिव्हरी नियम पाळेन. प्रत्येक राईडवर प्लॅटफॉर्म कमिशन कपातीस माझी संमती आहे.</p>
+      <label style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+        <input type="checkbox" id="agreeCheck" style="width:auto; margin:0;" /> मला सर्व अटी व शर्ती मान्य आहेत.
+      </label>
     </div>
-    <div class="perm-alert-item">
-      <span>🔋 अनरिस्ट्रिक्टेड बॅटरी (Battery Opt)</span>
-      <button type="button" onclick="alert('✅ बॅटरी ऑप्टिमायझेशन काढले आहे!')" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">तपासा</button>
+
+    <div style="margin-top:10px; font-size:13px; color:#ffcc80;">
+      नोंदणी जॉइनिंग फी: <strong id="joiningFeeText">₹199</strong> (Admin मंजुरीनंतर सक्रिय होईल)
     </div>
-    <div class="perm-alert-item" style="border:none;">
-      <span>📷 कॅमेरा व स्टोरेज (Camera & KYC)</span>
-      <button type="button" onclick="alert('✅ कॅमेरा परवानग्या सक्रिय आहेत!')" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">तपासा</button>
-    </div>
+
+    <button onclick="registerRider()">नोंदणी पूर्ण करा (Submit KYC)</button>
   </div>
 
-  <div class="promo-hero">
-    <h3 style="color:#ff944d; font-size:14px; margin-bottom:4px;">🚀 GP Rider पार्टनर बना आणि घरबसल्या कमावा</h3>
-    <div style="color:#2ecc71; font-size:20px; font-weight:900; margin:4px 0;">₹30,000 - ₹50,000 / महिना</div>
-    <div style="background:#ff6600; color:#000; display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:800; margin-top:4px;">🎁 + ₹5,000 जॉइनिंग बोनस!</div>
-  </div>
-
-  <div id="authScreen" class="card">
-    <div class="tabs">
-      <button id="rTabLogin" class="tab-btn active" onclick="switchRTab('login')">🔑 जुना लॉगिन</button>
-      <button id="rTabReg" class="tab-btn" onclick="switchRTab('reg')">📝 नवीन नोंदणी</button>
+  <!-- Main Rider Dashboard -->
+  <div id="riderMain" class="hidden">
+    
+    <!-- Approval Status Banner -->
+    <div id="approvalBanner" class="card" style="border-color: var(--orange); text-align:center;">
+      <strong id="approvalStatusText" style="color: var(--orange);">⏳ तुमचे KYC आणि जॉइनिंग फी अप्रूव्हल प्रलंबित आहे...</strong>
     </div>
 
-    <!-- जुना रायडर लॉगिन -->
-    <div id="rSecLogin">
-      <input type="tel" id="rLoginPhone" maxlength="10" placeholder="१० अंकी नोंदणीकृत मोबाईल नंबर">
-      <button type="button" onclick="startRiderLoginOtp()">WhatsApp द्वारे OTP मागवा</button>
-      
-      <div id="rLoginOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #2f3542; padding-top:10px;">
-        <div class="otp-timer-strip">⏳ ॲडमिनकडे OTP विनंती पाठवली आहे!</div>
-        <a id="rLoginWaBtn" href="#" target="_blank" class="wa-btn" style="margin-bottom:8px;">📲 Admin ला WhatsApp वर मेसेज पाठवा</a>
-        <input type="number" id="rLoginOtpInput" placeholder="Admin ने दिलेला ६ अंकी OTP टाका">
-        <button type="button" onclick="verifyRiderLoginOtp()" style="background:#2ecc71; margin-top:8px;">डॅशबोर्ड उघडा (Login)</button>
+    <!-- Tab 1: Orders & Timer -->
+    <div id="rtab-orders">
+      <div id="activeOrderBox" class="hidden card" style="border: 2px solid var(--green);">
+        <h3 style="color: var(--green);">🚚 चालू डिलिव्हरी (Active Ride)</h3>
+        <div id="activeOrderDetails" style="margin: 8px 0; font-size: 14px;"></div>
+        <div id="riderMap"></div>
+        
+        <label style="font-size:12px; color:#aaa; display:block; margin-top:8px;">📸 पार्सल फोटो काढा (Camera Proof):</label>
+        <input type="file" accept="image/*" capture="environment" id="parcelPhoto" />
+
+        <input type="number" id="verifyOtpInput" placeholder="ग्राहकाचा 4-अंकी OTP टाका" />
+        <button class="btn-green" onclick="completeDelivery()">OTP तपासा आणि डिलिव्हरी पूर्ण करा</button>
+        <button style="background:#25D366; color:#000; margin-top:6px;" onclick="contactCustomerWA()">ग्राहकाला WhatsApp करा</button>
+      </div>
+
+      <h3 style="color: var(--orange); margin-bottom: 8px;">नवीन ऑर्डर अलर्ट (Live Requests)</h3>
+      <div id="newOrdersContainer">ऑनलाईन व्हा म्हणजे नवीन ऑर्डर्स दिसतील...</div>
+    </div>
+
+    <!-- Tab 2: Earnings & Wallet -->
+    <div id="rtab-wallet" class="hidden">
+      <div class="card">
+        <h3 style="color: var(--orange);">माझी कमाई आणि वॉलेट</h3>
+        <p style="margin-top:10px;">एकूण पूर्ण राईड्स: <strong id="statRides">0</strong></p>
+        <p style="margin-top:6px;">एकूण कमाई (कमिशन वजा जाता): <strong id="statEarnings" style="color:var(--green); font-size:18px;">₹0</strong></p>
+        <p style="margin-top:6px; font-size:12px; color:#aaa;">प्लॅटफॉर्म कमिशन कपात: <span id="commRateDisplay">20%</span></p>
+        <button style="margin-top:12px;" onclick="requestPayout()">पैसे बँकेत जमा करा (Withdraw Request)</button>
       </div>
     </div>
 
-    <!-- नवीन रायडर नोंदणी -->
-    <div id="rSecReg" class="hidden">
-      <input type="text" id="rName" placeholder="पूर्ण नाव">
-      <input type="tel" id="rPhone" maxlength="10" placeholder="१० अंकी खरा मोबाईल नंबर">
-
-      <label style="font-size:12px; color:#ff6600; display:block; margin-top:6px;">वाहनाचा प्रकार निवडा:</label>
-      <select id="rVehicleType" onchange="toggleOwnerBox(this.value)">
-        <option value="2-Wheeler">🏍️ 2-Wheeler (Bike / Scooter)</option>
-        <option value="3-Wheeler">🛺 3-Wheeler (Auto Tempo)</option>
-        <option value="Mini Tempo">🚚 Mini Tempo / Truck</option>
-      </select>
-
-      <input type="text" id="rVehicle" placeholder="गाडीचा नंबर (उदा. MH12AB1234)">
-
-      <div id="ownerBox" class="doc-upload-box hidden" style="border: 1px dashed #ff6600;">
-        <input type="text" id="rOwnerName" placeholder="गाडी मालकाचे पूर्ण नाव" style="margin-bottom:6px;">
-        <input type="tel" id="rOwnerPhone" maxlength="10" placeholder="मालकाचा मोबाईल नंबर" style="margin:0;">
-      </div>
-
-      <input type="tel" id="rAadhaar" maxlength="12" placeholder="ओळखपत्र नंबर">
-
-      <!-- आधार फ्रंट फोटो -->
-      <div class="doc-upload-box">
-        <label style="font-size:12px; color:#4db8ff;">🪪 ओळखपत्र (समोरील बाजू - Front):</label>
-        <input type="file" accept="image/*" capture="environment" id="aadhaarFrontInput" onchange="previewDoc(event, 'front')" style="display:none;">
-        <img id="prev_front" class="preview-img hidden">
-        <button type="button" onclick="document.getElementById('aadhaarFrontInput').click()" style="background:#162838; color:#4db8ff; font-size:12px;">📷 फ्रंट साईड फोटो काढा</button>
-      </div>
-
-      <!-- आधार बॅक फोटो -->
-      <div class="doc-upload-box">
-        <label style="font-size:12px; color:#4db8ff;">🪪 ओळखपत्र (मागील बाजू - Back):</label>
-        <input type="file" accept="image/*" capture="environment" id="aadhaarBackInput" onchange="previewDoc(event, 'back')" style="display:none;">
-        <img id="prev_back" class="preview-img hidden">
-        <button type="button" onclick="document.getElementById('aadhaarBackInput').click()" style="background:#162838; color:#4db8ff; font-size:12px;">📷 बॅक साईड फोटो काढा</button>
-      </div>
-
-      <!-- सेल्फी -->
-      <div class="cam-box">
-        <p style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 नोंदणीसाठी तुमचा थेट सेल्फी काढा:</p>
-        <input type="file" accept="image/*" capture="user" id="selfieInput" onchange="previewDoc(event, 'selfie')" style="display:none;">
-        <img id="prev_selfie" class="preview-img hidden">
-        <button type="button" onclick="document.getElementById('selfieInput').click()" style="background:#262b36; color:#fff; font-size:13px;">🤳 फ्रंट कॅमेरा उघडा व सेल्फी घ्या</button>
-      </div>
-
-      <button type="button" onclick="startRiderRegOtp()">नोंदणी पूर्ण करा व OTP मागवा</button>
-
-      <div id="rRegWaBox" class="hidden" style="margin-top:10px; border-top:1px solid #2f3542; padding-top:10px;">
-        <div class="otp-timer-strip">⏳ नोंदणी सेव्ह झाली! WhatsApp द्वारे ॲडमिनकडे OTP मागवा:</div>
-        <a id="rRegWaBtn" href="#" target="_blank" class="wa-btn" style="margin-bottom:8px;">📲 ॲडमिनला WhatsApp वर नोंदणी पाठवा</a>
-        <input type="number" id="rRegOtpInput" placeholder="Admin ने दिलेला ६ अंकी OTP टाका">
-        <button type="button" onclick="verifyRiderRegOtp()" style="background:#2ecc71; margin-top:8px;">OTP तपासा व डॅशबोर्ड उघडा</button>
+    <!-- Tab 3: Refer & Profile -->
+    <div id="rtab-profile" class="hidden">
+      <div class="card">
+        <h3 style="color: var(--orange);">रायडर प्रोफाईल & रेफर</h3>
+        <p id="profileInfo" style="font-size:14px; line-height:1.6; margin-top:8px;"></p>
+        <div style="background:#111; padding:10px; border-radius:8px; margin-top:10px; text-align:center;">
+          तुमचा रेफर कोड: <strong id="riderReferCode" style="color:var(--orange);">GPR000</strong>
+        </div>
+        <button class="btn-red" style="margin-top:12px;" onclick="logoutRider()">लॉगआउट (Logout)</button>
       </div>
     </div>
-  </div>
 
-  <!-- रायडर डॅशबोर्ड (वेटिंग टाईम आणि वॉलेटसह) -->
-  <div id="riderScreen" class="hidden">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <span id="riderLabel" style="font-size:13px; color:#bbb; font-weight:600;">स्वागत आहे!</span>
-      <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#262b36; color:#fff; font-size:12px;">Logout</button>
-    </div>
-
-    <div class="duty-bar">
-      <div><div id="dutyStatusTag" style="color:#e74c3c; font-size:14px; font-weight:800;">● OFFLINE</div></div>
-      <button type="button" id="btnToggleDuty" onclick="toggleRiderDuty()" style="width:auto; padding:8px 16px; background:#2ecc71;">ONLINE या</button>
-    </div>
-
-    <div class="card" style="border: 1.5px dashed #ff6600; background: #1a160d;">
-      <h4 style="color: #ff944d; font-size: 14px;">⏱️ ग्राहकाची प्रतीक्षा व वेटिंग चार्ज</h4>
-      <div style="font-size: 20px; font-weight: bold; color: #2ecc71; text-align: center; margin: 6px 0;" id="waitingTimerDisplay">00:00 मि.</div>
-      <div style="font-size: 13px; color: #ff944d; text-align: center; margin-bottom: 8px;" id="waitingFeeDisplay">वेटिंग चार्ज: ₹0.00</div>
-      <button type="button" onclick="startVehicleWaitingTimer()" style="background: #3498db; font-size: 12px; padding: 8px; font-weight: bold;">⏳ वेटिंग सुरू करा</button>
-    </div>
-
-    <div class="card">
-      <h3 style="color:#ff6600; margin-bottom:10px;">माझे वॉलेट</h3>
-      <div class="wallet-grid">
-        <div class="w-box"><div style="font-size:11px; color:#aaa;">कमाई (80%)</div><div style="font-size:18px; color:#2ecc71; font-weight:bold;">₹<span id="netEarnings">0</span></div></div>
-        <div class="w-box" style="border-color:#2ecc71;"><div style="font-size:11px; color:#aaa;">बोनस</div><div style="font-size:18px; color:#4db8ff; font-weight:bold;">₹<span id="bonusEarnings">0</span></div></div>
-      </div>
-    </div>
   </div>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<div class="tabs" id="riderTabs" style="display:none;">
+  <div class="tab-btn active" onclick="switchRiderTab('orders', this)">🛵 ऑर्डर्स</div>
+  <div class="tab-btn" onclick="switchRiderTab('wallet', this)">💰 कमाई & वॉलेट</div>
+  <div class="tab-btn" onclick="switchRiderTab('profile', this)">👤 प्रोफाईल</div>
+</div>
 
+<script>
+  // 🔴 तुमचा FIREBASE CONFIG इथे पेस्ट करा
   const firebaseConfig = {
-    apiKey: "AIzaSyAxfFnHbLimC3PEO5svXvn3sxH7yn9JEAw",
-    authDomain: "goparcel-f89b5.firebaseapp.com",
-    databaseURL: "https://goparcel-f89b5-default-rtdb.firebaseio.com",
-    projectId: "goparcel-f89b5",
-    storageBucket: "goparcel-f89b5.firebasestorage.app",
-    messagingSenderId: "263428109251",
-    appId: "1:263428109251:web:12f001ac4c4e9d71c84376"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
-  
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const ADMIN_WHATSAPP = "919049505512";
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-  window.capturedImgs = { front: "", back: "", selfie: "" };
+  let rider = JSON.parse(localStorage.getItem('gp_rider') || 'null');
+  let isOnline = false;
+  let globalSettings = { joiningFee: 199, commission: 20, orderTimerSec: 30 };
+  let activeOrder = null;
+  let timerInterval = null;
 
-  window.previewDoc = (e, type) => {
-    const file = e.target.files[0];
-    if(file){
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        window.capturedImgs[type] = ev.target.result;
-        const img = document.getElementById('prev_' + type);
-        img.src = ev.target.result;
-        img.classList.remove('hidden');
-        alert("✅ " + type + " फोटो यशस्वीरीत्या घेतला गेला!");
-      };
-      reader.readAsDataURL(file);
-    }
+  window.onload = () => {
+    db.collection('settings').doc('global').onSnapshot(doc => {
+      if (doc.exists) {
+        globalSettings = { ...globalSettings, ...doc.data() };
+        document.getElementById('joiningFeeText').innerText = '₹' + globalSettings.joiningFee;
+        document.getElementById('commRateDisplay').innerText = globalSettings.commission + '%';
+        if (doc.data().consentText) document.getElementById('riderConsentText').innerText = doc.data().consentText;
+      }
+    });
+    if (rider) initRiderDashboard();
   };
 
-  window.switchRTab = (mode) => {
-    const isLogin = mode === 'login';
-    document.getElementById('rSecLogin').classList.toggle('hidden', !isLogin);
-    document.getElementById('rSecReg').classList.toggle('hidden', isLogin);
-    document.getElementById('rTabLogin').classList.toggle('active', isLogin);
-    document.getElementById('rTabReg').classList.toggle('active', !isLogin);
-  };
-
-  window.toggleOwnerBox = (vType) => {
-    document.getElementById('ownerBox').classList.toggle('hidden', vType === '2-Wheeler');
-  };
-
-  window.startRiderLoginOtp = async () => {
-    const phone = document.getElementById('rLoginPhone').value.trim();
-    if(!phone || phone.length < 10) { alert("१० अंकी वैध मोबाईल नंबर टाका!"); return; }
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const timeStr = new Date().toLocaleTimeString('en-IN');
-
-    try {
-      await addDoc(collection(db, "otpRequests"), {
-        role: "Rider Login", name: "Existing Rider", phone, otp, createdAt: Date.now(), timeStr, status: "Pending"
-      });
-
-      const waMsg = `👑 GoParcel Admin OTP Request:\nनमस्कार Admin, रायडर लॉगिनसाठी (${phone}) OTP मागवला आहे.\n🔐 OTP कोड: ${otp}\nवेळ: ${timeStr}`;
-      document.getElementById('rLoginWaBtn').href = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(waMsg)}`;
-      document.getElementById('rLoginOtpBox').classList.remove('hidden');
-      alert("✅ OTP तयार झाला! WhatsApp वर क्लिक करून ॲडमिनकडून OTP घ्या.");
-    } catch (err) {
-      alert("❌ एरर: " + err.message);
-    }
-  };
-
-  window.verifyRiderLoginOtp = () => {
-    if(!document.getElementById('rLoginOtpInput').value.trim()) { alert("कृपया OTP टाका!"); return; }
-    alert("🎉 लॉगिन यशस्वी!");
-    document.getElementById('authScreen').classList.add('hidden');
-    document.getElementById('riderScreen').classList.remove('hidden');
-  };
-
-  window.startRiderRegOtp = async () => {
+  function registerRider() {
+    if (!document.getElementById('agreeCheck').checked) return alert("कृपया अटी व शर्तींना संमती (Consent) द्या.");
     const name = document.getElementById('rName').value.trim();
     const phone = document.getElementById('rPhone').value.trim();
-    const aadhaar = document.getElementById('rAadhaar').value.trim();
-    const vehicle = document.getElementById('rVehicle').value.trim();
-    const vehicleType = document.getElementById('rVehicleType').value;
-    if(!name || !phone || !aadhaar) { alert("कृपया सर्व माहिती भरा!"); return; }
+    if (!name || phone.length < 10) return alert("योग्य नाव आणि मोबाईल नंबर टाका.");
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const timeStr = new Date().toLocaleTimeString('en-IN');
+    const data = {
+      name, phone,
+      city: document.getElementById('rCity').value,
+      vehicleType: document.getElementById('rVehicle').value,
+      vehicleNumber: document.getElementById('rVehNum').value,
+      license: document.getElementById('rLicense').value,
+      aadhaar: document.getElementById('rAadhaar').value,
+      approved: false,
+      wallet: 0,
+      rides: 0,
+      referCode: 'GPR' + phone.slice(-4),
+      consentAccepted: true,
+      joinedAt: new Date().toISOString()
+    };
 
-    try {
-      await addDoc(collection(db, "pending_riders"), {
-        name, phone, aadhaarNo: aadhaar, vehicleNo: vehicle, vehicleType,
-        aadhaarFront: window.capturedImgs.front || "",
-        aadhaarBack: window.capturedImgs.back || "",
-        selfie: window.capturedImgs.selfie || "",
-        createdAt: new Date(), status: "Pending"
-      });
+    db.collection('riders').doc(phone).set(data, { merge: true }).then(() => {
+      localStorage.setItem('gp_rider', JSON.stringify(data));
+      rider = data;
+      initRiderDashboard();
+    });
+  }
 
-      await addDoc(collection(db, "otpRequests"), {
-        role: "Rider Register", name, phone, otp, createdAt: Date.now(), timeStr, status: "Pending"
-      });
+  function initRiderDashboard() {
+    document.getElementById('riderAuthCard').classList.add('hidden');
+    document.getElementById('riderMain').classList.remove('hidden');
+    document.getElementById('riderTabs').style.display = 'flex';
 
-      const waMsg = `👑 GoParcel New Registration:\nनाव: ${name}\nमोबाईल: ${phone}\nओळखपत्र: ${aadhaar}\n🔐 OTP: ${otp}`;
-      document.getElementById('rRegWaBtn').href = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(waMsg)}`;
-      document.getElementById('rRegWaBox').classList.remove('hidden');
-      alert("✅ नोंदणी सेव्ह झाली आणि ॲडमिनकडे OTP विनंती गेली!");
-    } catch (err) {
-      alert("❌ एरर: " + err.message);
-    }
-  };
-
-  window.verifyRiderRegOtp = () => {
-    if(!document.getElementById('rRegOtpInput').value.trim()) { alert("कृपया OTP टाका!"); return; }
-    alert("🎉 नोंदणी आणि OTP पडताळणी यशस्वी!");
-    document.getElementById('authScreen').classList.add('hidden');
-    document.getElementById('riderScreen').classList.remove('hidden');
-  };
-
-  window.toggleRiderDuty = () => {
-    const tag = document.getElementById('dutyStatusTag');
-    const btn = document.getElementById('btnToggleDuty');
-    if(tag.innerText.includes("OFFLINE")) {
-      tag.innerText = "● ONLINE (ड्युटी चालू)"; tag.style.color = "#2ecc71"; btn.innerText = "OFFLINE या"; btn.style.background = "#e74c3c";
-    } else {
-      tag.innerText = "● OFFLINE"; tag.style.color = "#e74c3c"; btn.innerText = "ONLINE या"; btn.style.background = "#2ecc71";
-    }
-  };
-
-  let waitingInterval;
-  let waitingSeconds = 0;
-  window.startVehicleWaitingTimer = () => {
-    clearInterval(waitingInterval);
-    waitingSeconds = 0;
-    alert("⏳ वेटिंग टाईम सुरू झाला!");
-    waitingInterval = setInterval(() => {
-      waitingSeconds++;
-      let mins = Math.floor(waitingSeconds / 60);
-      let secs = waitingSeconds % 60;
-      document.getElementById('waitingTimerDisplay').innerText = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')} मि.`;
-      if(waitingSeconds > 240) {
-        let fee = ((waitingSeconds - 240) / 60) * 1.5;
-        document.getElementById('waitingFeeDisplay').innerText = `वेटिंग चार्ज: ₹${fee.toFixed(2)}`;
+    db.collection('riders').doc(rider.phone).onSnapshot(doc => {
+      if (doc.exists) {
+        rider = doc.data();
+        localStorage.setItem('gp_rider', JSON.stringify(rider));
+        const banner = document.getElementById('approvalBanner');
+        if (rider.approved) {
+          banner.style.borderColor = '#00c853';
+          document.getElementById('approvalStatusText').style.color = '#00c853';
+          document.getElementById('approvalStatusText').innerText = '✅ तुमचे खाते मंजूर (Approved) आहे! तुम्ही काम सुरू करू शकता.';
+        } else {
+          document.getElementById('approvalStatusText').innerText = `⏳ Admin मंजुरी प्रलंबित आहे (जॉइनिंग फी: ₹${globalSettings.joiningFee})`;
+        }
+        document.getElementById('statRides').innerText = rider.rides || 0;
+        document.getElementById('statEarnings').innerText = '₹' + (rider.wallet || 0);
+        document.getElementById('riderReferCode').innerText = rider.referCode;
+        document.getElementById('profileInfo').innerHTML = `नाव: <strong>${rider.name}</strong><br>मोबाईल: ${rider.phone}<br>वाहन: ${rider.vehicleType} (${rider.vehicleNumber})<br>शहर: ${rider.city}`;
       }
-    }, 1000);
-  };
+    });
+  }
+
+  function toggleOnline() {
+    if (!rider || !rider.approved) return alert("Admin कडून खाते Approved झाल्याशिवाय तुम्ही ऑनलाईन होऊ शकत नाही.");
+    isOnline = !isOnline;
+    const btn = document.getElementById('onlineToggle');
+    btn.innerText = isOnline ? 'ONLINE' : 'OFFLINE';
+    btn.className = 'status-pill ' + (isOnline ? 'online' : 'offline');
+    if (isOnline) listenPendingOrders();
+    else document.getElementById('newOrdersContainer').innerHTML = 'तुम्ही सध्या OFFLINE आहात.';
+  }
+
+  function listenPendingOrders() {
+    db.collection('orders').where('status', '==', 'PENDING').onSnapshot(snap => {
+      if (!isOnline) return;
+      const box = document.getElementById('newOrdersContainer');
+      if (snap.empty) { box.innerHTML = '<div class="card">सध्या नवीन ऑर्डर्स नाहीत...</div>'; return; }
+      box.innerHTML = '';
+      let timeLeft = globalSettings.orderTimerSec || 30;
+      clearInterval(timerInterval);
+
+      snap.forEach(doc => {
+        const o = doc.data();
+        const netEarn = Math.round(o.fare * (1 - globalSettings.commission / 100));
+        box.innerHTML += `
+          <div class="card" style="border: 1px solid var(--orange);">
+            <div class="timer-box">⏱️ ऑर्डर स्वीकारण्यासाठी वेळ: <span id="countdown">${timeLeft}</span> सेकंद</div>
+            <p><strong>${o.vehicleType}</strong> • अंतर: ${o.distanceKm} km</p>
+            <p style="font-size:13px; margin:6px 0;">🟢 पिकअप: ${o.pickup}<br>🔴 ड्रॉप: ${o.drop}</p>
+            <p style="font-size:16px; color:var(--green); font-weight:bold;">तुमची कमाई: ₹${netEarn} (एकूण भाडे ₹${o.fare})</p>
+            <div style="display:flex; gap:8px; margin-top:10px;">
+              <button class="btn-green" onclick="acceptOrder('${doc.id}')">स्वीकारा (Accept)</button>
+              <button class="btn-red" onclick="this.parentElement.parentElement.remove()">नाकारा (Reject)</button>
+            </div>
+          </div>`;
+      });
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        const el = document.getElementById('countdown');
+        if (el) el.innerText = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          box.innerHTML = '<div class="card">ऑर्डरची वेळ संपली. नवीन ऑर्डरची प्रतीक्षा करा...</div>';
+        }
+      }, 1000);
+    });
+  }
+
+  function acceptOrder(orderId) {
+    clearInterval(timerInterval);
+    db.collection('orders').doc(orderId).update({
+      status: 'ACCEPTED',
+      riderName: rider.name,
+      riderPhone: rider.phone
+    }).then(() => {
+      db.collection('orders').doc(orderId).get().then(doc => {
+        activeOrder = { id: doc.id, ...doc.data() };
+        document.getElementById('activeOrderBox').classList.remove('hidden');
+        document.getElementById('activeOrderDetails').innerHTML = `
+          ग्राहक: <strong>${activeOrder.customerName}</strong> (${activeOrder.customerPhone})<br>
+          🟢 पिकअप: ${activeOrder.pickup}<br>
+          🔴 ड्रॉप: ${activeOrder.drop}<br>
+          भाडे: <strong>₹${activeOrder.fare}</strong>`;
+      });
+    });
+  }
+
+  function completeDelivery() {
+    if (!activeOrder) return;
+    const enteredOtp = document.getElementById('verifyOtpInput').value.trim();
+    if (enteredOtp !== activeOrder.otp) return alert("❌ चुकीचा OTP! ग्राहकाकडून योग्य OTP तपासा.");
+
+    const netEarn = Math.round(activeOrder.fare * (1 - globalSettings.commission / 100));
+    db.collection('orders').doc(activeOrder.id).update({ status: 'DELIVERED' });
+    db.collection('riders').doc(rider.phone).update({
+      wallet: (rider.wallet || 0) + netEarn,
+      rides: (rider.rides || 0) + 1
+    });
+
+    alert(`✅ डिलिव्हरी पूर्ण झाली! तुमच्या वॉलेटमध्ये ₹${netEarn} जमा झाले.`);
+    activeOrder = null;
+    document.getElementById('activeOrderBox').classList.add('hidden');
+  }
+
+  function contactCustomerWA() {
+    if (!activeOrder) return;
+    window.open(`https://wa.me/91${activeOrder.customerPhone}?text=नमस्कार, मी GoParcel रायडर ${rider.name} बोलतोय.`, '_blank');
+  }
+
+  function requestPayout() {
+    if ((rider.wallet || 0) < 100) return alert("विथड्रॉवलसाठी किमान ₹100 शिल्लक आवश्यक आहे.");
+    db.collection('payouts').add({
+      riderName: rider.name,
+      riderPhone: rider.phone,
+      amount: rider.wallet,
+      status: 'PENDING',
+      requestedAt: new Date().toISOString()
+    });
+    alert("तुमची पेमेंट विथड्रॉवल विनंती Admin कडे पाठवली आहे.");
+  }
+
+  function switchRiderTab(tab, el) {
+    ['orders', 'wallet', 'profile'].forEach(t => document.getElementById('rtab-' + t).classList.add('hidden'));
+    document.getElementById('rtab-' + tab).classList.remove('hidden');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function logoutRider() {
+    localStorage.removeItem('gp_rider');
+    location.reload();
+  }
 </script>
 </body>
 </html>
