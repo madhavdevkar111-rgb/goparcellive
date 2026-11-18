@@ -94,7 +94,6 @@
 
   <!-- 1. RIDERS KYC, SELFIE APPROVAL & DIRECT ADD RIDER -->
   <div id="secRiders" class="panel-box" style="overflow-x:auto;">
-    <!-- Admin Direct Add Rider Form -->
     <div style="background:#111; border:1px solid #2ecc71; border-radius:10px; padding:12px; margin-bottom:16px;">
       <h4 style="color:#2ecc71; margin-bottom:8px;">➕ ॲडमिनमधून थेट नवीन रायडर जोडा (Direct Add Rider)</h4>
       <div class="form-grid" style="margin-bottom:8px;">
@@ -109,7 +108,7 @@
 
     <h3 style="color:#ff6600; margin-bottom:6px;">रायडर कागदपत्रे (Driver + Vehicle Owner), Selfie Approval व UTR पडताळणी</h3>
     <table>
-      <thead><tr><th>रायडर व मोबाईल</th><th>सर्व अपलोड केलेले फोटो (Selfie + Driver + Owner)</th><th>वाहन, मालक व बँक खाते</th><th>Selfie / Fee / Status</th><th>अधिकार (Actions)</th></tr></thead>
+      <thead><tr><th>रायडर व मोबाईल</th><th>सर्व अपलोड केलेले फोटो (Selfie + Duty + Driver + Owner)</th><th>वाहन, मालक व बँक खाते</th><th>Selfie / Fee / Status</th><th>अधिकार (Actions)</th></tr></thead>
       <tbody id="ridersTableBody"></tbody>
     </table>
   </div>
@@ -190,7 +189,7 @@
     </div>
   </div>
 
-  <!-- 8. MASTER SETTINGS (DRIVER DOCS + VEHICLE OWNER DOCS + RATES) -->
+  <!-- 8. MASTER SETTINGS -->
   <div id="secMaster" class="panel-box hidden">
     <h3 style="color:#ff6600; margin-bottom:12px;">🎛️ संपूर्ण ॲपचे मास्टर कंट्रोल</h3>
     <div class="form-grid">
@@ -208,8 +207,10 @@
     </div>
 
     <div class="section-divider">
-      <h4 style="color:#4db8ff; margin-bottom:8px;">⏰ टायमिंग रेट अलर्ट (Peak Hour Surge):</h4>
+      <h4 style="color:#4db8ff; margin-bottom:8px;">⏰ सेल्फी तपासणी वेळ, ६०-मिनिट ब्लॉक व टायमिंग रेट अलर्ट:</h4>
       <div class="form-grid">
+        <div><label>ऑटो सेल्फी तपासणी कालावधी (तासांत)</label><input type="number" id="setSelfieIntervalHours" value="2" min="1" max="12"></div>
+        <div><label>४ सेल्फी रिजेक्टनंतर ब्लॉक वेळ (मिनिटांत)</label><input type="number" id="setTempBlockMinutes" value="60" min="5" max="1440"></div>
         <div>
           <label>टायमिंग रेट अलर्ट स्थिती</label>
           <select id="setSurgeActive">
@@ -231,7 +232,6 @@
       </div>
     </div>
 
-    <!-- ड्रायव्हर डॉक्युमेंट्स सिलेक्शन -->
     <div class="section-divider">
       <h4 style="color:#4db8ff; margin-bottom:8px;">🛡️ १. ड्रायव्हर डॉक्युमेंट लिस्ट (Driver Documents & Upload Mode):</h4>
       <div class="form-grid">
@@ -271,13 +271,12 @@
           </select>
         </div>
         <div class="doc-rule-card">
-          <label class="chk-row"><input type="checkbox" id="reqDailySelfie" checked> दररोज ड्युटी Live Selfie</label>
+          <label class="chk-row"><input type="checkbox" id="reqDailySelfie" checked> ऑटो फेस मॅच सेल्फी अनिवार्य</label>
           <span style="font-size:11px; color:#2ecc71;">नेहमी Live Front Camera</span>
         </div>
       </div>
     </div>
 
-    <!-- मोठ्या गाड्यांसाठी गाडी मालकाचे डॉक्युमेंट्स (Vehicle Owner Documents) -->
     <div class="section-divider">
       <h4 style="color:#2ecc71; margin-bottom:8px;">🏢 २. गाडी मालकाचे डॉक्युमेंट्स (मोठ्या वाहनांसाठी - 3-Wheeler, Mini Tempo, Bolero, Truck):</h4>
       <div class="form-grid">
@@ -367,7 +366,6 @@
     if (tab === 'map') setTimeout(() => adminMap.invalidateSize(), 200);
   };
 
-  // Admin Direct Add Rider
   window.adminDirectAddRider = async () => {
     const name = document.getElementById('addRName').value.trim();
     const phone = document.getElementById('addRPhone').value.trim();
@@ -379,6 +377,8 @@
     await setDoc(doc(db, "riders", "rider_" + phone), {
       name, phone, gender, vehCategory, vehicleNo,
       mobileVerified: true, feePaid: true, approved: true, selfieApproved: true,
+      selfieExpiresAt: Date.now() + (2 * 60 * 60 * 1000),
+      selfieRejectCount: 0, tempBlockUntil: 0,
       consentAccepted: true, consentTime: new Date().toLocaleString('en-IN'),
       createdAt: serverTimestamp()
     }, { merge: true });
@@ -389,7 +389,6 @@
     alert(`✅ नवीन रायडर '${name}' थेट जोडला गेला आणि Selfie + Account मंजूर झाले!`);
   };
 
-  // Live Support Chat
   onSnapshot(query(collection(db, "supportChats"), orderBy("createdAt", "asc")), (snap) => {
     allChatMsgs = [];
     const roomsMap = {};
@@ -522,6 +521,8 @@
       document.getElementById('setRateTempo').value = s.rateTempo ?? 25;
       document.getElementById('setRateBolero').value = s.rateBolero ?? 35;
       document.getElementById('setRateTruck').value = s.rateTruck ?? 50;
+      document.getElementById('setSelfieIntervalHours').value = s.selfieIntervalHours ?? 2;
+      document.getElementById('setTempBlockMinutes').value = s.tempBlockMinutes ?? 60;
       document.getElementById('setSurgeActive').value = String(s.surgeActive ?? false);
       document.getElementById('setSurgeMultiplier').value = s.surgeMultiplier ?? 1.2;
       document.getElementById('setTimingAlertText').value = s.timingAlertText ?? "";
@@ -565,6 +566,8 @@
       rateTempo: Number(document.getElementById('setRateTempo').value),
       rateBolero: Number(document.getElementById('setRateBolero').value),
       rateTruck: Number(document.getElementById('setRateTruck').value),
+      selfieIntervalHours: Number(document.getElementById('setSelfieIntervalHours').value),
+      tempBlockMinutes: Number(document.getElementById('setTempBlockMinutes').value),
       surgeActive: document.getElementById('setSurgeActive').value === 'true',
       surgeMultiplier: Number(document.getElementById('setSurgeMultiplier').value),
       timingAlertText: document.getElementById('setTimingAlertText').value.trim(),
@@ -620,8 +623,16 @@
   });
 
   window.approveRiderSelfie = async (riderId, status) => {
-    await updateDoc(doc(db, "riders", riderId), { selfieApproved: status });
-    alert(status ? "✅ रायडरचा Selfie Approve झाला! आता तो ONLINE होऊ शकतो." : "❌ Selfie Approval रद्द केले!");
+    const hrs = Number(document.getElementById('setSelfieIntervalHours')?.value || 2);
+    const nextExpiry = status ? (Date.now() + (hrs * 60 * 60 * 1000)) : 0;
+    await updateDoc(doc(db, "riders", riderId), {
+      selfieApproved: status,
+      selfieStatus: status ? "Approved by Admin" : "Rejected by Admin",
+      selfieExpiresAt: nextExpiry,
+      selfieRejectCount: 0,
+      tempBlockUntil: 0
+    });
+    alert(status ? `✅ रायडरचा Selfie Approve झाला! आता तो ${hrs} तासांसाठी ONLINE होऊ शकतो.` : "❌ Selfie Approval रद्द केले!");
   };
 
   window.verifyOnboardingFee = async (riderId, status) => {
@@ -654,7 +665,8 @@
       }
       const mkThumb = (src, lbl, clr) => src ? `<div><img src="${src}" class="selfie-thumb" style="border-color:${clr};" onclick="openImgModal('${src}', '${lbl}')"><div class="photo-label">${lbl}</div></div>` : '';
       const thumbsHtml = [
-        mkThumb(r.regSelfie, 'Selfie', '#ff6600'),
+        mkThumb(r.regSelfie, 'RegSelfie', '#ff6600'),
+        mkThumb(r.dailySelfie, 'LiveSelfie', '#e91e63'),
         mkThumb(r.kycPhoto, 'Front', '#4db8ff'),
         mkThumb(r.kycPhotoBack, 'Back', '#4db8ff'),
         mkThumb(r.kycLicensePhoto, 'DL', '#9b59b6'),
@@ -674,14 +686,16 @@
 
       const utrHtml = r.feeUtr ? `<div class="utr-pill">UTR: ${r.feeUtr}</div>` : '';
       const feeVerifyBtn = (!r.feePaid && r.feeUtr) ? `<button class="btn-sm btn-approve" onclick="verifyOnboardingFee('${d.id}', true)">💳 Verify UTR</button>` : '';
-      const selfieBtn = !r.selfieApproved ? `<button class="btn-sm btn-edit" onclick="approveRiderSelfie('${d.id}', true)">📸 Approve Selfie</button>` : '';
+      const selfieBtn = `<button class="btn-sm btn-edit" onclick="approveRiderSelfie('${d.id}', true)">📸 Approve Selfie / Unblock</button>`;
+      const tempBlockedTag = (r.tempBlockUntil && r.tempBlockUntil > Date.now()) ? `<div style="color:#ff453a; font-size:11px; font-weight:bold;">⛔ 60m Blocked (4/4)</div>` : '';
 
       tbody.innerHTML += `<tr>
         <td><b>${r.name || 'Rider'}</b> (${r.gender || 'Male'})<br><small>📞 ${r.phone || ''}</small></td>
         <td><div style="display:flex; gap:5px; flex-wrap:wrap;">${thumbsHtml}</div></td>
         <td><b>${r.vehCategory || ''} - ${r.vehicleNo || '-'}</b><br><small>${r.kycDoc || '-'}</small>${ownerInfo}${bankInfo}</td>
         <td>
-          Selfie: ${r.selfieApproved ? '<b style="color:#2ecc71;">✅ OK</b>' : '<b style="color:#e74c3c;">⏳ Pending</b>'}<br>
+          Selfie: ${r.selfieApproved ? '<b style="color:#2ecc71;">✅ OK</b>' : `<b style="color:#e74c3c;">${r.selfieStatus || '⏳ Pending'}</b>`}<br>
+          ${tempBlockedTag}
           Fee: ${r.feePaid ? '<span style="color:#2ecc71;">✅ Paid</span>' : '<span style="color:#e74c3c;">❌ Unpaid</span>'} ${utrHtml}<br>
           A/C: ${r.approved ? '<b style="color:#2ecc71;">Approved</b>' : '<b style="color:#ff6600;">Pending</b>'}
         </td>
