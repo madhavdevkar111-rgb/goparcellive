@@ -4,26 +4,50 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GoParcel - Master Control Admin</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
     body { background: #0d0f12; color: #f5f5f5; }
-    header { background: linear-gradient(135deg, #000000 65%, #261200 100%); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; }
+    header { background: linear-gradient(135deg, #000000 65%, #261200 100%); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; }
     header h1 { color: #ff6600; font-size: 20px; font-weight: 800; }
     .container { max-width: 1120px; margin: auto; padding: 14px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 15px; }
+    .stat-card { background: #16191f; padding: 14px; border-radius: 12px; border-top: 3px solid #ff6600; border: 1px solid #282d37; }
+    .stat-card h3 { font-size: 12px; color: #aaa; }
+    .stat-card p { font-size: 20px; font-weight: bold; color: #fff; margin-top: 4px; }
+    .nav-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 4px; }
+    .nav-btn { padding: 10px 14px; background: #1e222b; color: #ccc; border: 1px solid #2f3542; border-radius: 10px; cursor: pointer; font-weight: bold; white-space: nowrap; }
+    .nav-btn.active { background: #ff6600; color: #000; border-color: #ff6600; }
     .panel-box { background: #16191f; padding: 16px; border-radius: 14px; border: 1px solid #282d37; margin-bottom: 15px; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     th, td { padding: 10px; text-align: left; border-bottom: 1px solid #282d37; font-size: 13px; }
     th { background: #ff6600; color: #000; }
+    .btn-sm { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; margin: 2px; }
+    .btn-approve { background: #2ecc71; color: #000; }
     .btn-wa { background: #25D366; color: #000; padding: 6px 12px; border-radius: 6px; font-weight: bold; text-decoration: none; display: inline-block; }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 <header>
-  <h1>👑 GoParcel Master Panel - OTP डॅशबोर्ड</h1>
+  <h1>👑 GoParcel Master Panel - पूर्ण डॅशबोर्ड</h1>
 </header>
 
 <div class="container">
-  <div class="panel-box" style="overflow-x:auto;">
+  <div class="stats">
+    <div class="stat-card"><h3>एकूण ऑर्डर्स</h3><p id="totalOrders">0</p></div>
+    <div class="stat-card"><h3>मंजूर रायडर्स</h3><p id="approvedRidersCount" style="color:#2ecc71;">0</p></div>
+    <div class="stat-card"><h3>प्लॅटफॉर्म कमिशन</h3><p style="color:#ff6600;">₹<span id="platformComm">0</span></p></div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-btn active" onclick="showTab('otpLive')">🔔 सक्रिय OTP विनंत्या</button>
+    <button class="nav-btn" onclick="showTab('riders')">🛵 रायडर्स KYC व फोटाज</button>
+    <button class="nav-btn" onclick="showTab('orders')">📦 लाईव्ह ऑर्डर्स</button>
+  </div>
+
+  <!-- १. सक्रिय OTP विनंत्या -->
+  <div id="secOtpLive" class="panel-box" style="overflow-x:auto;">
     <h3 style="color:#ff6600; margin-bottom:10px;">🔔 सक्रिय OTP विनंत्या (Live OTP Requests)</h3>
     <table>
       <thead>
@@ -32,11 +56,29 @@
       <tbody id="otpLiveTableBody"></tbody>
     </table>
   </div>
+
+  <!-- २. रायडर KYC -->
+  <div id="secRiders" class="panel-box hidden" style="overflow-x:auto;">
+    <h3 style="color:#ff6600; margin-bottom:10px;">स्कॅन केलेले रायडर डॉक्युमेंट्स</h3>
+    <table>
+      <thead><tr><th>नाव व मोबाईल</th><th>वाहन प्रकार</th><th>स्टेटस</th><th>कृती</th></tr></thead>
+      <tbody id="ridersTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ३. ऑर्डर्स -->
+  <div id="secOrders" class="panel-box hidden" style="overflow-x:auto;">
+    <h3 style="color:#ff6600; margin-bottom:10px;">सर्व लाईव्ह ऑर्डर्स</h3>
+    <table>
+      <thead><tr><th>कस्टमर</th><th>पत्ता</th><th>वाहन</th><th>भाडे</th><th>स्टेटस</th></tr></thead>
+      <tbody id="adminTableBody"></tbody>
+    </table>
+  </div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAxfFnHbLimC3PEO5svXvn3sxH7yn9JEAw",
@@ -51,6 +93,13 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  window.showTab = (tab) => {
+    ['otpLive', 'riders', 'orders'].forEach(t => {
+      document.getElementById('sec' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('hidden', t !== tab);
+    });
+  };
+
+  // लाईव्ह OTP डॅशबोर्ड सिंक
   onSnapshot(query(collection(db, "otpRequests"), orderBy("createdAt", "desc")), (snap) => {
     const tbody = document.getElementById('otpLiveTableBody');
     if (!tbody) return;
@@ -69,6 +118,40 @@
         <td><a href="${waUrl}" target="_blank" class="btn-wa">📲 रायडरला WhatsApp वर पाठवा</a></td>
       </tr>`;
     });
+  });
+
+  // रायडर KYC लिस्ट
+  onSnapshot(collection(db, "pending_riders"), (snap) => {
+    const tbody = document.getElementById('ridersTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    snap.forEach(d => {
+      const r = d.data();
+      tbody.innerHTML += `<tr>
+        <td><b>${r.name}</b><br><small>📞 ${r.phone}</small></td>
+        <td>${r.vehicleType || '2-Wheeler'} (${r.vehicleNo || '-'})</td>
+        <td><b>${r.status || 'Pending'}</b></td>
+        <td><button class="btn-sm btn-approve" onclick="alert('रायडर मंजूर केला!')">Approve</button></td>
+      </tr>`;
+    });
+  });
+
+  // लाईव्ह ऑर्डर्स लिस्ट
+  onSnapshot(collection(db, "orders"), (snap) => {
+    const tbody = document.getElementById('adminTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    let count = 0, comm = 0;
+    snap.forEach(d => {
+      const o = d.data(); count++;
+      comm += Math.round(Number(o.fare || 0) * 0.2);
+      tbody.innerHTML += `<tr>
+        <td>${o.customerEmail || 'User'}</td><td>${o.pickup} ➔ ${o.drop}</td>
+        <td>${o.vehicle}</td><td>₹${o.fare}</td><td><b>${o.status}</b></td>
+      </tr>`;
+    });
+    document.getElementById('totalOrders').innerText = count;
+    document.getElementById('platformComm').innerText = comm;
   });
 </script>
 </body>
