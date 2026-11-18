@@ -1,158 +1,336 @@
 <!DOCTYPE html>
 <html lang="mr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GoParcel - Master Control Admin</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoParcel Admin - मास्टर कंट्रोल पॅनेल</title>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-    body { background: #0d0f12; color: #f5f5f5; }
-    header { background: linear-gradient(135deg, #000000 65%, #261200 100%); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; }
-    header h1 { color: #ff6600; font-size: 20px; font-weight: 800; }
-    .container { max-width: 1120px; margin: auto; padding: 14px; }
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 15px; }
-    .stat-card { background: #16191f; padding: 14px; border-radius: 12px; border-top: 3px solid #ff6600; border: 1px solid #282d37; }
-    .stat-card h3 { font-size: 12px; color: #aaa; }
-    .stat-card p { font-size: 20px; font-weight: bold; color: #fff; margin-top: 4px; }
-    .nav-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 4px; }
-    .nav-btn { padding: 10px 14px; background: #1e222b; color: #ccc; border: 1px solid #2f3542; border-radius: 10px; cursor: pointer; font-weight: bold; white-space: nowrap; }
-    .nav-btn.active { background: #ff6600; color: #000; border-color: #ff6600; }
-    .panel-box { background: #16191f; padding: 16px; border-radius: 14px; border: 1px solid #282d37; margin-bottom: 15px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #282d37; font-size: 13px; }
-    th { background: #ff6600; color: #000; }
-    .btn-sm { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; margin: 2px; }
-    .btn-approve { background: #2ecc71; color: #000; }
-    .btn-wa { background: #25D366; color: #000; padding: 6px 12px; border-radius: 6px; font-weight: bold; text-decoration: none; display: inline-block; }
-    .hidden { display: none !important; }
+    :root { --bg: #0b0b0b; --card: #181818; --orange: #ff6600; --text: #fff; --border: #2e2e2e; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background: var(--bg); color: var(--text); }
+    header { background: #000; padding: 14px 20px; border-bottom: 2px solid var(--orange); display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 22px; font-weight: bold; color: var(--orange); }
+    .nav-tabs { display: flex; overflow-x: auto; background: #121212; border-bottom: 1px solid var(--border); padding: 6px; gap: 6px; }
+    .nav-btn { padding: 10px 14px; background: #1e1e1e; color: #ccc; border: 1px solid #333; border-radius: 8px; cursor: pointer; white-space: nowrap; font-size: 13px; }
+    .nav-btn.active { background: var(--orange); color: #000; font-weight: bold; border-color: var(--orange); }
+    .container { max-width: 900px; margin: auto; padding: 16px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .stat-box { background: #111; border-left: 4px solid var(--orange); padding: 14px; border-radius: 8px; }
+    .stat-num { font-size: 24px; font-weight: bold; color: var(--orange); margin-top: 4px; }
+    label { display: block; font-size: 13px; color: #bbb; margin-top: 10px; }
+    input, textarea, select { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; margin-top: 4px; }
+    button { padding: 10px 16px; background: var(--orange); color: #000; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin-top: 12px; }
+    .btn-sm { padding: 6px 10px; font-size: 12px; margin-top: 0; }
+    .btn-green { background: #00c853; color: #000; }
+    .btn-red { background: #ff3d00; color: #fff; }
+    .hidden { display: none; }
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #111; border-radius: 8px; margin-top: 8px; border: 1px solid #2a2a2a; }
   </style>
 </head>
 <body>
+
 <header>
-  <h1>👑 GoParcel Master Panel - पूर्ण डॅशबोर्ड</h1>
+  <div class="logo">GoParcel <span style="color:#fff;">MASTER ADMIN</span></div>
+  <span style="font-size:12px; color:#00c853;">● Live Connected</span>
 </header>
 
-<div class="container">
-  <div class="stats">
-    <div class="stat-card"><h3>एकूण ऑर्डर्स</h3><p id="totalOrders">0</p></div>
-    <div class="stat-card"><h3>मंजूर रायडर्स</h3><p id="approvedRidersCount" style="color:#2ecc71;">0</p></div>
-    <div class="stat-card"><h3>प्लॅटफॉर्म कमिशन</h3><p style="color:#ff6600;">₹<span id="platformComm">0</span></p></div>
-  </div>
-
-  <div class="nav-tabs">
-    <button class="nav-btn active" onclick="showTab('otpLive')">🔔 सक्रिय OTP विनंत्या</button>
-    <button class="nav-btn" onclick="showTab('riders')">🛵 रायडर्स KYC व फोटाज</button>
-    <button class="nav-btn" onclick="showTab('orders')">📦 लाईव्ह ऑर्डर्स</button>
-  </div>
-
-  <!-- १. सक्रिय OTP विनंत्या -->
-  <div id="secOtpLive" class="panel-box" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:10px;">🔔 सक्रिय OTP विनंत्या (Live OTP Requests)</h3>
-    <table>
-      <thead>
-        <tr><th>वेळ</th><th>प्रकार</th><th>नाव व मोबाईल</th><th>सक्रिय OTP</th><th>कृती (WhatsApp)</th></tr>
-      </thead>
-      <tbody id="otpLiveTableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- २. रायडर KYC -->
-  <div id="secRiders" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:10px;">स्कॅन केलेले रायडर डॉक्युमेंट्स</h3>
-    <table>
-      <thead><tr><th>नाव व मोबाईल</th><th>वाहन प्रकार</th><th>स्टेटस</th><th>कृती</th></tr></thead>
-      <tbody id="ridersTableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- ३. ऑर्डर्स -->
-  <div id="secOrders" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:10px;">सर्व लाईव्ह ऑर्डर्स</h3>
-    <table>
-      <thead><tr><th>कस्टमर</th><th>पत्ता</th><th>वाहन</th><th>भाडे</th><th>स्टेटस</th></tr></thead>
-      <tbody id="adminTableBody"></tbody>
-    </table>
-  </div>
+<!-- सर्व Admin टॅब्स -->
+<div class="nav-tabs">
+  <div class="nav-btn active" onclick="openAdminTab('dash', this)">📊 डॅशबोर्ड</div>
+  <div class="nav-btn" onclick="openAdminTab('cities', this)">🏙️ सर्व्हिस सिटी</div>
+  <div class="nav-btn" onclick="openAdminTab('rates', this)">⚡ दर & टायमिंग अलर्ट</div>
+  <div class="nav-btn" onclick="openAdminTab('fees', this)">🎁 जॉइनिंग फी & रेफर</div>
+  <div class="nav-btn" onclick="openAdminTab('banners', this)">📢 बॅनर & संमती पत्र</div>
+  <div class="nav-btn" onclick="openAdminTab('riders', this)">🛵 रायडर अप्रूव्हल</div>
+  <div class="nav-btn" onclick="openAdminTab('payouts', this)">💳 वॉलेट & पेमेंट</div>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<div class="container">
 
+  <!-- 1. Dashboard Tab -->
+  <div id="atab-dash">
+    <div class="grid-3">
+      <div class="stat-box"><div>एकूण ऑर्डर्स</div><div class="stat-num" id="totalOrdersCount">0</div></div>
+      <div class="stat-box"><div>एकूण उलाढाल (Revenue)</div><div class="stat-num" id="totalRevenue">₹0</div></div>
+      <div class="stat-box"><div>नोंदणीकृत रायडर्स</div><div class="stat-num" id="totalRidersCount">0</div></div>
+    </div>
+    <div class="card">
+      <h3 style="color: var(--orange); margin-bottom: 10px;">अलीकडील ऑर्डर्स (Live Orders)</h3>
+      <div id="adminOrdersList">लोड होत आहे...</div>
+    </div>
+  </div>
+
+  <!-- 2. Service Cities Tab -->
+  <div id="atab-cities" class="hidden">
+    <div class="card">
+      <h3 style="color: var(--orange);">नवीन सर्व्हिस सिटी जोडा</h3>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <input type="text" id="newCityName" placeholder="शहराचे नाव (उदा. पिंपरी-चिंचवड, हिंगोली)" style="margin:0;" />
+        <button onclick="addCity()" style="margin:0; width:auto;">+ जोडा</button>
+      </div>
+      <div id="citiesList" style="margin-top: 14px;"></div>
+    </div>
+  </div>
+
+  <!-- 3. Pricing, Timing Alert & Timer Control -->
+  <div id="atab-rates" class="hidden">
+    <div class="card">
+      <h3 style="color: var(--orange);">वाहन दर आणि टायमिंग रेट अलर्ट</h3>
+      <div class="grid-3">
+        <div><label>2-Wheeler बेस फेअर (₹)</label><input type="number" id="base2W" value="30" /></div>
+        <div><label>2-Wheeler प्रति KM (₹)</label><input type="number" id="rate2W" value="10" /></div>
+        <div><label>3-Wheeler बेस फेअर (₹)</label><input type="number" id="base3W" value="80" /></div>
+        <div><label>3-Wheeler प्रति KM (₹)</label><input type="number" id="rate3W" value="20" /></div>
+        <div><label>Mini Tempo बेस फेअर (₹)</label><input type="number" id="baseTempo" value="150" /></div>
+        <div><label>Mini Tempo प्रति KM (₹)</label><input type="number" id="rateTempo" value="35" /></div>
+      </div>
+
+      <hr style="border-color:#333; margin: 14px 0;" />
+      <h4 style="color: var(--orange);">⏰ टायमिंग रेट अलर्ट (Peak Hour / Night Surge)</h4>
+      <label>टायमिंग रेट अलर्ट स्थिती:</label>
+      <select id="surgeActive">
+        <option value="false">बंद (Normal Rates)</option>
+        <option value="true">चालू (Peak Hour Alert Active)</option>
+      </select>
+      <label>दर वाढ गुणक (Surge Multiplier - उदा. 1.2 म्हणजे २०% जादा दर):</label>
+      <input type="number" step="0.1" id="surgeMultiplier" value="1.2" />
+      <label>रायडर ऑर्डर स्वीकार टायमर (सेकंदात):</label>
+      <input type="number" id="orderTimerSec" value="30" />
+
+      <button onclick="saveGlobalSettings()">दर आणि टायमिंग सेटिंग्ज सेव्ह करा</button>
+    </div>
+  </div>
+
+  <!-- 4. Joining Fee & Refer Bonus -->
+  <div id="atab-fees" class="hidden">
+    <div class="card">
+      <h3 style="color: var(--orange);">जॉइनिंग फी, कमिशन आणि रेफर बोनस कंट्रोल</h3>
+      <label>रायडर जॉइनिंग फी (₹ मध्ये - मोफत करण्यासाठी 0 टाका):</label>
+      <input type="number" id="joiningFee" value="199" />
+
+      <label>प्लॅटफॉर्म कमिशन (%):</label>
+      <input type="number" id="commission" value="20" />
+
+      <label>रेफर बोनस रक्कम (₹ मध्ये):</label>
+      <input type="number" id="referBonus" value="50" />
+
+      <button onclick="saveGlobalSettings()">फी आणि बोनस अपडेट करा</button>
+    </div>
+  </div>
+
+  <!-- 5. Banners & Consent Agreement -->
+  <div id="atab-banners" class="hidden">
+    <div class="card">
+      <h3 style="color: var(--orange);">होम स्क्रीन बॅनर आणि संमती पत्र (Consent Agreement)</h3>
+      <label>ग्राहक आणि रायडर ॲपवरील मुख्य ऑफर बॅनर मजकूर:</label>
+      <input type="text" id="bannerText" placeholder="उदा. 🎉 दिवाळी धमाका! पहिल्या ३ राईड्सवर २०% सूट!" />
+
+      <label>सहमती पत्र (Terms & Consent Agreement मजकूर):</label>
+      <textarea id="consentText" rows="5"></textarea>
+
+      <button onclick="saveGlobalSettings()">बॅनर आणि संमती पत्र लाईव्ह करा</button>
+    </div>
+  </div>
+
+  <!-- 6. Rider Approvals & KYC -->
+  <div id="atab-riders" class="hidden">
+    <div class="card">
+      <h3 style="color: var(--orange);">रायडर KYC आणि अप्रूव्हल लिस्ट</h3>
+      <div id="ridersApprovalList">रायडर्स लोड होत आहेत...</div>
+    </div>
+  </div>
+
+  <!-- 7. Payouts -->
+  <div id="atab-payouts" class="hidden">
+    <div class="card">
+      <h3 style="color: var(--orange);">रायडर विथड्रॉवल विनंत्या (Payouts)</h3>
+      <div id="payoutsList">विनंत्या लोड होत आहेत...</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // 🔴 तुमचा FIREBASE CONFIG इथे पेस्ट करा
   const firebaseConfig = {
-    apiKey: "AIzaSyAxfFnHbLimC3PEO5svXvn3sxH7yn9JEAw",
-    authDomain: "goparcel-f89b5.firebaseapp.com",
-    databaseURL: "https://goparcel-f89b5-default-rtdb.firebaseio.com",
-    projectId: "goparcel-f89b5",
-    storageBucket: "goparcel-f89b5.firebasestorage.app",
-    messagingSenderId: "263428109251",
-    appId: "1:263428109251:web:12f001ac4c4e9d71c84376"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  let citiesArray = [{ name: "Pune", active: true }];
+
+  window.onload = () => {
+    loadSettings();
+    loadCities();
+    loadRiders();
+    loadOrders();
+    loadPayouts();
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.showTab = (tab) => {
-    ['otpLive', 'riders', 'orders'].forEach(t => {
-      document.getElementById('sec' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('hidden', t !== tab);
+  function openAdminTab(tab, el) {
+    ['dash', 'cities', 'rates', 'fees', 'banners', 'riders', 'payouts'].forEach(t => {
+      document.getElementById('atab-' + t).classList.add('hidden');
     });
-  };
+    document.getElementById('atab-' + tab).classList.remove('hidden');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
 
-  // लाईव्ह OTP डॅशबोर्ड सिंक
-  onSnapshot(query(collection(db, "otpRequests"), orderBy("createdAt", "desc")), (snap) => {
-    const tbody = document.getElementById('otpLiveTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = "";
-    
-    snap.forEach(d => {
-      const r = d.data();
-      const waMsg = `नमस्कार ${r.name}, तुमचा GoParcel OTP कोड आहे: ${r.otp}. हा कोड ॲपमध्ये टाका.`;
-      const waUrl = `https://wa.me/91${r.phone}?text=${encodeURIComponent(waMsg)}`;
-
-      tbody.innerHTML += `<tr style="background:#291a10;">
-        <td><b>🕒 ${r.timeStr || ''}</b></td>
-        <td>${r.role || ''}</td>
-        <td><b>${r.name}</b><br><small>📞 ${r.phone}</small></td>
-        <td><b style="color:#ff6600; font-size:18px;">${r.otp}</b></td>
-        <td><a href="${waUrl}" target="_blank" class="btn-wa">📲 रायडरला WhatsApp वर पाठवा</a></td>
-      </tr>`;
+  function loadSettings() {
+    db.collection('settings').doc('global').onSnapshot(doc => {
+      if (doc.exists) {
+        const d = doc.data();
+        if (d.base2W !== undefined) document.getElementById('base2W').value = d.base2W;
+        if (d.rate2W !== undefined) document.getElementById('rate2W').value = d.rate2W;
+        if (d.base3W !== undefined) document.getElementById('base3W').value = d.base3W;
+        if (d.rate3W !== undefined) document.getElementById('rate3W').value = d.rate3W;
+        if (d.baseTempo !== undefined) document.getElementById('baseTempo').value = d.baseTempo;
+        if (d.rateTempo !== undefined) document.getElementById('rateTempo').value = d.rateTempo;
+        if (d.surgeActive !== undefined) document.getElementById('surgeActive').value = String(d.surgeActive);
+        if (d.surgeMultiplier !== undefined) document.getElementById('surgeMultiplier').value = d.surgeMultiplier;
+        if (d.orderTimerSec !== undefined) document.getElementById('orderTimerSec').value = d.orderTimerSec;
+        if (d.joiningFee !== undefined) document.getElementById('joiningFee').value = d.joiningFee;
+        if (d.commission !== undefined) document.getElementById('commission').value = d.commission;
+        if (d.referBonus !== undefined) document.getElementById('referBonus').value = d.referBonus;
+        if (d.bannerText !== undefined) document.getElementById('bannerText').value = d.bannerText;
+        if (d.consentText !== undefined) document.getElementById('consentText').value = d.consentText;
+      }
     });
-  });
+  }
 
-  // रायडर KYC लिस्ट
-  onSnapshot(collection(db, "pending_riders"), (snap) => {
-    const tbody = document.getElementById('ridersTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = "";
-    snap.forEach(d => {
-      const r = d.data();
-      tbody.innerHTML += `<tr>
-        <td><b>${r.name}</b><br><small>📞 ${r.phone}</small></td>
-        <td>${r.vehicleType || '2-Wheeler'} (${r.vehicleNo || '-'})</td>
-        <td><b>${r.status || 'Pending'}</b></td>
-        <td><button class="btn-sm btn-approve" onclick="alert('रायडर मंजूर केला!')">Approve</button></td>
-      </tr>`;
+  function saveGlobalSettings() {
+    const payload = {
+      base2W: Number(document.getElementById('base2W').value),
+      rate2W: Number(document.getElementById('rate2W').value),
+      base3W: Number(document.getElementById('base3W').value),
+      rate3W: Number(document.getElementById('rate3W').value),
+      baseTempo: Number(document.getElementById('baseTempo').value),
+      rateTempo: Number(document.getElementById('rateTempo').value),
+      surgeActive: document.getElementById('surgeActive').value === 'true',
+      surgeMultiplier: Number(document.getElementById('surgeMultiplier').value),
+      orderTimerSec: Number(document.getElementById('orderTimerSec').value),
+      joiningFee: Number(document.getElementById('joiningFee').value),
+      commission: Number(document.getElementById('commission').value),
+      referBonus: Number(document.getElementById('referBonus').value),
+      bannerText: document.getElementById('bannerText').value,
+      consentText: document.getElementById('consentText').value
+    };
+    db.collection('settings').doc('global').set(payload, { merge: true }).then(() => {
+      alert("✅ सर्व सेटिंग्ज यशस्वीरित्या अपडेट झाल्या आहेत!");
     });
-  });
+  }
 
-  // लाईव्ह ऑर्डर्स लिस्ट
-  onSnapshot(collection(db, "orders"), (snap) => {
-    const tbody = document.getElementById('adminTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = "";
-    let count = 0, comm = 0;
-    snap.forEach(d => {
-      const o = d.data(); count++;
-      comm += Math.round(Number(o.fare || 0) * 0.2);
-      tbody.innerHTML += `<tr>
-        <td>${o.customerEmail || 'User'}</td><td>${o.pickup} ➔ ${o.drop}</td>
-        <td>${o.vehicle}</td><td>₹${o.fare}</td><td><b>${o.status}</b></td>
-      </tr>`;
+  function loadCities() {
+    db.collection('settings').doc('cities').onSnapshot(doc => {
+      if (doc.exists && doc.data().list) citiesArray = doc.data().list;
+      renderCities();
     });
-    document.getElementById('totalOrders').innerText = count;
-    document.getElementById('platformComm').innerText = comm;
-  });
+  }
+
+  function addCity() {
+    const name = document.getElementById('newCityName').value.trim();
+    if (!name) return;
+    citiesArray.push({ name, active: true });
+    db.collection('settings').doc('cities').set({ list: citiesArray });
+    document.getElementById('newCityName').value = '';
+  }
+
+  function toggleCity(idx) {
+    citiesArray[idx].active = !citiesArray[idx].active;
+    db.collection('settings').doc('cities').set({ list: citiesArray });
+  }
+
+  function renderCities() {
+    const box = document.getElementById('citiesList');
+    box.innerHTML = '';
+    citiesArray.forEach((c, i) => {
+      box.innerHTML += `
+        <div class="list-item">
+          <span><strong>${c.name}</strong> (${c.active ? '🟢 चालू' : '🔴 बंद'})</span>
+          <button class="btn-sm ${c.active ? 'btn-red' : 'btn-green'}" onclick="toggleCity(${i})">
+            ${c.active ? 'बंद करा' : 'चालू करा'}
+          </button>
+        </div>`;
+    });
+  }
+
+  function loadRiders() {
+    db.collection('riders').onSnapshot(snap => {
+      document.getElementById('totalRidersCount').innerText = snap.size;
+      const box = document.getElementById('ridersApprovalList');
+      box.innerHTML = '';
+      snap.forEach(doc => {
+        const r = doc.data();
+        box.innerHTML += `
+          <div class="list-item" style="flex-direction:column; align-items:flex-start; gap:6px;">
+            <div style="display:flex; justify-content:space-between; width:100%;">
+              <strong>${r.name} (${r.phone})</strong>
+              <span style="color:${r.approved ? '#00c853' : '#ff9800'};">${r.approved ? '✅ Approved' : '⏳ Pending'}</span>
+            </div>
+            <div style="font-size:12px; color:#bbb;">
+              शहर: ${r.city} | वाहन: ${r.vehicleType} (${r.vehicleNumber}) | आधार: ${r.aadhaar} | लायसन्स: ${r.license}
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-sm btn-green" onclick="setRiderApproval('${doc.id}', true)">Approve करा</button>
+              <button class="btn-sm btn-red" onclick="setRiderApproval('${doc.id}', false)">Block / Reject</button>
+            </div>
+          </div>`;
+      });
+    });
+  }
+
+  function setRiderApproval(id, status) {
+    db.collection('riders').doc(id).update({ approved: status });
+  }
+
+  function loadOrders() {
+    db.collection('orders').onSnapshot(snap => {
+      document.getElementById('totalOrdersCount').innerText = snap.size;
+      let rev = 0;
+      const box = document.getElementById('adminOrdersList');
+      box.innerHTML = '';
+      snap.forEach(doc => {
+        const o = doc.data();
+        rev += Number(o.fare || 0);
+        box.innerHTML += `
+          <div class="list-item">
+            <div>
+              <strong>${o.customerName}</strong> (${o.vehicleType}) - ₹${o.fare}<br>
+              <span style="font-size:12px; color:#aaa;">${o.pickup} ➔ ${o.drop}</span>
+            </div>
+            <span style="color:var(--orange); font-weight:bold;">${o.status}</span>
+          </div>`;
+      });
+      document.getElementById('totalRevenue').innerText = '₹' + rev;
+    });
+  }
+
+  function loadPayouts() {
+    db.collection('payouts').onSnapshot(snap => {
+      const box = document.getElementById('payoutsList');
+      if (snap.empty) { box.innerHTML = 'कोणतीही प्रलंबित विनंती नाही.'; return; }
+      box.innerHTML = '';
+      snap.forEach(doc => {
+        const p = doc.data();
+        box.innerHTML += `
+          <div class="list-item">
+            <div><strong>${p.riderName}</strong> (${p.riderPhone}) - <strong>₹${p.amount}</strong></div>
+            <button class="btn-sm btn-green" onclick="db.collection('payouts').doc('${doc.id}').update({status:'PAID'})">
+              ${p.status === 'PAID' ? '✅ Paid' : 'Approve Payout'}
+            </button>
+          </div>`;
+      });
+    });
+  }
 </script>
 </body>
 </html>
