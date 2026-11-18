@@ -1,332 +1,589 @@
 <!DOCTYPE html>
 <html lang="mr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GoParcel Rider - रायडर पार्टनर ॲप</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoParcel - Rider Partner App</title>
   <style>
-    :root { --bg: #0d0d0d; --card: #1a1a1a; --orange: #ff6600; --text: #fff; --green: #00c853; --red: #ff3d00; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
-    header { background: #000; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--orange); }
-    .logo { font-size: 20px; font-weight: bold; color: var(--orange); }
-    .container { max-width: 600px; margin: auto; padding: 12px; }
-    .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 14px; border: 1px solid #2c2c2c; }
-    input, select, button { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #222; color: #fff; font-size: 14px; margin-top: 8px; }
-    button { background: var(--orange); color: #000; font-weight: bold; border: none; cursor: pointer; }
-    .btn-green { background: var(--green); color: #000; }
-    .btn-red { background: var(--red); color: #fff; }
-    .status-pill { padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; }
-    .online { background: var(--green); color: #000; }
-    .offline { background: #444; color: #fff; }
-    .timer-box { background: #331100; border: 2px solid var(--orange); padding: 10px; border-radius: 8px; text-align: center; font-size: 18px; font-weight: bold; color: var(--orange); margin-bottom: 10px; }
-    .tabs { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; border-top: 1px solid #333; }
-    .tab-btn { flex: 1; padding: 12px; text-align: center; color: #aaa; cursor: pointer; font-size: 13px; }
-    .tab-btn.active { color: var(--orange); font-weight: bold; border-top: 2px solid var(--orange); }
-    .hidden { display: none; }
-    #riderMap { height: 200px; border-radius: 10px; margin-top: 10px; }
+    body { background: #121212; color: #fff; padding-bottom: 70px; }
+    header { background: #000; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; }
+    header h1 { color: #ff6600; font-size: 20px; }
+    .container { max-width: 500px; margin: auto; padding: 14px; }
+    .card { background: #1a1a1a; padding: 15px; border-radius: 12px; margin-bottom: 14px; border: 1px solid #2c2c2c; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+    .tab-btn { flex: 1; padding: 11px; background: #222; color: #ccc; border-radius: 8px; font-size: 14px; border: 1px solid #333; margin: 0; cursor: pointer; }
+    .tab-btn.active { background: #ff6600; color: #000; border-color: #ff6600; font-weight: bold; }
+    input, button, a.wa-btn, a.nav-map-btn { width: 100%; padding: 12px; margin: 7px 0; border-radius: 8px; border: 1px solid #333; background: #1e1e1e; color: #fff; font-size: 15px; display: block; text-align: center; text-decoration: none; }
+    input { text-align: left; }
+    button { background: #ff6600; color: #000; font-weight: bold; border: none; cursor: pointer; }
+    a.wa-btn { background: #25D366; color: #000; font-weight: bold; border: none; }
+    a.nav-map-btn { background: #1c2e3d; color: #4db8ff; border: 1px solid #4db8ff; font-size: 13px; padding: 9px; font-weight: bold; }
+    .wallet-grid { display: flex; gap: 10px; text-align: center; }
+    .w-box { flex: 1; background: #000; padding: 12px; border-radius: 8px; border: 1px solid #ff6600; }
+    .order-card { background: #222; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #ff6600; }
+    .timer-strip { background: #331400; border: 1px solid #ff6600; color: #ffaa66; padding: 6px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 13px; margin-bottom: 8px; }
+    .cam-box { background: #000; border: 2px dashed #ff6600; border-radius: 10px; padding: 10px; text-align: center; margin: 10px 0; }
+    .doc-upload-box { background: #111; border: 1px solid #444; padding: 10px; border-radius: 8px; margin: 8px 0; }
+    .consent-box { background: #111; border: 1px solid #ff6600; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 13px; color: #ddd; }
+    video, img.preview-img { width: 100%; max-height: 220px; border-radius: 8px; object-fit: cover; }
+    video { transform: scaleX(-1); }
+    .banner-strip { background: #2b1d12; border: 1px solid #ff6600; color: #ffd2b3; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; text-align: center; font-weight: bold; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; border-top: 1px solid #333; display: flex; z-index: 999; }
+    .b-nav-item { flex: 1; padding: 12px; text-align: center; color: #aaa; font-size: 13px; cursor: pointer; }
+    .b-nav-item.active { color: #ff6600; font-weight: bold; border-top: 2px solid #ff6600; }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
-
 <header>
-  <div class="logo">GoParcel <span style="color:#fff;">RIDER</span></div>
-  <div id="onlineToggle" class="status-pill offline" onclick="toggleOnline()">OFFLINE</div>
+  <h1>GoParcel Rider</h1>
+  <span id="dutyStatusTag" style="color:#e74c3c; font-size:12px; font-weight:bold;">● OFFLINE</span>
 </header>
 
 <div class="container">
-
-  <!-- Step 1: Registration / Login & KYC -->
-  <div id="riderAuthCard" class="card">
-    <h3 style="color: var(--orange);">रायडर नोंदणी / लॉगिन</h3>
-    <input type="text" id="rName" placeholder="पूर्ण नाव (आधार कार्डनुसार)" />
-    <input type="tel" id="rPhone" placeholder="मोबाईल नंबर" />
-    <select id="rCity">
-      <option value="Pune">पुणे (Pune)</option>
-    </select>
-    <select id="rVehicle">
-      <option value="2-Wheeler">2-Wheeler (बाईक / स्कूटर)</option>
-      <option value="3-Wheeler">3-Wheeler (रिक्षा / टेम्पो)</option>
-      <option value="Mini Tempo">Mini Tempo</option>
-    </select>
-    <input type="text" id="rVehNum" placeholder="गाडीचा नंबर (उदा. MH 12 AB 1234)" />
-    <input type="text" id="rLicense" placeholder="ड्रायव्हिंग लायसन्स नंबर" />
-    <input type="text" id="rAadhaar" placeholder="आधार कार्ड नंबर" />
-    <input type="text" id="rReferBy" placeholder="रेफरल कोड (असल्यास टाका)" />
-
-    <div style="background:#111; padding:10px; border-radius:8px; margin-top:10px; font-size:13px;">
-      <p style="color:var(--orange); font-weight:bold;">सहमती पत्र (Consent Agreement):</p>
-      <p id="riderConsentText" style="color:#ccc; margin:6px 0;">मी GoParcel चे सर्व वाहतूक आणि डिलिव्हरी नियम पाळेन. प्रत्येक राईडवर प्लॅटफॉर्म कमिशन कपातीस माझी संमती आहे.</p>
-      <label style="display:flex; align-items:center; gap:8px; margin-top:6px;">
-        <input type="checkbox" id="agreeCheck" style="width:auto; margin:0;" /> मला सर्व अटी व शर्ती मान्य आहेत.
-      </label>
+  <!-- Auth & Registration Screen -->
+  <div id="authScreen" class="card">
+    <h2 style="color:#ff6600; margin-bottom:12px; text-align:center;">रायडर पार्टनर पोर्टल</h2>
+    <div class="tabs">
+      <button id="rTabLogin" class="tab-btn active" onclick="switchRTab('login')">🔑 जुना रायडर लॉगिन</button>
+      <button id="rTabReg" class="tab-btn" onclick="switchRTab('reg')">📝 नवीन रायडर नोंदणी</button>
     </div>
 
-    <div style="margin-top:10px; font-size:13px; color:#ffcc80;">
-      नोंदणी जॉइनिंग फी: <strong id="joiningFeeText">₹199</strong> (Admin मंजुरीनंतर सक्रिय होईल)
+    <!-- Login Section -->
+    <div id="rSecLogin">
+      <input type="tel" id="rLoginPhone" maxlength="10" placeholder="१० अंकी नोंदणीकृत मोबाईल नंबर">
+      <button onclick="startRiderLoginOtp()">नवीन लॉगिन OTP मागवा</button>
+      <div id="rLoginOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
+        <a id="rLoginWaLink" href="#" target="_blank" class="wa-btn">📲 Admin ला WhatsApp वर कळवा</a>
+        <input type="number" id="rLoginOtpInput" placeholder="Admin ने आत्ता दिलेला ६ अंकी OTP टाका">
+        <button onclick="verifyRiderLoginOtp()" style="background:#2ecc71;">डॅशबोर्ड उघडा (Login)</button>
+      </div>
     </div>
 
-    <button onclick="registerRider()">नोंदणी पूर्ण करा (Submit KYC)</button>
+    <!-- Registration Section -->
+    <div id="rSecReg" class="hidden">
+      <input type="text" id="rName" placeholder="पूर्ण नाव (आधार कार्डप्रमाणे)">
+      <input type="tel" id="rPhone" maxlength="10" placeholder="१० अंकी खरा मोबाईल नंबर">
+      <input type="text" id="rVehicle" placeholder="गाडीचा नंबर (उदा. MH12AB1234)">
+      <input type="tel" id="rAadhaar" maxlength="12" placeholder="१२ अंकी अचूक आधार कार्ड नंबर">
+      <input type="text" id="rLicense" placeholder="ड्रायव्हिंग लायसन्स नंबर">
+      <input type="text" id="rRcBook" class="hidden" placeholder="गाडीचा RC बुक नंबर">
+      <input type="text" id="rPanCard" class="hidden" placeholder="पॅन कार्ड नंबर">
+      <input type="text" id="rReferCodeInput" placeholder="रेफरल कोड (असल्यास टाका)">
+
+      <div class="doc-upload-box">
+        <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">📄 आधार कार्ड / लायसन्स कागदपत्राचा स्पष्ट फोटो निवडा:</label>
+        <input type="file" id="docFileInput" accept="image/*" onchange="handleDocPhoto(this)">
+        <img id="docPreview" class="preview-img hidden" style="margin-top:6px;">
+      </div>
+
+      <div class="cam-box">
+        <p style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 नोंदणीसाठी तुमचा मूळ सेल्फी फोटो काढा:</p>
+        <video id="regVideo" autoplay playsinline class="hidden"></video>
+        <img id="regPreview" class="preview-img hidden" style="transform:scaleX(-1);">
+        <button type="button" onclick="openCamera('reg')" style="background:#333; color:#fff; font-size:13px;">📷 फ्रंट कॅमेरा उघडा</button>
+        <button type="button" id="btnSnapReg" onclick="takeSnapshot()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ सेल्फी फोटो घ्या</button>
+      </div>
+
+      <!-- Consent Agreement Box -->
+      <div class="consent-box">
+        <strong style="color:#ff6600; display:block; margin-bottom:4px;">📜 सहमती पत्र (Consent Agreement):</strong>
+        <p id="consentAgreementText" style="font-size:12px; color:#ccc; line-height:1.4; margin-bottom:8px;">
+          मी GoParcel चे सर्व नियम व वाहतूक अटी पाळेन. प्रत्येक डिलिव्हरीवर प्लॅटफॉर्म कमिशन कपातीस माझी पूर्ण संमती आहे.
+        </p>
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:#fff;">
+          <input type="checkbox" id="regConsentCheck" style="width:auto; margin:0;"> मला वरील सर्व अटी व शर्ती मान्य आहेत.
+        </label>
+      </div>
+
+      <button id="btnStartReg" onclick="startRiderRegOtp()">कागदपत्रे तपासा व OTP मागवा</button>
+      <div id="rRegOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
+        <a id="rRegWaLink" href="#" target="_blank" class="wa-btn">📲 Admin ला WhatsApp वर कळवा</a>
+        <input type="number" id="rRegOtpInput" placeholder="Admin ने आत्ता दिलेला ६ अंकी OTP टाका">
+        <button onclick="verifyRiderRegOtp()" style="background:#2ecc71;">नोंदणी पूर्ण करा (Register)</button>
+      </div>
+    </div>
   </div>
 
   <!-- Main Rider Dashboard -->
-  <div id="riderMain" class="hidden">
-    
-    <!-- Approval Status Banner -->
-    <div id="approvalBanner" class="card" style="border-color: var(--orange); text-align:center;">
-      <strong id="approvalStatusText" style="color: var(--orange);">⏳ तुमचे KYC आणि जॉइनिंग फी अप्रूव्हल प्रलंबित आहे...</strong>
+  <div id="riderScreen" class="hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <span id="riderLabel" style="font-size:13px; color:#aaa;"></span>
+      <button onclick="logoutRider()" style="width:auto; padding:6px 12px; background:#333; color:#fff; font-size:12px; margin:0;">Logout</button>
     </div>
 
-    <!-- Tab 1: Orders & Timer -->
-    <div id="rtab-orders">
-      <div id="activeOrderBox" class="hidden card" style="border: 2px solid var(--green);">
-        <h3 style="color: var(--green);">🚚 चालू डिलिव्हरी (Active Ride)</h3>
-        <div id="activeOrderDetails" style="margin: 8px 0; font-size: 14px;"></div>
-        <div id="riderMap"></div>
-        
-        <label style="font-size:12px; color:#aaa; display:block; margin-top:8px;">📸 पार्सल फोटो काढा (Camera Proof):</label>
-        <input type="file" accept="image/*" capture="environment" id="parcelPhoto" />
+    <div id="riderNoticeBanner" class="banner-strip hidden"></div>
 
-        <input type="number" id="verifyOtpInput" placeholder="ग्राहकाचा 4-अंकी OTP टाका" />
-        <button class="btn-green" onclick="completeDelivery()">OTP तपासा आणि डिलिव्हरी पूर्ण करा</button>
-        <button style="background:#25D366; color:#000; margin-top:6px;" onclick="contactCustomerWA()">ग्राहकाला WhatsApp करा</button>
-      </div>
-
-      <h3 style="color: var(--orange); margin-bottom: 8px;">नवीन ऑर्डर अलर्ट (Live Requests)</h3>
-      <div id="newOrdersContainer">ऑनलाईन व्हा म्हणजे नवीन ऑर्डर्स दिसतील...</div>
-    </div>
-
-    <!-- Tab 2: Earnings & Wallet -->
-    <div id="rtab-wallet" class="hidden">
-      <div class="card">
-        <h3 style="color: var(--orange);">माझी कमाई आणि वॉलेट</h3>
-        <p style="margin-top:10px;">एकूण पूर्ण राईड्स: <strong id="statRides">0</strong></p>
-        <p style="margin-top:6px;">एकूण कमाई (कमिशन वजा जाता): <strong id="statEarnings" style="color:var(--green); font-size:18px;">₹0</strong></p>
-        <p style="margin-top:6px; font-size:12px; color:#aaa;">प्लॅटफॉर्म कमिशन कपात: <span id="commRateDisplay">20%</span></p>
-        <button style="margin-top:12px;" onclick="requestPayout()">पैसे बँकेत जमा करा (Withdraw Request)</button>
+    <!-- Rejected KYC Re-upload Banner -->
+    <div id="rejectedBanner" class="card hidden" style="background:#2b1212; border:2px solid #e74c3c;">
+      <h4 style="color:#ff6b6b;">❌ तुमची कागदपत्रे / KYC नाकारली गेली आहे!</h4>
+      <p id="rejectReasonText" style="font-size:13px; color:#ddd; margin:6px 0;"></p>
+      <div class="doc-upload-box">
+        <label style="font-size:12px; color:#4db8ff;">पुन्हा खरा व स्पष्ट कागदपत्राचा फोटो अपलोड करा:</label>
+        <input type="file" accept="image/*" onchange="reuploadKycDoc(this)">
       </div>
     </div>
 
-    <!-- Tab 3: Refer & Profile -->
-    <div id="rtab-profile" class="hidden">
+    <!-- Daily Duty Selfie Card -->
+    <div id="dailySelfieCard" class="card" style="border:2px solid #ff6600; background:#24180e;">
+      <h3 style="color:#ff6600;">📸 आजची ड्युटी सुरू करा (Daily Selfie)</h3>
+      <p style="font-size:12px; color:#ddd; margin:6px 0;">दररोज ऑनलाईन येताना तुमचा ताजा लाईव्ह सेल्फी काढणे अनिवार्य आहे.</p>
+      <video id="dutyVideo" autoplay playsinline class="hidden"></video>
+      <button onclick="openCamera('duty')" style="background:#3498db; color:#fff;">📷 ड्युटी सेल्फीसाठी कॅमेरा उघडा</button>
+      <button id="btnSnapDuty" onclick="submitDailySelfie()" class="hidden" style="background:#2ecc71;">✅ सेल्फी अपलोड करा व ONLINE या</button>
+    </div>
+
+    <!-- Onboarding Fee Banner -->
+    <div id="onboardingBanner" class="card" style="background:#2b1708; border-color:#ff6600;">
+      <h4 style="color:#ff6600;">खाते सक्रिय करा (Onboarding Fee: ₹<span class="dynFee">1000</span>)</h4>
+      <button onclick="payOnboarding()">₹<span class="dynFee">1000</span> शुल्क जमा करा</button>
+    </div>
+
+    <!-- Pending Approval Banner -->
+    <div id="approvalBanner" class="card hidden" style="background:#1c252c; border-color:#3498db;">
+      <h4 style="color:#3498db;">⏳ Admin मंजुरीच्या प्रतीक्षेत</h4>
+      <p style="font-size:12px; color:#bbb; margin-top:4px;">तुमचे कागदपत्रे व सेल्फी तपासले जात आहेत.</p>
+    </div>
+
+    <!-- SECTION 1: ORDERS & ACTIVE DELIVERY -->
+    <div id="secOrders">
       <div class="card">
-        <h3 style="color: var(--orange);">रायडर प्रोफाईल & रेफर</h3>
-        <p id="profileInfo" style="font-size:14px; line-height:1.6; margin-top:8px;"></p>
-        <div style="background:#111; padding:10px; border-radius:8px; margin-top:10px; text-align:center;">
-          तुमचा रेफर कोड: <strong id="riderReferCode" style="color:var(--orange);">GPR000</strong>
+        <h3 style="color:#ff6600; margin-bottom:10px;">माझ्या चालू डिलिव्हरी</h3>
+        <div id="myDeliveries">कोणतीही चालू ऑर्डर नाही.</div>
+      </div>
+
+      <div class="card">
+        <h3 style="color:#ff6600; margin-bottom:4px;">नवीन उपलब्ध ऑर्डर्स (<span id="radiusLabel">2</span> किमी परिसर)</h3>
+        <div id="availableOrders">जवळपासच्या ऑर्डर्स शोधत आहे...</div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: WALLET & PAYOUTS -->
+    <div id="secWallet" class="hidden">
+      <div class="card">
+        <h3 style="color:#ff6600; margin-bottom:10px;">माझे वॉलेट (Wallet)</h3>
+        <div class="wallet-grid">
+          <div class="w-box">
+            <div style="font-size:12px; color:#aaa;">निव्वळ कमाई (<span id="rPct">80</span>%)</div>
+            <div style="font-size:20px; color:#2ecc71; font-weight:bold;">₹<span id="netEarnings">0</span></div>
+          </div>
+          <div class="w-box">
+            <div style="font-size:12px; color:#aaa;">कमिशन (<span id="cPct">20</span>%)</div>
+            <div style="font-size:20px; color:#ff6600; font-weight:bold;">₹<span id="commDeducted">0</span></div>
+          </div>
         </div>
-        <button class="btn-red" style="margin-top:12px;" onclick="logoutRider()">लॉगआउट (Logout)</button>
+        <button onclick="requestWithdrawal()" style="background:#2ecc71; margin-top:14px;">💳 बँक खात्यात पैसे काढा (Withdraw Request)</button>
+      </div>
+    </div>
+
+    <!-- SECTION 3: REFER & PROFILE -->
+    <div id="secRefer" class="hidden">
+      <div class="card" style="text-align:center;">
+        <h3 style="color:#ff6600;">🎁 मित्रांना रेफर करा व बोनस मिळवा!</h3>
+        <p style="font-size:13px; color:#ccc; margin:8px 0;">प्रत्येक नवीन रायडरच्या यशस्वी जॉइनिंगवर तुम्हाला मिळेल <strong style="color:#2ecc71;">₹<span id="dynReferBonus">100</span></strong> बोनस!</p>
+        <div style="background:#000; border:1px dashed #ff6600; padding:10px; border-radius:8px; font-size:18px; font-weight:bold; color:#ff6600; margin:10px 0;" id="myRiderReferCode">GPR0000</div>
+        <a id="shareReferWa" href="#" target="_blank" class="wa-btn">📲 WhatsApp वर मित्रांना शेअर करा</a>
       </div>
     </div>
 
   </div>
 </div>
 
-<div class="tabs" id="riderTabs" style="display:none;">
-  <div class="tab-btn active" onclick="switchRiderTab('orders', this)">🛵 ऑर्डर्स</div>
-  <div class="tab-btn" onclick="switchRiderTab('wallet', this)">💰 कमाई & वॉलेट</div>
-  <div class="tab-btn" onclick="switchRiderTab('profile', this)">👤 प्रोफाईल</div>
+<!-- Bottom Navigation Bar -->
+<div id="bottomNav" class="bottom-nav hidden">
+  <div class="b-nav-item active" onclick="switchBottomTab('Orders', this)">🛵 ऑर्डर्स</div>
+  <div class="b-nav-item" onclick="switchBottomTab('Wallet', this)">💰 वॉलेट</div>
+  <div class="b-nav-item" onclick="switchBottomTab('Refer', this)">🎁 रेफर & बोनस</div>
 </div>
 
-<script>
-  // 🔴 तुमचा FIREBASE CONFIG इथे पेस्ट करा
+<canvas id="snapCanvas" width="240" height="240" class="hidden"></canvas>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, doc, setDoc, getDoc, getDocs, updateDoc, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  let rider = JSON.parse(localStorage.getItem('gp_rider') || 'null');
-  let isOnline = false;
-  let globalSettings = { joiningFee: 199, commission: 20, orderTimerSec: 30 };
-  let activeOrder = null;
-  let timerInterval = null;
-
-  window.onload = () => {
-    db.collection('settings').doc('global').onSnapshot(doc => {
-      if (doc.exists) {
-        globalSettings = { ...globalSettings, ...doc.data() };
-        document.getElementById('joiningFeeText').innerText = '₹' + globalSettings.joiningFee;
-        document.getElementById('commRateDisplay').innerText = globalSettings.commission + '%';
-        if (doc.data().consentText) document.getElementById('riderConsentText').innerText = doc.data().consentText;
-      }
-    });
-    if (rider) initRiderDashboard();
+    apiKey: "AIzaSyAxfFnHbLimC3PEO5svXvn3sxH7yn9JEAw",
+    authDomain: "goparcel-f89b5.firebaseapp.com",
+    databaseURL: "https://goparcel-f89b5-default-rtdb.firebaseio.com",
+    projectId: "goparcel-f89b5",
+    storageBucket: "goparcel-f89b5.firebasestorage.app",
+    messagingSenderId: "263428109251",
+    appId: "1:263428109251:web:12f001ac4c4e9d71c84376",
+    measurementId: "G-BGH30XLR8M"
   };
 
-  function registerRider() {
-    if (!document.getElementById('agreeCheck').checked) return alert("कृपया अटी व शर्तींना संमती (Consent) द्या.");
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  let adminWaNumber = "919999999999", currentOnboardingFee = 1000, currentCommPct = 20, maxRadiusKm = 2;
+  let orderAlertTimerSec = 45, currentReferBonus = 100;
+  let reqDailySelfie = true, isDutyVerifiedToday = false;
+  let isFeePaid = false, isApproved = false, existingRiderName = "", activeRiderId = null, activeRiderName = "";
+  let rLoginReqId = null, rRegReqId = null, regSelfieData = "", docPhotoData = "", activeStream = null;
+  let riderLat = null, riderLng = null, currentNetBalance = 0;
+  let docRules = { docAadhaar: true, docLicense: true, docRcBook: false, docPanCard: false };
+  let alertCountdownInterval = null;
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  function getNowTimeStr() { return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+
+  function isValidAadhaar(num) {
+    if (!/^[2-9]{1}[0-9]{11}$/.test(num)) return false;
+    const d = [[0,1,2,3,4,5,6,7,8,9],[1,2,3,4,0,6,7,8,9,5],[2,3,4,0,1,7,8,9,5,6],[3,4,0,1,2,8,9,5,6,7],[4,0,1,2,3,9,5,6,7,8],[5,9,8,7,6,0,4,3,2,1],[6,5,9,8,7,1,0,4,3,2],[7,6,5,9,8,2,1,0,4,3],[8,7,6,5,9,3,2,1,0,4],[9,8,7,6,5,4,3,2,1,0]];
+    const p = [[0,1,2,3,4,5,6,7,8,9],[1,5,7,6,2,8,3,0,9,4],[5,8,0,3,7,9,6,1,4,2],[8,9,1,6,0,4,3,5,2,7],[9,4,5,3,1,2,6,8,7,0],[4,2,8,6,5,7,3,9,0,1],[2,7,9,3,8,0,6,4,1,5],[7,0,4,6,9,1,3,2,5,8]];
+    let c = 0;
+    num.split('').reverse().forEach((digit, i) => { c = d[c][p[i % 8][parseInt(digit, 10)]]; });
+    return c === 0;
+  }
+
+  function getDistanceKm(lat1, lon1, lat2, lon2) {
+    if (!lat1 || !lon1 || !lat2 || !lon2) return 0;
+    const R = 6371, dLat = (lat2 - lat1) * Math.PI / 180, dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  window.switchRTab = (t) => {
+    document.getElementById('rSecLogin').classList.toggle('hidden', t !== 'login');
+    document.getElementById('rSecReg').classList.toggle('hidden', t !== 'reg');
+    document.getElementById('rTabLogin').classList.toggle('active', t === 'login');
+    document.getElementById('rTabReg').classList.toggle('active', t === 'reg');
+  };
+
+  window.switchBottomTab = (tabName, el) => {
+    ['Orders', 'Wallet', 'Refer'].forEach(t => document.getElementById('sec' + t).classList.add('hidden'));
+    document.getElementById('sec' + tabName).classList.remove('hidden');
+    document.querySelectorAll('.b-nav-item').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  };
+
+  onSnapshot(doc(db, "config", "appSettings"), (snap) => {
+    if (snap.exists()) {
+      const s = snap.data();
+      adminWaNumber = s.adminWa || "919999999999";
+      currentOnboardingFee = s.onboardingFee ?? 1000;
+      currentCommPct = s.commission ?? 20;
+      maxRadiusKm = s.pickupRadiusKm ?? 2;
+      orderAlertTimerSec = s.orderTimerSec ?? 45;
+      currentReferBonus = s.riderReferBonus ?? 100;
+      reqDailySelfie = s.reqDailySelfie ?? true;
+      docRules = { docAadhaar: s.docAadhaar ?? true, docLicense: s.docLicense ?? true, docRcBook: s.docRcBook ?? false, docPanCard: s.docPanCard ?? false };
+      
+      document.getElementById('rAadhaar').classList.toggle('hidden', !docRules.docAadhaar);
+      document.getElementById('rLicense').classList.toggle('hidden', !docRules.docLicense);
+      document.getElementById('rRcBook').classList.toggle('hidden', !docRules.docRcBook);
+      document.getElementById('rPanCard').classList.toggle('hidden', !docRules.docPanCard);
+      document.querySelectorAll('.dynFee').forEach(el => el.innerText = currentOnboardingFee);
+      document.getElementById('cPct').innerText = currentCommPct;
+      document.getElementById('rPct').innerText = 100 - currentCommPct;
+      document.getElementById('radiusLabel').innerText = maxRadiusKm;
+      document.getElementById('dynReferBonus').innerText = currentReferBonus;
+      if (s.consentText) document.getElementById('consentAgreementText').innerText = s.consentText;
+
+      const b = document.getElementById('riderNoticeBanner');
+      if (s.riderBannerText) { b.innerText = "📢 " + s.riderBannerText; b.classList.remove('hidden'); }
+      else b.classList.add('hidden');
+    }
+  });
+
+  function compressImageFile(file, callback) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const scale = Math.min(480 / img.width, 480 / img.height, 1);
+        canvas.width = img.width * scale; canvas.height = img.height * scale;
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        callback(canvas.toDataURL('image/jpeg', 0.65));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  window.handleDocPhoto = (input) => {
+    if (input.files && input.files[0]) {
+      compressImageFile(input.files[0], (base64) => {
+        docPhotoData = base64;
+        const prev = document.getElementById('docPreview');
+        prev.src = base64; prev.classList.remove('hidden');
+      });
+    }
+  };
+
+  window.reuploadKycDoc = (input) => {
+    if (input.files && input.files[0] && activeRiderId) {
+      compressImageFile(input.files[0], async (base64) => {
+        await updateDoc(doc(db, "riders", activeRiderId), { kycPhoto: base64, kycRejected: false, rejectReason: "" });
+        alert("✅ नवीन कागदपत्रांचा फोटो Admin कडे पाठवला आहे!");
+      });
+    }
+  };
+
+  window.openCamera = async (mode) => {
+    try {
+      if (activeStream) activeStream.getTracks().forEach(t => t.stop());
+      activeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+      const vid = document.getElementById(mode === 'reg' ? 'regVideo' : 'dutyVideo');
+      vid.srcObject = activeStream; vid.classList.remove('hidden');
+      document.getElementById(mode === 'reg' ? 'btnSnapReg' : 'btnSnapDuty').classList.remove('hidden');
+    } catch (err) { alert("कॅमेरा परवानगी (Allow) द्या!"); }
+  };
+
+  function captureBase64(videoEl) {
+    const canvas = document.getElementById('snapCanvas');
+    canvas.getContext('2d').drawImage(videoEl, 0, 0, 240, 240);
+    if (activeStream) activeStream.getTracks().forEach(t => t.stop());
+    videoEl.classList.add('hidden');
+    return canvas.toDataURL('image/jpeg', 0.65);
+  }
+
+  window.takeSnapshot = () => {
+    regSelfieData = captureBase64(document.getElementById('regVideo'));
+    const prev = document.getElementById('regPreview');
+    prev.src = regSelfieData; prev.classList.remove('hidden');
+    document.getElementById('btnSnapReg').classList.add('hidden');
+  };
+
+  window.submitDailySelfie = async () => {
+    const selfieImg = captureBase64(document.getElementById('dutyVideo'));
+    await updateDoc(doc(db, "riders", activeRiderId), { dailySelfie: selfieImg, lastDutyDate: todayStr, lastSelfieTime: serverTimestamp() });
+    alert("✅ आजचा लाईव्ह सेल्फी व्हेरिफाय झाला! आता तुम्ही ONLINE आहात.");
+  };
+
+  window.startRiderLoginOtp = async () => {
+    const phone = document.getElementById('rLoginPhone').value.trim();
+    if (phone.length !== 10 || isNaN(phone)) return alert("कृपया १० अंकी मोबाईल नंबर टाका!");
+    const snap = await getDoc(doc(db, "riders", "rider_" + phone));
+    if (!snap.exists()) { alert("हा नंबर नोंदणीकृत नाही!"); switchRTab('reg'); return; }
+    existingRiderName = snap.data().name || "Rider";
+    const secretOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const timeStr = getNowTimeStr();
+    const reqRef = await addDoc(collection(db, "otpRequests"), { role: "Rider (Login)", name: existingRiderName, phone, otp: secretOtp, timeStr, status: "Pending", createdAt: Date.now() });
+    rLoginReqId = reqRef.id;
+    document.getElementById('rLoginWaLink').href = `https://wa.me/${adminWaNumber}?text=${encodeURIComponent(`नमस्कार GoParcel Admin, मी रायडर ${existingRiderName} (${phone}) आत्ता (${timeStr}) लॉगिन करत आहे. कृपया OTP पाठवा.`)}`;
+    document.getElementById('rLoginOtpBox').classList.remove('hidden');
+  };
+
+  window.verifyRiderLoginOtp = async () => {
+    const phone = document.getElementById('rLoginPhone').value.trim();
+    const entered = document.getElementById('rLoginOtpInput').value.trim();
+    const reqSnap = await getDoc(doc(db, "otpRequests", rLoginReqId));
+    if (!reqSnap.exists() || reqSnap.data().otp !== entered) return alert("चुकीचा OTP!");
+    await updateDoc(doc(db, "otpRequests", rLoginReqId), { status: "Verified" });
+    const rid = "rider_" + phone, label = `${existingRiderName} (${phone})`;
+    localStorage.setItem("gp_verified_rider_id", rid); localStorage.setItem("gp_verified_rider_name", label);
+    startRiderSession(rid, label);
+  };
+
+  window.startRiderRegOtp = async () => {
     const name = document.getElementById('rName').value.trim();
     const phone = document.getElementById('rPhone').value.trim();
-    if (!name || phone.length < 10) return alert("योग्य नाव आणि मोबाईल नंबर टाका.");
+    const vehicleNo = document.getElementById('rVehicle').value.trim().toUpperCase().replace(/\s+/g, '');
+    const aadhaar = document.getElementById('rAadhaar').value.trim();
+    const license = document.getElementById('rLicense').value.trim().toUpperCase();
+    const rc = document.getElementById('rRcBook').value.trim().toUpperCase();
+    const pan = document.getElementById('rPanCard').value.trim().toUpperCase();
+    const referredBy = document.getElementById('rReferCodeInput').value.trim().toUpperCase();
+    const consentOk = document.getElementById('regConsentCheck').checked;
 
-    const data = {
-      name, phone,
-      city: document.getElementById('rCity').value,
-      vehicleType: document.getElementById('rVehicle').value,
-      vehicleNumber: document.getElementById('rVehNum').value,
-      license: document.getElementById('rLicense').value,
-      aadhaar: document.getElementById('rAadhaar').value,
-      approved: false,
-      wallet: 0,
-      rides: 0,
-      referCode: 'GPR' + phone.slice(-4),
-      consentAccepted: true,
-      joinedAt: new Date().toISOString()
-    };
+    if (!name || phone.length !== 10 || !vehicleNo) return alert("कृपया नाव, मोबाईल आणि गाडीचा नंबर भरा!");
+    if (docRules.docAadhaar && !isValidAadhaar(aadhaar)) return alert("❌ चुकीचा आधार नंबर! कृपया अचूक १२ अंकी खरा आधार नंबर टाका.");
+    if (docRules.docLicense && license.length < 8) return alert("❌ चुकीचा ड्रायव्हिंग लायसन्स नंबर!");
+    if (!docPhotoData) return alert("❌ कृपया कागदपत्रांचा (आधार/लायसन्स) स्पष्ट फोटो अपलोड करा!");
+    if (!regSelfieData) return alert("❌ कृपया कॅमेऱ्याने तुमचा मूळ सेल्फी फोटो काढा!");
+    if (!consentOk) return alert("❌ कृपया सहमती पत्रास (Consent Agreement) संमती द्या!");
 
-    db.collection('riders').doc(phone).set(data, { merge: true }).then(() => {
-      localStorage.setItem('gp_rider', JSON.stringify(data));
-      rider = data;
-      initRiderDashboard();
-    });
-  }
+    const btn = document.getElementById('btnStartReg');
+    btn.innerText = "डुप्लिकेट तपासत आहे...";
 
-  function initRiderDashboard() {
-    document.getElementById('riderAuthCard').classList.add('hidden');
-    document.getElementById('riderMain').classList.remove('hidden');
-    document.getElementById('riderTabs').style.display = 'flex';
-
-    db.collection('riders').doc(rider.phone).onSnapshot(doc => {
-      if (doc.exists) {
-        rider = doc.data();
-        localStorage.setItem('gp_rider', JSON.stringify(rider));
-        const banner = document.getElementById('approvalBanner');
-        if (rider.approved) {
-          banner.style.borderColor = '#00c853';
-          document.getElementById('approvalStatusText').style.color = '#00c853';
-          document.getElementById('approvalStatusText').innerText = '✅ तुमचे खाते मंजूर (Approved) आहे! तुम्ही काम सुरू करू शकता.';
-        } else {
-          document.getElementById('approvalStatusText').innerText = `⏳ Admin मंजुरी प्रलंबित आहे (जॉइनिंग फी: ₹${globalSettings.joiningFee})`;
-        }
-        document.getElementById('statRides').innerText = rider.rides || 0;
-        document.getElementById('statEarnings').innerText = '₹' + (rider.wallet || 0);
-        document.getElementById('riderReferCode').innerText = rider.referCode;
-        document.getElementById('profileInfo').innerHTML = `नाव: <strong>${rider.name}</strong><br>मोबाईल: ${rider.phone}<br>वाहन: ${rider.vehicleType} (${rider.vehicleNumber})<br>शहर: ${rider.city}`;
+    const allRiders = await getDocs(collection(db, "riders"));
+    let duplicateFound = "";
+    allRiders.forEach(d => {
+      const r = d.data();
+      if (d.id !== "rider_" + phone) {
+        if (aadhaar && r.aadhaarNo === aadhaar) duplicateFound = "हा आधार नंबर आधीच दुसऱ्या रायडर खात्याशी जोडलेला आहे!";
+        if (vehicleNo && r.vehicleNo === vehicleNo) duplicateFound = "हा गाडीचा नंबर आधीच नोंदणीकृत आहे!";
       }
     });
+    if (duplicateFound) {
+      btn.innerText = "कागदपत्रे तपासा व OTP मागवा";
+      return alert("🚫 डुप्लिकेट आढळले: " + duplicateFound);
+    }
+
+    const kycSummary = [aadhaar ? `Aadhaar:${aadhaar}` : '', license ? `DL:${license}` : '', rc ? `RC:${rc}` : '', pan ? `PAN:${pan}` : ''].filter(Boolean).join(' | ');
+    const secretOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const timeStr = getNowTimeStr();
+
+    await setDoc(doc(db, "riders", "rider_" + phone), {
+      name, phone, vehicleNo, aadhaarNo: aadhaar, licenseNo: license,
+      kycDoc: kycSummary, kycPhoto: docPhotoData, regSelfie: regSelfieData,
+      referredBy, referCode: "GPR" + phone.slice(-4),
+      consentAccepted: true, consentTime: serverTimestamp(),
+      kycRejected: false, rejectReason: ""
+    }, { merge: true });
+
+    const reqRef = await addDoc(collection(db, "otpRequests"), { role: "Rider (New)", name, phone, otp: secretOtp, timeStr, status: "Pending", createdAt: Date.now() });
+    rRegReqId = reqRef.id;
+    document.getElementById('rRegWaLink').href = `https://wa.me/${adminWaNumber}?text=${encodeURIComponent(`नमस्कार GoParcel Admin, मी नवीन रायडर ${name} (${phone}) आत्ता (${timeStr}) नोंदणी करत आहे. कृपया OTP पाठवा.`)}`;
+    document.getElementById('rRegOtpBox').classList.remove('hidden');
+    btn.innerText = "कागदपत्रे तपासा व OTP मागवा";
+  };
+
+  window.verifyRiderRegOtp = async () => {
+    const name = document.getElementById('rName').value.trim();
+    const phone = document.getElementById('rPhone').value.trim();
+    const entered = document.getElementById('rRegOtpInput').value.trim();
+    const reqSnap = await getDoc(doc(db, "otpRequests", rRegReqId));
+    if (!reqSnap.exists() || reqSnap.data().otp !== entered) return alert("चुकीचा OTP!");
+    await updateDoc(doc(db, "otpRequests", rRegReqId), { status: "Verified" });
+    const rid = "rider_" + phone;
+    await updateDoc(doc(db, "riders", rid), { mobileVerified: true, feePaid: false, approved: false, createdAt: serverTimestamp() });
+    const label = `${name} (${phone})`;
+    localStorage.setItem("gp_verified_rider_id", rid); localStorage.setItem("gp_verified_rider_name", label);
+    startRiderSession(rid, label);
+  };
+
+  window.logoutRider = () => { localStorage.removeItem("gp_verified_rider_id"); localStorage.removeItem("gp_verified_rider_name"); location.reload(); };
+  window.payOnboarding = async () => { await updateDoc(doc(db, "riders", activeRiderId), { feePaid: true, paidAmount: currentOnboardingFee }); alert("शुल्क जमा झाले!"); };
+
+  window.acceptOrder = async (orderId) => {
+    if (reqDailySelfie && !isDutyVerifiedToday) return alert("आधी आजचा लाईव्ह ड्युटी सेल्फी काढून ONLINE या!");
+    if (!isFeePaid && currentOnboardingFee > 0) return alert(`आधी ₹${currentOnboardingFee} ऑनबोर्डिंग शुल्क भरा!`);
+    if (!isApproved) return alert("तुमच्या खात्याला अजून Admin ची मंजुरी मिळालेली नाही!");
+    clearInterval(alertCountdownInterval);
+    await updateDoc(doc(db, "orders", orderId), { status: "Accepted", riderId: activeRiderId, riderEmail: activeRiderName });
+  };
+
+  window.completeOrderWithPin = async (orderId, expectedPin) => {
+    if (expectedPin) {
+      const enteredPin = prompt("कस्टमरकडून ४-अंकी डिलिव्हरी PIN विचारून टाका:");
+      if (!enteredPin) return;
+      if (enteredPin.trim() !== expectedPin) return alert("❌ चुकीचा डिलिव्हरी PIN! कस्टमरच्या ॲपमधील अचूक ४-अंकी PIN टाका.");
+    }
+    await updateDoc(doc(db, "orders", orderId), { status: "Delivered", deliveredAt: serverTimestamp() });
+    alert("🎉 डिलिव्हरी यशस्वीरित्या पूर्ण झाली! कमाई वॉलेटमध्ये जमा झाली आहे.");
+  };
+
+  window.requestWithdrawal = async () => {
+    if (currentNetBalance < 100) return alert("विथड्रॉवलसाठी वॉलेटमध्ये किमान ₹100 शिल्लक आवश्यक आहे.");
+    await addDoc(collection(db, "payoutRequests"), {
+      riderId: activeRiderId,
+      riderName: activeRiderName,
+      amount: currentNetBalance,
+      status: "Pending",
+      requestedAt: serverTimestamp()
+    });
+    alert("✅ तुमची पेमेंट विथड्रॉवल विनंती Admin कडे पाठवली आहे!");
+  };
+
+  function startGpsTracking(rid) {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.watchPosition(async (pos) => {
+        riderLat = pos.coords.latitude; riderLng = pos.coords.longitude;
+        await updateDoc(doc(db, "riders", rid), { lat: riderLat, lng: riderLng, lastSeen: serverTimestamp() });
+      }, () => {}, { enableHighAccuracy: true });
+    }
   }
 
-  function toggleOnline() {
-    if (!rider || !rider.approved) return alert("Admin कडून खाते Approved झाल्याशिवाय तुम्ही ऑनलाईन होऊ शकत नाही.");
-    isOnline = !isOnline;
-    const btn = document.getElementById('onlineToggle');
-    btn.innerText = isOnline ? 'ONLINE' : 'OFFLINE';
-    btn.className = 'status-pill ' + (isOnline ? 'online' : 'offline');
-    if (isOnline) listenPendingOrders();
-    else document.getElementById('newOrdersContainer').innerHTML = 'तुम्ही सध्या OFFLINE आहात.';
-  }
+  function startRiderSession(rid, label) {
+    activeRiderId = rid; activeRiderName = label;
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('riderScreen').classList.remove('hidden');
+    document.getElementById('bottomNav').classList.remove('hidden');
+    document.getElementById('riderLabel').innerText = label;
 
-  function listenPendingOrders() {
-    db.collection('orders').where('status', '==', 'PENDING').onSnapshot(snap => {
-      if (!isOnline) return;
-      const box = document.getElementById('newOrdersContainer');
-      if (snap.empty) { box.innerHTML = '<div class="card">सध्या नवीन ऑर्डर्स नाहीत...</div>'; return; }
-      box.innerHTML = '';
-      let timeLeft = globalSettings.orderTimerSec || 30;
-      clearInterval(timerInterval);
+    const myCode = "GPR" + rid.slice(-4);
+    document.getElementById('myRiderReferCode').innerText = myCode;
+    document.getElementById('shareReferWa').href = `https://wa.me/?text=${encodeURIComponent(`GoParcel रायडर बना आणि दररोज चांगली कमाई करा! माझा रेफरल कोड वापरा: ${myCode}`)}`;
 
-      snap.forEach(doc => {
-        const o = doc.data();
-        const netEarn = Math.round(o.fare * (1 - globalSettings.commission / 100));
-        box.innerHTML += `
-          <div class="card" style="border: 1px solid var(--orange);">
-            <div class="timer-box">⏱️ ऑर्डर स्वीकारण्यासाठी वेळ: <span id="countdown">${timeLeft}</span> सेकंद</div>
-            <p><strong>${o.vehicleType}</strong> • अंतर: ${o.distanceKm} km</p>
-            <p style="font-size:13px; margin:6px 0;">🟢 पिकअप: ${o.pickup}<br>🔴 ड्रॉप: ${o.drop}</p>
-            <p style="font-size:16px; color:var(--green); font-weight:bold;">तुमची कमाई: ₹${netEarn} (एकूण भाडे ₹${o.fare})</p>
-            <div style="display:flex; gap:8px; margin-top:10px;">
-              <button class="btn-green" onclick="acceptOrder('${doc.id}')">स्वीकारा (Accept)</button>
-              <button class="btn-red" onclick="this.parentElement.parentElement.remove()">नाकारा (Reject)</button>
-            </div>
+    startGpsTracking(rid);
+
+    onSnapshot(doc(db, "riders", rid), (snap) => {
+      if (snap.exists()) {
+        const r = snap.data();
+        isFeePaid = !!r.feePaid; isApproved = !!r.approved;
+        isDutyVerifiedToday = (r.lastDutyDate === todayStr);
+        if (r.lat && r.lng) { riderLat = r.lat; riderLng = r.lng; }
+        const needSelfie = reqDailySelfie && !isDutyVerifiedToday;
+
+        document.getElementById('rejectedBanner').classList.toggle('hidden', !r.kycRejected);
+        if (r.kycRejected) document.getElementById('rejectReasonText').innerText = "कारण: " + (r.rejectReason || "कागदपत्र स्पष्ट नाही.");
+
+        document.getElementById('dailySelfieCard').classList.toggle('hidden', !needSelfie);
+        document.getElementById('onboardingBanner').classList.toggle('hidden', isFeePaid || currentOnboardingFee === 0);
+        document.getElementById('approvalBanner').classList.toggle('hidden', isApproved);
+        const tag = document.getElementById('dutyStatusTag');
+        if (!needSelfie && isApproved) { tag.innerText = `● ONLINE (${maxRadiusKm}km Radius)`; tag.style.color = "#2ecc71"; }
+        else { tag.innerText = "● OFFLINE / PENDING"; tag.style.color = "#ff6600"; }
+      }
+    });
+
+    onSnapshot(query(collection(db, "orders"), where("status", "==", "Pending")), (snap) => {
+      const div = document.getElementById('availableOrders');
+      div.innerHTML = "";
+      clearInterval(alertCountdownInterval);
+      let foundNearby = 0;
+      let secLeft = orderAlertTimerSec;
+
+      snap.forEach(d => {
+        const o = d.data();
+        const awayKm = getDistanceKm(riderLat, riderLng, o.pickupLat, o.pickupLng);
+        if (awayKm <= maxRadiusKm) {
+          foundNearby++;
+          const net = Math.round(o.fare * ((100 - currentCommPct) / 100));
+          div.innerHTML += `<div class="order-card">
+            <div class="timer-strip">⏱️ ऑर्डर अलर्ट टायमर: <span class="orderTimerVal">${secLeft}</span> सेकंद शिल्लक</div>
+            <div style="display:flex; justify-content:space-between;"><b>${o.vehicle} - ${o.parcel}</b><span style="color:#4db8ff; font-size:12px;">📍 ${awayKm.toFixed(1)} km दूर</span></div>
+            <small>🟢 Pickup: ${o.pickup}<br>🔴 Drop: ${o.drop}</small><br>
+            <div style="margin:6px 0; color:#2ecc71;">तुमची कमाई: <b>₹${net}</b> (भाडे: ₹${o.fare})</div>
+            <button onclick="acceptOrder('${d.id}')">ऑर्डर स्वीकारा (Accept)</button>
           </div>`;
-      });
-
-      timerInterval = setInterval(() => {
-        timeLeft--;
-        const el = document.getElementById('countdown');
-        if (el) el.innerText = timeLeft;
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          box.innerHTML = '<div class="card">ऑर्डरची वेळ संपली. नवीन ऑर्डरची प्रतीक्षा करा...</div>';
         }
-      }, 1000);
-    });
-  }
-
-  function acceptOrder(orderId) {
-    clearInterval(timerInterval);
-    db.collection('orders').doc(orderId).update({
-      status: 'ACCEPTED',
-      riderName: rider.name,
-      riderPhone: rider.phone
-    }).then(() => {
-      db.collection('orders').doc(orderId).get().then(doc => {
-        activeOrder = { id: doc.id, ...doc.data() };
-        document.getElementById('activeOrderBox').classList.remove('hidden');
-        document.getElementById('activeOrderDetails').innerHTML = `
-          ग्राहक: <strong>${activeOrder.customerName}</strong> (${activeOrder.customerPhone})<br>
-          🟢 पिकअप: ${activeOrder.pickup}<br>
-          🔴 ड्रॉप: ${activeOrder.drop}<br>
-          भाडे: <strong>₹${activeOrder.fare}</strong>`;
       });
+
+      if (foundNearby > 0) {
+        alertCountdownInterval = setInterval(() => {
+          secLeft--;
+          document.querySelectorAll('.orderTimerVal').forEach(el => el.innerText = Math.max(0, secLeft));
+          if (secLeft <= 0) clearInterval(alertCountdownInterval);
+        }, 1000);
+      } else {
+        div.innerHTML = `तुमच्या ${maxRadiusKm} किमी परिसरात सध्या नवीन ऑर्डर नाही.`;
+      }
+    });
+
+    onSnapshot(query(collection(db, "orders"), where("riderId", "==", rid)), (snap) => {
+      const div = document.getElementById('myDeliveries');
+      div.innerHTML = "";
+      let totalNet = 0, totalComm = 0;
+      snap.forEach(d => {
+        const o = d.data();
+        if (o.status === "Delivered") {
+          totalNet += Math.round(o.fare * ((100 - currentCommPct) / 100));
+          totalComm += Math.round(o.fare * (currentCommPct / 100));
+        } else {
+          const gMapsUrl = o.pickupLat ? `https://www.google.com/maps/dir/?api=1&destination=${o.dropLat},${o.dropLng}&waypoints=${o.pickupLat},${o.pickupLng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.pickup)}`;
+          const custPhoneClean = (o.customerPhone || o.phone || "").replace(/\D/g, '');
+          const waCustBtn = custPhoneClean ? `<a href="https://wa.me/91${custPhoneClean.slice(-10)}?text=${encodeURIComponent(`नमस्कार, मी GoParcel रायडर ${activeRiderName} बोलतोय. तुमची ऑर्डर पिकअपसाठी निघालो आहे.`)}" target="_blank" class="wa-btn" style="font-size:13px; padding:9px;">📲 कस्टमरला WhatsApp करा</a>` : '';
+          div.innerHTML += `<div class="order-card">
+            <b>${o.vehicle} (${o.status})</b> - ₹${o.fare}<br><small>🟢 ${o.pickup} ➔ 🔴 ${o.drop}</small>
+            <a href="${gMapsUrl}" target="_blank" class="nav-map-btn">🗺️ Google Maps वर रस्ता पहा</a>
+            ${waCustBtn}
+            <button onclick="completeOrderWithPin('${d.id}', '${o.deliveryPin || ''}')" style="background:#2ecc71; margin-top:6px;">🔐 PIN टाकून डिलिव्हरी पूर्ण करा</button>
+          </div>`;
+        }
+      });
+      currentNetBalance = totalNet;
+      document.getElementById('netEarnings').innerText = totalNet;
+      document.getElementById('commDeducted').innerText = totalComm;
     });
   }
 
-  function completeDelivery() {
-    if (!activeOrder) return;
-    const enteredOtp = document.getElementById('verifyOtpInput').value.trim();
-    if (enteredOtp !== activeOrder.otp) return alert("❌ चुकीचा OTP! ग्राहकाकडून योग्य OTP तपासा.");
-
-    const netEarn = Math.round(activeOrder.fare * (1 - globalSettings.commission / 100));
-    db.collection('orders').doc(activeOrder.id).update({ status: 'DELIVERED' });
-    db.collection('riders').doc(rider.phone).update({
-      wallet: (rider.wallet || 0) + netEarn,
-      rides: (rider.rides || 0) + 1
-    });
-
-    alert(`✅ डिलिव्हरी पूर्ण झाली! तुमच्या वॉलेटमध्ये ₹${netEarn} जमा झाले.`);
-    activeOrder = null;
-    document.getElementById('activeOrderBox').classList.add('hidden');
-  }
-
-  function contactCustomerWA() {
-    if (!activeOrder) return;
-    window.open(`https://wa.me/91${activeOrder.customerPhone}?text=नमस्कार, मी GoParcel रायडर ${rider.name} बोलतोय.`, '_blank');
-  }
-
-  function requestPayout() {
-    if ((rider.wallet || 0) < 100) return alert("विथड्रॉवलसाठी किमान ₹100 शिल्लक आवश्यक आहे.");
-    db.collection('payouts').add({
-      riderName: rider.name,
-      riderPhone: rider.phone,
-      amount: rider.wallet,
-      status: 'PENDING',
-      requestedAt: new Date().toISOString()
-    });
-    alert("तुमची पेमेंट विथड्रॉवल विनंती Admin कडे पाठवली आहे.");
-  }
-
-  function switchRiderTab(tab, el) {
-    ['orders', 'wallet', 'profile'].forEach(t => document.getElementById('rtab-' + t).classList.add('hidden'));
-    document.getElementById('rtab-' + tab).classList.remove('hidden');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-  }
-
-  function logoutRider() {
-    localStorage.removeItem('gp_rider');
-    location.reload();
-  }
+  const savedRid = localStorage.getItem("gp_verified_rider_id");
+  if (savedRid) startRiderSession(savedRid, localStorage.getItem("gp_verified_rider_name"));
 </script>
 </body>
 </html>
