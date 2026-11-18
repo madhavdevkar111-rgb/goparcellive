@@ -16,7 +16,9 @@
     .card { background: #1a1a1a; padding: 15px; border-radius: 12px; margin-bottom: 14px; border: 1px solid #2c2c2c; }
     input, select, button, a.btn-link { width: 100%; padding: 12px; margin: 7px 0; border-radius: 8px; border: 1px solid #333; background: #111; color: #fff; font-size: 15px; display: block; text-decoration: none; }
     button, a.btn-link { background: #ff6600; color: #000; font-weight: bold; border: none; cursor: pointer; text-align: center; }
-    #custMap { height: 230px; width: 100%; border-radius: 10px; margin: 10px 0; border: 1px solid #444; z-index: 1; }
+    .loc-btn-row { display: flex; gap: 8px; margin-bottom: 6px; }
+    .btn-gps { background: #1c2e3d; color: #4db8ff; border: 1px solid #4db8ff; font-size: 13px; padding: 9px; margin: 4px 0; }
+    #custMap { height: 260px; width: 100%; border-radius: 10px; margin: 10px 0; border: 2px solid #444; z-index: 1; }
     .veh-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
     .veh-box { background: #111; border: 2px solid #333; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; }
     .veh-box.active { border-color: #ff6600; background: #2b180a; }
@@ -50,7 +52,7 @@
 </header>
 
 <div class="container">
-  <!-- Customer Login with Language-Specific OTP -->
+  <!-- Customer Login -->
   <div id="custAuthCard" class="card">
     <h3 id="lblLoginTitle" style="color:#ff6600; margin-bottom:8px;">कस्टमर लॉगिन</h3>
     <input type="text" id="cName" placeholder="तुमचे पूर्ण नाव">
@@ -71,12 +73,19 @@
     <!-- TAB 1: BOOK PARCEL -->
     <div id="cTabBook">
       <div class="card">
-        <label style="font-size:12px; color:#2ecc71;">🟢 पिकअप पत्ता (नकाशावर पहिला क्लिक)</label>
+        <div class="loc-btn-row">
+          <button type="button" class="btn-gps" onclick="useCurrentGpsLocation('pickup')">📍 माझे सध्याचे लोकेशन घ्या (Current Pickup)</button>
+        </div>
+
+        <label style="font-size:12px; color:#2ecc71;">🟢 पिकअप पत्ता (नकाशावर हिरवा मार्कर ओढून सरकवा)</label>
         <input type="text" id="pickupInput" placeholder="पिकअप पत्ता टाका">
-        <label style="font-size:12px; color:#e74c3c;">🔴 ड्रॉप पत्ता (नकाशावर दुसरा क्लिक)</label>
+        
+        <label style="font-size:12px; color:#e74c3c;">🔴 ड्रॉप पत्ता (नकाशावर लाल मार्कर ओढून सरकवा)</label>
         <input type="text" id="dropInput" placeholder="ड्रॉप पत्ता टाका">
 
         <div id="custMap"></div>
+        <p style="font-size:11px; color:#4db8ff; margin-bottom:6px;">💡 टीप: नकाशावरील 🟢 (Pickup) आणि 🔴 (Drop) मार्कर बोटाने धरून (Drag) अचूक जागेवर सरकवा.</p>
+
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#aaa;">
           <span>अंतर (KM):</span>
           <input type="number" id="distKmInput" value="3" min="1" step="0.5" style="width:90px; padding:4px 8px; margin:0;" oninput="recalcPrices()">
@@ -111,7 +120,7 @@
           </div>
         </div>
 
-        <!-- ऑर्डर बुक करताना सहमती पत्र (GPS + Timer + PDF Record) -->
+        <!-- Consent Agreement -->
         <div class="consent-box">
           <strong style="color:#ff6600;">📜 ऑर्डर संमती पत्र (Consent Agreement):</strong>
           <p id="orderConsentText" style="margin:5px 0; color:#ccc; line-height:1.4;">
@@ -135,10 +144,10 @@
       </div>
     </div>
 
-    <!-- TAB 2: MY ORDERS (सुधारित ऑर्डर टेबल व लाईव्ह स्टेटस) -->
+    <!-- TAB 2: MY ORDERS -->
     <div id="cTabOrders" class="hidden">
       <div class="card" style="overflow-x:auto;">
-        <h3 style="color:#ff6600; margin-bottom:8px;">🚚 माझ्या ऑर्डर्स व लाईव्ह स्थिती (Order Table)</h3>
+        <h3 style="color:#ff6600; margin-bottom:8px;">🚚 माझ्या ऑर्डर्स व लाईव्ह स्थिती</h3>
         <table class="order-tbl">
           <thead>
             <tr>
@@ -178,7 +187,7 @@
       </div>
     </div>
 
-    <!-- TAB 4: HELP & EMERGENCY SOS -->
+    <!-- TAB 4: HELP & SOS -->
     <div id="cTabHelp" class="hidden">
       <div class="card">
         <h3 style="color:#ff6600; margin-bottom:10px;">🆘 हेल्प आणि इमर्जन्सी सपोर्ट</h3>
@@ -266,13 +275,6 @@
     if (el) el.innerText = new Date().toLocaleTimeString('en-IN');
   }, 1000);
 
-  if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(pos => {
-      custGpsLat = pos.coords.latitude;
-      custGpsLng = pos.coords.longitude;
-    });
-  }
-
   let appCfg = {
     minFare: 30, rate2W: 10, rate3W: 18, rateTempo: 25,
     surgeActive: false, surgeMultiplier: 1.2, timingAlertText: "",
@@ -282,10 +284,9 @@
 
   let custUser = JSON.parse(localStorage.getItem("gp_cust_user") || "null");
   let chosenVehicle = "2-Wheeler";
-  let map, pMarker, dMarker, clicks = 0;
+  let map, pMarker, dMarker, routeLine;
   let pLat = 18.5204, pLng = 73.8567, dLat = 18.5314, dLng = 73.8446;
 
-  // सक्रिय शहरे (Service Zones) लोड करणे
   onSnapshot(collection(db, "serviceZones"), (snap) => {
     const sel = document.getElementById('activeCitySelect');
     if (!snap.empty) {
@@ -297,7 +298,6 @@
     }
   });
 
-  // Master Panel रेट आणि सेटिंग्ज सिंक
   onSnapshot(doc(db, "config", "appSettings"), (snap) => {
     if (snap.exists()) {
       const s = snap.data();
@@ -396,26 +396,99 @@
     document.getElementById('profCustPhone').value = custUser.phone || "";
     document.getElementById('profCustAddr').value = custUser.address || "";
     initMap();
+    useCurrentGpsLocation('pickup', true);
     listenOrders();
   }
+
+  // Reverse Geocoding द्वारे पत्ता शोधणे
+  async function fetchAddressFromCoords(lat, lng, inputId) {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+      const data = await res.json();
+      if (data && data.display_name) {
+        document.getElementById(inputId).value = data.display_name.split(',').slice(0, 3).join(', ');
+      }
+    } catch (e) {}
+  }
+
+  function updateDistanceAndLine() {
+    if (!map) return;
+    const km = Math.max(1, (map.distance([pLat, pLng], [dLat, dLng]) / 1000)).toFixed(1);
+    document.getElementById('distKmInput').value = km;
+    if (routeLine) map.removeLayer(routeLine);
+    routeLine = L.polyline([[pLat, pLng], [dLat, dLng]], { color: '#ff6600', weight: 4, dashArray: '6, 6' }).addTo(map);
+    recalcPrices();
+  }
+
+  // Current Location GPS घेणे
+  window.useCurrentGpsLocation = (target, silent = false) => {
+    if (!("geolocation" in navigator)) {
+      if (!silent) alert("तुमच्या ब्राउझरमध्ये GPS लोकेशन उपलब्ध नाही.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition((pos) => {
+      custGpsLat = pos.coords.latitude;
+      custGpsLng = pos.coords.longitude;
+      if (target === 'pickup') {
+        pLat = custGpsLat; pLng = custGpsLng;
+        dLat = pLat + 0.012; dLng = pLng + 0.012;
+        if (map && pMarker && dMarker) {
+          pMarker.setLatLng([pLat, pLng]).openPopup();
+          dMarker.setLatLng([dLat, dLng]);
+          map.setView([pLat, pLng], 14);
+          updateDistanceAndLine();
+        }
+        fetchAddressFromCoords(pLat, pLng, 'pickupInput');
+        fetchAddressFromCoords(dLat, dLng, 'dropInput');
+      }
+    }, (err) => {
+      if (!silent) alert("कृपया मोबाईलचे GPS Location (Allow) चालू करा!");
+    }, { enableHighAccuracy: true });
+  };
 
   function initMap() {
     if (map) return;
     map = L.map('custMap').setView([pLat, pLng], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    pMarker = L.marker([pLat, pLng]).addTo(map).bindPopup("🟢 Pickup");
-    dMarker = L.marker([dLat, dLng]).addTo(map).bindPopup("🔴 Drop");
 
-    map.on('click', (e) => {
-      clicks++;
-      if (clicks % 2 === 1) { pLat = e.latlng.lat; pLng = e.latlng.lng; pMarker.setLatLng([pLat, pLng]); }
-      else {
-        dLat = e.latlng.lat; dLng = e.latlng.lng; dMarker.setLatLng([dLat, dLng]);
-        const km = Math.max(1, (map.distance([pLat, pLng], [dLat, dLng]) / 1000)).toFixed(1);
-        document.getElementById('distKmInput').value = km;
-        recalcPrices();
-      }
+    const greenPin = L.divIcon({ html: '<div style="font-size:26px; line-height:1;">🟢</div>', className: '', iconSize: [28, 28], iconAnchor: [14, 14] });
+    const redPin = L.divIcon({ html: '<div style="font-size:26px; line-height:1;">🔴</div>', className: '', iconSize: [28, 28], iconAnchor: [14, 14] });
+
+    // Draggable Pickup & Drop मार्कर्स (बोटाने धरून सरकवता येतील)
+    pMarker = L.marker([pLat, pLng], { icon: greenPin, draggable: true }).addTo(map).bindPopup("🟢 Pickup (सरकवा)");
+    dMarker = L.marker([dLat, dLng], { icon: redPin, draggable: true }).addTo(map).bindPopup("🔴 Drop (सरकवा)");
+
+    pMarker.on('dragend', () => {
+      const pos = pMarker.getLatLng();
+      pLat = pos.lat; pLng = pos.lng;
+      updateDistanceAndLine();
+      fetchAddressFromCoords(pLat, pLng, 'pickupInput');
     });
+
+    dMarker.on('dragend', () => {
+      const pos = dMarker.getLatLng();
+      dLat = pos.lat; dLng = pos.lng;
+      updateDistanceAndLine();
+      fetchAddressFromCoords(dLat, dLng, 'dropInput');
+    });
+
+    // नकाशावर क्लिक केल्यासही जवळचा मार्कर सरकेल
+    map.on('click', (e) => {
+      const distToP = map.distance([e.latlng.lat, e.latlng.lng], [pLat, pLng]);
+      const distToD = map.distance([e.latlng.lat, e.latlng.lng], [dLat, dLng]);
+      if (distToP < distToD) {
+        pLat = e.latlng.lat; pLng = e.latlng.lng;
+        pMarker.setLatLng([pLat, pLng]);
+        fetchAddressFromCoords(pLat, pLng, 'pickupInput');
+      } else {
+        dLat = e.latlng.lat; dLng = e.latlng.lng;
+        dMarker.setLatLng([dLat, dLng]);
+        fetchAddressFromCoords(dLat, dLng, 'dropInput');
+      }
+      updateDistanceAndLine();
+    });
+
+    updateDistanceAndLine();
   }
 
   window.pickVeh = (v, el) => {
@@ -488,8 +561,8 @@
       name: custUser.name,
       phone: custUser.phone,
       timestampStr: nowTime,
-      lat: custGpsLat,
-      lng: custGpsLng,
+      lat: pLat,
+      lng: pLng,
       summary: `Order: ${pickup} -> ${drop} (${chosenVehicle}, Rs.${fare})`,
       agreementText: appCfg.consentText,
       createdAt: Date.now()
@@ -503,8 +576,8 @@
       customerPhone: custUser.phone,
       city: document.getElementById('activeCitySelect').value,
       pickup, drop,
-      pickupLat: pLat, pickupLng: pLng,
-      dropLat: dLat, dropLng: dLng,
+      pickupLat: Number(pLat), pickupLng: Number(pLng),
+      dropLat: Number(dLat), dropLng: Number(dLng),
       distanceKm: Number(document.getElementById('distKmInput').value),
       parcel: document.getElementById('parcelSelect').value,
       vehicle: chosenVehicle,
@@ -516,7 +589,7 @@
       createdAt: serverTimestamp()
     });
 
-    alert(`✅ संमती PDF रेकॉर्डसह ऑर्डर बुक झाली! डिलिव्हरी PIN: ${pin}`);
+    alert(`✅ ऑर्डर बुक झाली! तुमचा डिलिव्हरी PIN: ${pin}`);
     switchCustTab('Orders', document.querySelectorAll('.b-nav')[1]);
   };
 
@@ -540,7 +613,6 @@
         if (o.status === "PickedUp") { statusMsg = "🚚 पार्सल निघाले आहे!"; statusColor = "#ff9800"; }
         if (o.status === "Delivered") { statusMsg = "✅ डिलिव्हर झाले!"; statusColor = "#2ecc71"; }
 
-        // टेबलमध्ये ऑर्डर दाखवणे
         tbody.innerHTML += `<tr>
           <td>🟢 ${o.pickup}<br>🔴 ${o.drop}</td>
           <td><b>${o.vehicle}</b><br><span style="color:#2ecc71;">₹${o.fare}</span></td>
@@ -548,7 +620,6 @@
           <td><span class="pin-badge">${o.deliveryPin}</span></td>
         </tr>`;
 
-        // खाली सविस्तर कार्ड (रायडरचा फोन नंबर लपवून फक्त नाव/स्थिती दाखवणे)
         const riderCleanName = o.riderEmail ? o.riderEmail.split('(')[0].trim() : 'रायडर शोधत आहे...';
         cardsBox.innerHTML += `<div class="card">
           <div style="display:flex; justify-content:space-between;">
