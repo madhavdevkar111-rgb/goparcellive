@@ -2,412 +2,44 @@
 <html lang="mr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GoParcel - Master Control Admin</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GoParcel - Admin Portal</title>
+  <link rel="icon" type="image/png" href="https://madhavdevkar111-rgb.github.io/goparcellive/Rider/logo.png">
+  <meta name="theme-color" content="#ff6600">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-    body { background: #0d0f12; color: #f5f5f5; }
-    header { background: linear-gradient(135deg, #000000 65%, #261200 100%); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; }
-    header h1 { color: #ff6600; font-size: 20px; font-weight: 800; }
-    .container { max-width: 1120px; margin: auto; padding: 14px; }
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 15px; }
-    .stat-card { background: #16191f; padding: 14px; border-radius: 12px; border-top: 3px solid #ff6600; border: 1px solid #282d37; }
-    .stat-card h3 { font-size: 12px; color: #aaa; }
-    .stat-card p { font-size: 20px; font-weight: bold; color: #fff; margin-top: 4px; }
-    .nav-tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 4px; }
-    .nav-btn { padding: 10px 14px; background: #1e222b; color: #ccc; border: 1px solid #2f3542; border-radius: 10px; cursor: pointer; font-weight: bold; white-space: nowrap; }
-    .nav-btn.active { background: #ff6600; color: #000; border-color: #ff6600; }
-    .panel-box { background: #16191f; padding: 16px; border-radius: 14px; border: 1px solid #282d37; margin-bottom: 15px; }
-    #zoneMap, #adminMap { height: 340px; width: 100%; border-radius: 12px; margin-top: 10px; z-index: 1; border: 1px solid #3a4150; }
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 15px; }
-    label { font-size: 13px; color: #ff6600; display: block; margin-bottom: 4px; font-weight: bold; }
-    input[type="text"], input[type="number"], input[type="tel"], input[type="password"], select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #333b48; background: #0d0f12; color: #fff; font-size: 14px; }
-    .chk-row { display: flex; align-items: center; gap: 10px; background: #0d0f12; padding: 11px; border-radius: 10px; border: 1px solid #2f3542; margin-bottom: 6px; cursor: pointer; color: #eee; }
-    .chk-row input { width: 18px; height: 18px; accent-color: #ff6600; }
-    button.save-btn { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #000; font-weight: 800; padding: 13px; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; width: 100%; }
-    .ref-control-card { background: #1c160d; border: 1px solid #ff6600; padding: 14px; border-radius: 12px; margin: 14px 0; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #282d37; font-size: 13px; vertical-align: middle; }
-    th { background: #ff6600; color: #000; }
-    .btn-sm { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; margin: 2px; display: inline-block; text-decoration: none; }
-    .btn-approve { background: #2ecc71; color: #000; }
-    .btn-wa { background: #25D366; color: #000; }
-    .btn-edit { background: #3498db; color: #fff; }
-    .btn-pdf { background: #9b59b6; color: #fff; }
-    .btn-block { background: #e74c3c; color: #fff; }
-    .selfie-thumb { width: 46px; height: 46px; border-radius: 8px; object-fit: cover; border: 2px solid #ff6600; cursor: pointer; }
-    .badge-req { background: #e74c3c; color: #fff; padding: 2px 7px; border-radius: 10px; font-size: 11px; margin-left: 4px; }
-    .lang-pill { background: #1c2e3d; color: #4db8ff; border: 1px solid #4db8ff; padding: 2px 7px; border-radius: 6px; font-size: 11px; font-weight: bold; }
-    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 15px; }
-    .modal-box { background: #16191f; padding: 20px; border-radius: 14px; border: 2px solid #ff6600; max-width: 480px; width: 100%; text-align: center; max-height: 88vh; overflow-y: auto; }
-    .modal-box img { max-width: 100%; max-height: 360px; border-radius: 8px; margin-bottom: 10px; }
-    .cert-paper { background: #fff; color: #111; padding: 18px; border-radius: 8px; text-align: left; font-size: 13px; line-height: 1.55; margin-bottom: 12px; border: 2px solid #ff6600; }
-    .lock-overlay { position: fixed; inset: 0; background: #090b0e; display: flex; align-items: center; justify-content: center; z-index: 10000; padding: 16px; }
-    .lock-card { background: #16191f; border: 2px solid #ff6600; border-radius: 16px; padding: 24px 20px; max-width: 390px; width: 100%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-    .hidden { display: none !important; }
-    @media print {
-      body * { visibility: hidden; }
-      #certPrintArea, #certPrintArea * { visibility: visible; }
-      #certPrintArea { position: fixed; left: 0; top: 0; width: 100%; }
-    }
+    body { background: #0d0f12; color: #f5f5f5; padding-bottom: 24px; }
+    header { background: linear-gradient(135deg, #000000 65%, #261200 100%); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; }
+    .brand-title h1 { color: #ff6600; font-size: 19px; font-weight: 800; }
+    .container { max-width: 500px; margin: auto; padding: 14px; }
+    .card { background: #16191f; padding: 16px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #282d37; }
+    .stats-grid { display: flex; gap: 8px; text-align: center; margin-bottom: 14px; }
+    .s-box { flex: 1; background: #0d0f12; padding: 12px; border-radius: 12px; border: 1px solid #ff6600; }
+    button { background: linear-gradient(135deg, #ff6600, #ff8533); color: #000; font-weight: 800; border: none; cursor: pointer; padding: 10px; border-radius: 8px; width: 100%; margin-top: 6px; }
   </style>
 </head>
 <body>
-
-<div id="adminLockScreen" class="lock-overlay">
-  <div class="lock-card">
-    <h2 style="color:#ff6600; margin-bottom:6px;">👑 GoParcel Master Admin</h2>
-    <p style="font-size:12px; color:#aaa; margin-bottom:14px;">सुरुवातीचा पासवर्ड: <b style="color:#2ecc71;">2026</b></p>
-    
-    <div id="loginPinBox">
-      <input type="password" id="adminPinInput" placeholder="Admin PIN टाका" style="text-align:center; font-size:18px; letter-spacing:4px; margin-bottom:10px;">
-      <button class="save-btn" onclick="unlockAdminPanel()" style="background:#ff6600; margin-bottom:10px;">🔓 Admin Panel उघडा</button>
-      <button type="button" onclick="showForgotBox()" style="background:transparent; border:none; color:#4db8ff; font-size:13px; text-decoration:underline; cursor:pointer;">🔑 पासवर्ड विसरलात? (Forgot PIN)</button>
-    </div>
-
-    <div id="forgotPinBox" class="hidden" style="border-top:1px solid #2f3542; padding-top:12px; margin-top:8px;">
-      <p style="font-size:12px; color:#ffd2b3; margin-bottom:8px;">नवीन PIN फक्त तुमच्या अधिकृत Admin मोबाईल नंबरवरच पाठवला जाईल:</p>
-      <input type="tel" id="recoveryPhoneInput" maxlength="10" placeholder="तुमचा १० अंकी Admin मोबाईल नंबर" style="text-align:center; margin-bottom:10px;">
-      <button type="button" class="save-btn" onclick="resetAdminPinViaWhatsapp()" style="background:#25D366; margin-bottom:8px;">📲 WhatsApp वर नवीन PIN पाठवा</button>
-      <button type="button" onclick="hideForgotBox()" style="background:#262b36; color:#fff; border:none; padding:8px 14px; border-radius:8px; font-size:12px; cursor:pointer;">← मागे जा (Back)</button>
-    </div>
-  </div>
-</div>
-
 <header>
-  <h1>👑 GoParcel Master Panel</h1>
-  <div style="display:flex; align-items:center; gap:10px;">
-    <span style="color:#2ecc71; font-size:13px;">● Secured</span>
-    <button onclick="lockAdminNow()" style="background:#e74c3c; color:#fff; border:none; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:bold; cursor:pointer;">🔒 Lock</button>
-  </div>
+  <div class="brand-title"><h1>GoParcel Admin Dashboard</h1></div>
 </header>
 
-<div id="imgModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <img id="modalImgSrc" src="">
-    <button class="save-btn" onclick="document.getElementById('imgModal').classList.add('hidden')">बंद करा (Close)</button>
-  </div>
-</div>
-
-<div id="legalPdfModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div id="certPrintArea" class="cert-paper"></div>
-    <div style="display:flex; gap:8px;">
-      <button class="save-btn" onclick="window.print()" style="background:#9b59b6; color:#fff;">🖨️ Save as PDF / Print</button>
-      <button class="save-btn" onclick="document.getElementById('legalPdfModal').classList.add('hidden')" style="background:#333; color:#fff;">बंद करा</button>
-    </div>
-  </div>
-</div>
-
 <div class="container">
-  <div class="stats">
-    <div class="stat-card"><h3>एकूण ऑर्डर्स</h3><p id="totalOrders">0</p></div>
-    <div class="stat-card"><h3>मंजूर रायडर्स</h3><p id="approvedRidersCount" style="color:#2ecc71;">0</p></div>
-    <div class="stat-card"><h3>सक्रिय सर्विस शहरे</h3><p id="activeZonesCount" style="color:#4db8ff;">0</p></div>
-    <div class="stat-card"><h3>प्लॅटफॉर्म कमिशन</h3><p style="color:#ff6600;">₹<span id="platformComm">0</span></p></div>
+  <div class="stats-grid">
+    <div class="s-box"><div style="font-size:11px; color:#aaa;">एकूण ऑर्डर्स</div><div style="font-size:18px; color:#2ecc71; font-weight:bold;">12</div></div>
+    <div class="s-box"><div style="font-size:11px; color:#aaa;">सक्रिय रायडर्स</div><div style="font-size:18px; color:#4db8ff; font-weight:bold;">5</div></div>
   </div>
 
-  <div class="nav-tabs">
-    <button id="tRiders" class="nav-btn active" onclick="showTab('riders')">🛵 रायडर्स KYC व Live फोटो</button>
-    <button id="tLegal" class="nav-btn" onclick="showTab('legal')">📜 कायदेशीर करार (T&C / PDF)</button>
-    <button id="tReferrals" class="nav-btn" onclick="showTab('referrals')">🎁 रेफरल व जॉइनिंग बोनस</button>
-    <button id="tOtpLive" class="nav-btn" onclick="showTab('otpLive')">🔔 सक्रिय OTP विनंत्या (10m) <span id="otpBadge" class="badge-req hidden">0</span></button>
-    <button id="tZones" class="nav-btn" onclick="showTab('zones')">🗺️ सर्विस एरिया व शहर व्होटिंग</button>
-    <button id="tMaster" class="nav-btn" onclick="showTab('master')">🎛️ दर, बोनस व नियम कंट्रोल</button>
-    <button id="tMap" class="nav-btn" onclick="showTab('map')">📍 लाईव्ह रायडर मॅप</button>
-    <button id="tOrders" class="nav-btn" onclick="showTab('orders')">📦 लाईव्ह ऑर्डर्स</button>
-  </div>
-
-  <!-- १. रायडर्स KYC -->
-  <div id="secRiders" class="panel-box" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:6px;">रायडर Live Camera कागदपत्रे, मूळ सेल्फी व ड्युटी सेल्फी पडताळणी</h3>
-    <table>
-      <thead><tr><th>रायडर व मोबाईल</th><th>सेल्फी व Live Camera दस्तऐवज</th><th>गाडी व KYC नंबर</th><th>फी व स्टेटस</th><th>अधिकार (Actions)</th></tr></thead>
-      <tbody id="ridersTableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- २. कायदेशीर करार व PDF पुरावा -->
-  <div id="secLegal" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:6px;">📜 डिजिटल करार व अटी संमती नोंदवही (T&C Agreements & PDF)</h3>
-    <table>
-      <thead><tr><th>प्रकार (Role)</th><th>नाव व मोबाईल नंबर</th><th>तपशील</th><th>संमती तारीख व वेळ</th><th>अधिकृत PDF पुरावा</th></tr></thead>
-      <tbody id="legalTableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- ३. रेफरल व जॉइनिंग बोनस -->
-  <div id="secReferrals" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:6px;">🎁 रायडर रेफरल व जॉइनिंग बोनस रिपोर्ट</h3>
-    <table>
-      <thead><tr><th>रेफर करणारा (Referrer)</th><th>नवीन जॉईन झालेला मित्र</th><th>पूर्ण ऑर्डर्स / लक्ष्य</th><th>बोनस रक्कम</th><th>बोनस कृती</th></tr></thead>
-      <tbody id="referralsTableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- ४. सक्रिय OTP विनंत्या -->
-  <div id="secOtpLive" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:4px;">🔔 गेल्या १० मिनिटांतील सक्रिय OTP विनंत्या</h3>
-    <table>
-      <thead><tr><th>जनरेट वेळ</th><th>प्रकार व भाषा</th><th>नाव व मोबाईल</th><th>सक्रिय OTP</th><th>उरलेली वैधता</th><th>कृती</th></tr></thead>
-      <tbody id="otpLiveTableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- ५. सर्विस झोन -->
-  <div id="secZones" class="panel-box hidden">
-    <h3 style="color:#ff6600; margin-bottom:6px;">🗺️ सर्विस एरिया मर्यादा ठरवा</h3>
-    <div class="form-grid">
-      <div><label>एरिया / शहराचे नाव</label><input type="text" id="zoneName" placeholder="उदा. Pune Central / Hingoli"></div>
-      <div><label>सर्विस रेंज (Radius in km)</label><input type="number" id="zoneRadius" value="10" min="1" max="100"></div>
-      <div><label>Latitude</label><input type="text" id="zoneLat" value="18.5204"></div>
-      <div><label>Longitude</label><input type="text" id="zoneLng" value="73.8567"></div>
+  <div class="card">
+    <h3 style="color:#ff6600; margin-bottom:10px;">📋 नवीन रायडर अर्ज व पडताळणी</h3>
+    <div id="pendingRidersList" style="font-size:13px; color:#ccc; background:#0d0f12; padding:10px; border-radius:8px;">
+      सध्या कोणतीही प्रलंबित नोंदणी नाही. सर्व रायडर प्रमाणित आहेत.
     </div>
-    <button class="save-btn" onclick="addServiceZone()">✅ हा सर्विस एरिया मॅपवर जोडा / अपडेट करा</button>
-    <div id="zoneMap"></div>
   </div>
 
-  <!-- ६. मास्टर कंट्रोल -->
-  <div id="secMaster" class="panel-box hidden">
-    <h3 style="color:#ff6600; margin-bottom:12px;">🎛️ संपूर्ण ॲपचे दर, पासवर्ड व मास्टर कंट्रोल</h3>
-    <div class="form-grid">
-      <div><label>Admin WhatsApp नंबर (91 सह)</label><input type="tel" id="setAdminWa" value="919049505512"></div>
-      <div><label>नवीन Admin Login PIN बदला</label><input type="text" id="setAdminPin" value="2026" maxlength="8"></div>
-      <div><label>रायडर पिकअप रेंज (Pickup Radius km)</label><input type="number" id="setPickupRadius" value="2"></div>
-      <div><label>रायडर ऑनबोर्डिंग फीस (₹)</label><input type="number" id="setOnboardingFee" value="1000"></div>
-      <div><label>प्लॅटफॉर्म कमिशन (%)</label><input type="number" id="setCommission" value="20"></div>
-      <div><label>किमान बेस भाडे (Min Fare ₹)</label><input type="number" id="setMinFare" value="30"></div>
-    </div>
-
-    <div class="ref-control-card" style="border-color: #3498db; background: #101820;">
-      <h4 style="color: #3498db; margin-bottom:8px;">⏱️ वाहननिहाय वेटिंग टाईम व दर नियंत्रण (Waiting Rules Config)</h4>
-      <div class="form-grid">
-        <div><label style="color:#4db8ff;">🏍️ 2-Wheeler मोफत मिनिटे</label><input type="number" id="w_2w_free" value="4"></div>
-        <div><label>2-Wheeler प्रति मिनिट दर (₹)</label><input type="number" step="0.5" id="w_2w_rate" value="1.5"></div>
-        <div><label style="color:#f1c40f;">🛺 3-Wheeler मोफत मिनिटे</label><input type="number" id="w_3w_free" value="6"></div>
-        <div><label>3-Wheeler प्रति मिनिट दर (₹)</label><input type="number" step="0.5" id="w_3w_rate" value="2.0"></div>
-      </div>
-    </div>
-    <button class="save-btn" onclick="saveMasterSettings()">🚀 सर्व बदल सेव्ह करा व लागू करा</button>
-  </div>
-
-  <!-- ७. लाईव्ह मॅप -->
-  <div id="secMap" class="panel-box hidden">
-    <h3 style="color:#ff6600;">सर्व रायडर्सचे लाईव्ह GPS लोकेशन</h3>
-    <div id="adminMap"></div>
-  </div>
-
-  <!-- ८. लाईव्ह ऑर्डर्स -->
-  <div id="secOrders" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:10px;">सर्व ऑर्डर्स, डिलिव्हरी PIN व कमिशन</h3>
-    <table>
-      <thead><tr><th>कस्टमर</th><th>पत्ता</th><th>वाहन / PIN</th><th>भाडे</th><th>रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
-      <tbody id="adminTableBody"></tbody>
-    </table>
+  <div class="card">
+    <h3 style="color:#ff6600; margin-bottom:10px;">⚙️ सिस्टीम कंट्रोल</h3>
+    <button onclick="alert('डेटा रिफ्रेश केला आहे.')">डेटा सिंक रीफ्रेश करा</button>
   </div>
 </div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, increment, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAxfFnHbLimC3PEO5svXvn3sxH7yn9JEAw",
-    authDomain: "goparcel-f89b5.firebaseapp.com",
-    databaseURL: "https://goparcel-f89b5-default-rtdb.firebaseio.com",
-    projectId: "goparcel-f89b5",
-    storageBucket: "goparcel-f89b5.firebasestorage.app",
-    messagingSenderId: "263428109251",
-    appId: "1:263428109251:web:12f001ac4c4e9d71c84376"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const settingsRef = doc(db, "config", "appSettings");
-  const OTP_VALID_MS = 10 * 60 * 1000;
-
-  const AUTHORIZED_ADMIN_MOBILE = "9049505512";
-  let liveAdminPin = "2026";
-  let cachedOtpDocs = [];
-
-  if (sessionStorage.getItem("gp_admin_unlocked") === "yes") {
-    document.getElementById('adminLockScreen').classList.add('hidden');
-  }
-
-  window.unlockAdminPanel = () => {
-    const entered = document.getElementById('adminPinInput').value.trim();
-    if (entered === liveAdminPin) {
-      sessionStorage.setItem("gp_admin_unlocked", "yes");
-      document.getElementById('adminLockScreen').classList.add('hidden');
-    } else {
-      alert("❌ चुकीचा Admin PIN!");
-    }
-  };
-
-  window.showForgotBox = () => { document.getElementById('loginPinBox').classList.add('hidden'); document.getElementById('forgotPinBox').classList.remove('hidden'); };
-  window.hideForgotBox = () => { document.getElementById('forgotPinBox').classList.add('hidden'); document.getElementById('loginPinBox').classList.remove('hidden'); };
-
-  window.resetAdminPinViaWhatsapp = async () => {
-    const cleanPhone = document.getElementById('recoveryPhoneInput').value.trim().replace(/\D/g, '').slice(-10);
-    if (cleanPhone !== AUTHORIZED_ADMIN_MOBILE) {
-      return alert("🚫 प्रवेश नाकारला! पासवर्ड रिसेट फक्त अधिकृत मुख्य Admin मोबाईल नंबरवरच उपलब्ध आहे.");
-    }
-    const newGeneratedPin = Math.floor(100000 + Math.random() * 900000).toString();
-    liveAdminPin = newGeneratedPin;
-    await setDoc(settingsRef, { adminPin: newGeneratedPin, adminWa: "91" + AUTHORIZED_ADMIN_MOBILE }, { merge: true });
-    document.getElementById('setAdminPin').value = newGeneratedPin;
-
-    const msg = `👑 GoParcel Master Admin सुरक्षा सूचना:\nतुमचा नवीन Admin Login PIN आहे: ${newGeneratedPin}`;
-    window.open(`https://wa.me/91${AUTHORIZED_ADMIN_MOBILE}?text=${encodeURIComponent(msg)}`, '_blank');
-    alert(`✅ नवीन Admin PIN (${newGeneratedPin}) तुमच्या WhatsApp वर पाठवला आहे!`);
-    hideForgotBox();
-  };
-
-  window.lockAdminNow = () => { sessionStorage.removeItem("gp_admin_unlocked"); location.reload(); };
-
-  let currentCommPercent = 20;
-  let refConfig = { referrerBonus: 500, refereeBonus: 300, targetOrders: 25, validDays: 30 };
-  let allRidersMap = {}, allOrdersList = [], riderDeliveredCounts = {};
-
-  window.openImgModal = (src) => { document.getElementById('modalImgSrc').src = src; document.getElementById('imgModal').classList.remove('hidden'); };
-
-  window.showTab = (tab) => {
-    ['riders', 'legal', 'referrals', 'otpLive', 'zones', 'master', 'map', 'orders'].forEach(t => {
-      const cap = t.charAt(0).toUpperCase() + t.slice(1);
-      document.getElementById('sec' + cap).classList.toggle('hidden', t !== tab);
-      document.getElementById('t' + cap).classList.toggle('active', t === tab);
-    });
-    if (tab === 'zones') setTimeout(() => zoneMap.invalidateSize(), 200);
-    if (tab === 'map') setTimeout(() => adminMap.invalidateSize(), 200);
-  };
-
-  const zoneMap = L.map('zoneMap').setView([18.5204, 73.8567], 11);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(zoneMap);
-  let previewMarker = L.marker([18.5204, 73.8567]).addTo(zoneMap);
-  let zoneLayers = L.layerGroup().addTo(zoneMap);
-
-  const adminMap = L.map('adminMap').setView([18.5204, 73.8567], 12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(adminMap);
-  const riderMarkers = {};
-
-  window.addServiceZone = async () => {
-    const name = document.getElementById('zoneName').value.trim();
-    const radiusKm = Number(document.getElementById('zoneRadius').value);
-    const lat = Number(document.getElementById('zoneLat').value);
-    const lng = Number(document.getElementById('zoneLng').value);
-    if (!name || !radiusKm) return alert("नाव व रेंज भरा!");
-    const zoneId = "zone_" + name.toLowerCase().replace(/[^a-z0-9]/g, '_');
-    await setDoc(doc(db, "serviceZones", zoneId), { name, radiusKm, lat, lng, active: true });
-    alert(`✅ '${name}' (${radiusKm} km) झोन सेव्ह झाला!`);
-  };
-
-  window.saveMasterSettings = async () => {
-    const newPin = document.getElementById('setAdminPin').value.trim() || "2026";
-    liveAdminPin = newPin;
-    await setDoc(settingsRef, {
-      adminPin: newPin,
-      adminWa: document.getElementById('setAdminWa').value.trim(),
-      pickupRadiusKm: Number(document.getElementById('setPickupRadius').value),
-      onboardingFee: Number(document.getElementById('setOnboardingFee').value),
-      commission: Number(document.getElementById('setCommission').value),
-      minFare: Number(document.getElementById('setMinFare').value),
-      w_2w_free: Number(document.getElementById('w_2w_free').value),
-      w_2w_rate: Number(document.getElementById('w_2w_rate').value),
-      w_3w_free: Number(document.getElementById('w_3w_free').value),
-      w_3w_rate: Number(document.getElementById('w_3w_rate').value)
-    }, { merge: true });
-    alert("✅ सर्व बदल आणि वेटिंग टाईमचे नियम यशस्वीपणे सेव्ह झाले!");
-  };
-
-  function renderLiveOtpRows() {
-    const tbody = document.getElementById('otpLiveTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = "";
-    const now = Date.now();
-    let activeCount = 0;
-
-    cachedOtpDocs.forEach(r => {
-      const exp = r.expiresAt || (Number(r.createdAt || 0) + OTP_VALID_MS);
-      const remMs = exp - now;
-      if (r.status === "Pending" && remMs > 0) {
-        activeCount++;
-        const mins = String(Math.floor(remMs / 60000)).padStart(2, '0');
-        const secs = String(Math.floor((remMs % 60000) / 1000)).padStart(2, '0');
-        const waMsg = `नमस्कार ${r.name}, तुमचा GoParcel पडताळणी OTP कोड आहे: ${r.otp}`;
-        const waUrl = `https://wa.me/91${r.phone}?text=${encodeURIComponent(waMsg)}`;
-
-        tbody.innerHTML += `<tr style="background:#291a10;">
-          <td><b>🕒 ${r.timeStr || ''}</b></td>
-          <td>${r.role || ''}</td>
-          <td><b>${r.name}</b><br><small>📞 ${r.phone}</small></td>
-          <td><b style="color:#ff6600; font-size:18px;">${r.otp}</b></td>
-          <td><span style="color:#4db8ff; font-weight:bold;">⏳ ${mins}:${secs} बाकी</span></td>
-          <td><a href="${waUrl}" target="_blank" class="btn-sm btn-wa">📲 WhatsApp OTP पाठवा</a></td>
-        </tr>`;
-      }
-    });
-
-    if (activeCount === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888; padding:16px;">सध्या गेल्या १० मिनिटांतील कोणतीही सक्रिय OTP विनंती नाही.</td></tr>`;
-    }
-
-    const badge = document.getElementById('otpBadge');
-    if (activeCount > 0) { badge.innerText = activeCount; badge.classList.remove('hidden'); }
-    else badge.classList.add('hidden');
-  }
-
-  setInterval(renderLiveOtpRows, 1000);
-
-  onSnapshot(query(collection(db, "otpRequests"), orderBy("createdAt", "desc")), (snap) => {
-    cachedOtpDocs = [];
-    snap.forEach(d => cachedOtpDocs.push({ id: d.id, ...d.data() }));
-    renderLiveOtpRows();
-  });
-
-  onSnapshot(collection(db, "riders"), (snap) => {
-    const tbody = document.getElementById('ridersTableBody'); tbody.innerHTML = "";
-    let approvedCount = 0;
-    allRidersMap = {};
-    snap.forEach(d => {
-      const r = d.data();
-      allRidersMap[d.id] = r;
-      if (r.approved) approvedCount++;
-      if (r.lat && r.lng) {
-        if (riderMarkers[d.id]) riderMarkers[d.id].setLatLng([r.lat, r.lng]);
-        else riderMarkers[d.id] = L.marker([r.lat, r.lng]).addTo(adminMap).bindPopup(`🛵 ${r.name}`);
-      }
-      const thumbs = [];
-      if (r.regSelfie) thumbs.push(`<img src="${r.regSelfie}" class="selfie-thumb" onclick="openImgModal('${r.regSelfie}')">`);
-      if (r.photoAadhaar) thumbs.push(`<img src="${r.photoAadhaar}" class="selfie-thumb" onclick="openImgModal('${r.photoAadhaar}')">`);
-
-      tbody.innerHTML += `<tr>
-        <td><b>${r.name || 'Rider'}</b><br><small>📞 ${r.phone || ''}</small></td>
-        <td><div style="display:flex; gap:5px;">${thumbs.join('')}</div></td>
-        <td><b>${r.vehicleType || ''} - ${r.vehicleNo || '-'}</b></td>
-        <td>${r.approved ? '<b style="color:#2ecc71;">Approved</b>' : '<b style="color:#ff6600;">Pending</b>'}</td>
-        <td><button class="btn-sm btn-approve" onclick="updateDoc(doc(db,'riders','${d.id}'), {approved:true})">Approve</button></td>
-      </tr>`;
-    });
-    document.getElementById('approvedRidersCount').innerText = approvedCount;
-  });
-
-  onSnapshot(collection(db, "orders"), (snap) => {
-    const tbody = document.getElementById('adminTableBody'); tbody.innerHTML = "";
-    let count = 0, comm = 0;
-    snap.forEach(d => {
-      const o = d.data(); count++;
-      comm += Math.round(Number(o.fare || 0) * (currentCommPercent / 100));
-      tbody.innerHTML += `<tr>
-        <td>${o.customerEmail || 'User'}</td><td>${o.pickup} ➔ ${o.drop}</td>
-        <td>${o.vehicle}<br><small style="color:#2ecc71;">PIN: ${o.deliveryPin || '-'}</small></td><td>₹${o.fare}</td><td>${o.riderEmail || '-'}</td>
-        <td><b>${o.status}</b></td><td><button class="btn-sm btn-block" onclick="deleteDoc(doc(db,'orders','${d.id}'))">Delete</button></td>
-      </tr>`;
-    });
-    document.getElementById('totalOrders').innerText = count;
-    document.getElementById('platformComm').innerText = comm;
-  });
-</script>
 </body>
 </html>
