@@ -258,7 +258,7 @@
 
   let currentRiderVehicleType = "2-Wheeler";
 
-  // 🌐 संपूर्ण परवानग्या आणि फॉर्मसह बहुभाषिक शब्दकोश (Multi-lingual Dictionary)
+  // 🌐 बहुभाषिक शब्दकोश (Multi-lingual Dictionary)
   const translations = {
     mr: {
       portalTitle: "GP Rider पार्टनर पोर्टल",
@@ -504,19 +504,111 @@
     }
   };
 
-  // 🚀 ॲप लोड होताच (App Start) सर्व परवानग्यांचे सिस्टम पॉप-अप्स ट्रिगर करणे
+  // 📸 कॅमेरा आणि स्कॅनिंगची मूळ फंक्शन्स (Camera Stream & Snapshot Logic)
+  let activeStream = null;
+  let activeCamTarget = null;
+
+  window.openCamera = async (target) => {
+    activeCamTarget = target;
+    const vid = target === 'duty' ? document.getElementById('dutyVideo') : document.getElementById('regVideo');
+    const snapBtn = target === 'duty' ? document.getElementById('btnSnapDuty') : document.getElementById('btnSnapReg');
+    const openBtn = target === 'duty' ? document.getElementById('btnOpenDutyCam' ) : document.getElementById('btnOpenSelfie');
+
+    try {
+      activeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      vid.srcObject = activeStream;
+      vid.classList.remove('hidden');
+      snapBtn.classList.remove('hidden');
+      openBtn.classList.add('hidden');
+    } catch (err) {
+      alert("❌ कॅमेरा सुरू होऊ शकला नाही. कृपया कॅमेरा परवानगी तपासा: " + err.message);
+    }
+  };
+
+  window.takeSnapshot = () => {
+    const vid = document.getElementById('regVideo');
+    const prev = document.getElementById('regPreview');
+    const canvas = document.getElementById('snapCanvas');
+    const ctx = canvas.getContext('2d');
+
+    ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/png');
+    prev.src = dataUrl;
+    prev.classList.remove('hidden');
+    vid.classList.add('hidden');
+
+    if (activeStream) {
+      activeStream.getTracks().forEach(track => track.stop());
+    }
+    document.getElementById('btnSnapReg').classList.add('hidden');
+    document.getElementById('btnOpenSelfie').classList.remove('hidden');
+    window.capturedRegSelfie = dataUrl;
+    alert("✅ सेल्फी यशस्वीपणे घेतला गेला!");
+  };
+
+  window.openDocCam = async (type) => {
+    const vid = document.getElementById('vid_aadhaar');
+    const snapBtn = document.getElementById('snap_aadhaar');
+    const scanBtn = document.getElementById('btnScanAadhaar');
+
+    try {
+      activeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+      vid.srcObject = activeStream;
+      vid.classList.remove('hidden');
+      snapBtn.classList.remove('hidden');
+      scanBtn.classList.add('hidden');
+    } catch (err) {
+      alert("❌ कागदपत्र स्कॅनिंग कॅमेरा सुरू होऊ शकला नाही: " + err.message);
+    }
+  };
+
+  window.captureDocCam = (type) => {
+    const vid = document.getElementById('vid_aadhaar');
+    const prev = document.getElementById('prev_aadhaar');
+    const canvas = document.getElementById('snapCanvas');
+    const ctx = canvas.getContext('2d');
+
+    ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/png');
+    prev.src = dataUrl;
+    prev.classList.remove('hidden');
+    vid.classList.add('hidden');
+
+    if (activeStream) {
+      activeStream.getTracks().forEach(track => track.stop());
+    }
+    document.getElementById('snap_aadhaar').classList.add('hidden');
+    document.getElementById('btnScanAadhaar').classList.remove('hidden');
+    window.capturedAadhaarPhoto = dataUrl;
+    alert("✅ आधार कार्ड फोटो स्कॅन झाला!");
+  };
+
+  window.submitDailySelfie = () => {
+    const vid = document.getElementById('dutyVideo');
+    const canvas = document.getElementById('snapCanvas');
+    const ctx = canvas.getContext('2d');
+
+    ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/png');
+
+    if (activeStream) {
+      activeStream.getTracks().forEach(track => track.stop());
+    }
+    vid.classList.add('hidden');
+    document.getElementById('btnSnapDuty').classList.add('hidden');
+    document.getElementById('dailySelfieCard').classList.add('hidden');
+    alert("✅ ड्युटी सेल्फी अपलोड झाला! आता तुम्ही ONLINE येऊ शकता.");
+  };
+
+  // 🚀 ॲप लोड होताच परवानग्या ट्रिगर करणे
   function requestAllStartupPermissions() {
-    // १. GPS / Location Popup
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(pos => {
         const gpsItem = document.getElementById('permItemGps');
         if(gpsItem) gpsItem.style.display = 'none';
-      }, err => {
-        console.log("GPS prompt requested");
-      }, { enableHighAccuracy: true });
+      }, err => {}, { enableHighAccuracy: true });
     }
 
-    // २. Notification Popup
     if ("Notification" in window && Notification.permission === "default") {
       Notification.requestPermission().then(permission => {
         if (permission === "granted") {
@@ -526,7 +618,6 @@
       });
     }
 
-    // ३. Camera Popup check
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => {
@@ -534,109 +625,18 @@
           const camItem = document.getElementById('permItemCam');
           if(camItem) camItem.style.display = 'none';
         })
-        .catch(err => {
-          console.log("Camera prompt requested");
-        });
+        .catch(err => {});
     }
   }
-
-  // 📝 रजिस्ट्रेशन करताना परवानग्या तपासण्याचे फंक्शन (Language Aware Validation)
-  window.checkPermissionsBeforeReg = () => {
-    const currentLang = localStorage.getItem("gp_rider_lang") || "mr";
-    const t = translations[currentLang] || translations["mr"];
-
-    // जीपीएस चेक
-    let gpsChecked = false;
-    const gpsItem = document.getElementById('permItemGps');
-    if (gpsItem && gpsItem.style.display === 'none') {
-      gpsChecked = true;
-    }
-
-    // कॅमेरा चेक
-    let camChecked = false;
-    const camItem = document.getElementById('permItemCam');
-    if (camItem && camItem.style.display === 'none') {
-      camChecked = true;
-    }
-
-    // जर परवानगी बाकी असेल तर निवडलेल्या भाषेत वॉर्निंग दाखवणे
-    if (!gpsChecked) {
-      alert(t.errGpsMissing);
-      requestGpsPermission();
-      return false;
-    }
-    if (!camChecked) {
-      alert(t.errCamMissing);
-      requestCameraPermission();
-      return false;
-    }
-    return true;
-  };
-
-  // (टीप: तुम्ही जिथे तुमची मुख्य `startRiderRegOtp()` फंक्शन कॉल करता, तिथे सर्वात वर `if(!checkPermissionsBeforeReg()) return;` हे जोडावे.)
-
-  function getVehicleWaitingRules(vehicleType) {
-    if (vehicleType === "3-Wheeler") {
-      return { freeSec: 360, ratePerMin: 2.00, desc: "३-व्हीलर: पहिली ६ मिनिटे मोफत, नंतर ₹२/मिनिट" };
-    } else if (vehicleType === "Mini Tempo") {
-      return { freeSec: 600, ratePerMin: 3.50, desc: "मिनी टेम्पो/ट्रक: पहिली १० मिनिटे मोफत, नंतर ₹३.५/मिनिट" };
-    } else {
-      return { freeSec: 240, ratePerMin: 1.50, desc: "२-व्हीलर: पहिली ४ मिनिटे मोफत, नंतर ₹१.५/मिनिट" };
-    }
-  }
-
-  let waitingInterval;
-  let waitingSeconds = 0;
-
-  window.startVehicleWaitingTimer = () => {
-    clearInterval(waitingInterval);
-    waitingSeconds = 0;
-    const rules = getVehicleWaitingRules(currentRiderVehicleType);
-    document.getElementById('waitingRuleDesc').innerText = rules.desc;
-    alert(`⏳ वेटिंग टाईम सुरू झाला आहे! ${rules.desc}`);
-    
-    waitingInterval = setInterval(() => {
-      waitingSeconds++;
-      let mins = Math.floor(waitingSeconds / 60);
-      let secs = waitingSeconds % 60;
-      let timerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')} मि.`;
-      let fee = 0;
-      
-      const timerDisplay = document.getElementById('waitingTimerDisplay');
-      const feeDisplay = document.getElementById('waitingFeeDisplay');
-      
-      if (waitingSeconds <= rules.freeSec) {
-        if(timerDisplay) {
-          timerDisplay.innerText = `${timerText} (मोफत वेळ चालू)`;
-          timerDisplay.style.color = "#2ecc71";
-        }
-        if(feeDisplay) feeDisplay.innerText = "वेटिंग चार्ज: ₹0.00 (मोफत)";
-      } else {
-        let extraMinutesDecimal = (waitingSeconds - rules.freeSec) / 60;
-        fee = extraMinutesDecimal * rules.ratePerMin;
-        if(timerDisplay) {
-          timerDisplay.innerText = `${timerText} (चार्ज लागू!)`;
-          timerDisplay.style.color = "#e74c3c";
-        }
-        if(feeDisplay) {
-          feeDisplay.innerText = `वेटिंग चार्ज: ₹${fee.toFixed(2)} (₹${rules.ratePerMin}/मिनिट)`;
-        }
-      }
-    }, 1000);
-  };
 
   window.openOverlaySettings = () => {
-    alert("कृपया फोनच्या Settings > Apps > GP Rider मध्ये जाऊन 'Display over other apps' (इतर ॲप्सवर वरती दाखवणे) परवानगी Allow करा.");
-    try {
-      window.location.href = "intent:#Intent;action=android.settings.action.MANAGE_OVERLAY_PERMISSION;end;";
-    } catch(e) {}
+    alert("कृपया फोनच्या Settings > Apps > GP Rider मध्ये जाऊन 'Display over other apps' परवानगी Allow करा.");
+    try { window.location.href = "intent:#Intent;action=android.settings.action.MANAGE_OVERLAY_PERMISSION;end;"; } catch(e) {}
   };
 
   window.openBatterySettings = () => {
-    alert("कृपया फोनच्या Settings > Apps > GP Rider > Battery मध्ये जाऊन 'Unrestricted' (अनरिस्ट्रिक्टेड) निवडा.");
-    try {
-      window.location.href = "intent:#Intent;action=android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS;end;";
-    } catch(e) {}
+    alert("कृपया फोनच्या Settings > Apps > GP Rider > Battery मध्ये जाऊन 'Unrestricted' निवडा.");
+    try { window.location.href = "intent:#Intent;action=android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS;end;"; } catch(e) {}
   };
 
   window.requestGpsPermission = () => {
@@ -658,15 +658,13 @@
           alert("कृपया ब्राउझर किंवा ॲप सेटिंगमधून Notification परवानगी चालू करा.");
         }
       });
-    } else {
-      alert("तुमच्या डिव्हाइसवर नोटिफिकेशन समर्थित आहे.");
     }
   };
 
   window.requestCameraPermission = () => {
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => {
-        alert("✅ कॅमेरा आणि स्टोरेज परवानगी सक्रिय आहे!");
+        alert("✅ कॅमेरा परवानगी सक्रिय आहे!");
         stream.getTracks().forEach(track => track.stop());
         document.getElementById('permItemCam').style.display = 'none';
       })
@@ -687,8 +685,6 @@
     const savedLang = localStorage.getItem("gp_rider_lang") || "mr";
     document.getElementById('appLangSelect').value = savedLang;
     changeAppLang(savedLang);
-
-    // ॲप चालू होताच परवानग्यांचे ऑटो पॉप-अप्स मागवणे
     setTimeout(requestAllStartupPermissions, 1500);
   });
 </script>
