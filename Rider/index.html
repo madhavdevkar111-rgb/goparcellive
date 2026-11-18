@@ -110,10 +110,11 @@
     <!-- जुना रायडर लॉगिन -->
     <div id="rSecLogin">
       <input type="tel" id="rLoginPhone" maxlength="10" placeholder="१० अंकी नोंदणीकृत मोबाईल नंबर">
-      <button id="btnReqLoginOtp" onclick="startRiderLoginOtp()">लॉगिन OTP मागवा</button>
+      <button id="btnReqLoginOtp" type="button" onclick="startRiderLoginOtp()">नवीन लॉगिन OTP मागवा</button>
       <div id="rLoginOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #2f3542; padding-top:10px;">
-        <input type="number" id="rLoginOtpInput" placeholder="६ अंकी OTP टाका">
-        <button id="btnVerifyLogin" onclick="verifyRiderLoginOtp()" style="background:#2ecc71;">डॅशबोर्ड उघडा (Login)</button>
+        <div id="rLoginOtpTimerLabel" class="otp-timer-strip">⏳ OTP पाठवला आहे (डिफॉल्ट: 1234)</div>
+        <input type="number" id="rLoginOtpInput" placeholder="४ किंवा ६ अंकी OTP टाका">
+        <button id="btnVerifyLogin" type="button" onclick="verifyRiderLoginOtp()" style="background:#2ecc71;">डॅशबोर्ड उघडा (Login)</button>
       </div>
     </div>
 
@@ -172,7 +173,7 @@
         </label>
       </div>
 
-      <button id="btnStartReg" onclick="startRiderRegOtp()">नोंदणी पूर्ण करा व डेटा पाठवा</button>
+      <button id="btnStartReg" type="button" onclick="startRiderRegOtp()">नोंदणी पूर्ण करा व डेटा पाठवा</button>
     </div>
   </div>
 
@@ -188,7 +189,7 @@
         <div id="dutyStatusTag" style="color:#e74c3c; font-size:14px; font-weight:800;">● OFFLINE</div>
         <div style="font-size:11px; color:#888;">ड्युटी स्थिती बदला</div>
       </div>
-      <button id="btnToggleDuty" onclick="toggleRiderDuty()" style="width:auto; padding:8px 16px; margin:0; font-size:12px; background:#2ecc71;">ONLINE या</button>
+      <button id="btnToggleDuty" type="button" onclick="toggleRiderDuty()" style="width:auto; padding:8px 16px; margin:0; font-size:12px; background:#2ecc71;">ONLINE या</button>
     </div>
 
     <div class="card" style="border: 1.5px dashed #ff6600; background: #1a160d;">
@@ -210,7 +211,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAxfFnHbLimC3PEO5svXvn3sxH7yn9JEAw",
@@ -229,7 +230,6 @@
   window.capturedAadhaarBack = "";
   window.capturedRegSelfie = "";
 
-  // डॉक्युमेंट फोटो प्रीव्ह्यू आणि सेव्ह करणे
   window.previewDocImage = (event, type) => {
     const file = event.target.files[0];
     if (file) {
@@ -259,13 +259,12 @@
     document.getElementById('ownerDetailsBox').classList.toggle('hidden', vehType === '2-Wheeler');
   };
 
-  // नवीन रायडर नोंदणी व डेटा थेट फायरबेसमध्ये पाठवणे (जो ॲडमिनला दिसेल)
   window.startRiderRegOtp = async () => {
-    const name = document.getElementById('rName').value;
-    const phone = document.getElementById('rPhone').value;
-    const aadhaar = document.getElementById('rAadhaar').value;
+    const name = document.getElementById('rName').value.trim();
+    const phone = document.getElementById('rPhone').value.trim();
+    const aadhaar = document.getElementById('rAadhaar').value.trim();
     const vehicleType = document.getElementById('rVehicleType').value;
-    const vehicleNo = document.getElementById('rVehicle').value;
+    const vehicleNo = document.getElementById('rVehicle').value.trim();
 
     if(!name || !phone || !aadhaar) {
       alert("कृपया नाव, मोबाईल नंबर आणि आधार नंबर भरा!");
@@ -278,7 +277,6 @@
     }
 
     try {
-      // फायरबेसच्या 'pending_riders' मध्ये डेटा सेव्ह होतो
       await addDoc(collection(db, "pending_riders"), {
         name: name,
         phone: phone,
@@ -292,9 +290,10 @@
         status: "Pending"
       });
 
-      alert("🎉 नोंदणी यशस्वी! तुमची माहिती व कागदपत्रे ॲडमिनकडे पाठवली आहेत.");
+      alert("🎉 नोंदणी यशस्वी! तुमची माहिती ॲडमिनकडे पाठवली आहे.");
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('riderScreen').classList.remove('hidden');
+      document.getElementById('riderLabel').innerText = "स्वागत आहे, " + name + " (" + phone + ")";
     } catch (error) {
       console.error("Firebase Error: ", error);
       alert("❌ डेटा सेव्ह करताना एरर आली: " + error.message);
@@ -302,17 +301,18 @@
   };
 
   window.startRiderLoginOtp = () => {
-    const phone = document.getElementById('rLoginPhone').value;
+    const phone = document.getElementById('rLoginPhone').value.trim();
     if(!phone || phone.length < 10) {
       alert("कृपया १० अंकी नोंदणीकृत मोबाईल नंबर टाका!");
       return;
     }
     document.getElementById('rLoginOtpBox').classList.remove('hidden');
-    alert("✅ लॉगिनसाठी OTP पाठवला आहे. (सिम्युलेशन OTP: 123456)");
+    alert("✅ तुमच्या नंबरवर OTP पाठवला आहे (डिफॉल्ट OTP: 1234 वापरा).");
   };
 
   window.verifyRiderLoginOtp = () => {
-    const otp = document.getElementById('rLoginOtpInput').value;
+    const otp = document.getElementById('rLoginOtpInput').value.trim();
+    const phone = document.getElementById('rLoginPhone').value.trim();
     if(!otp) {
       alert("कृपया OTP टाका!");
       return;
@@ -320,6 +320,7 @@
     alert("🎉 लॉगिन यशस्वी झाले!");
     document.getElementById('authScreen').classList.add('hidden');
     document.getElementById('riderScreen').classList.remove('hidden');
+    document.getElementById('riderLabel').innerText = "स्वागत आहे, रायडर (" + phone + ")";
   };
 
   window.toggleRiderDuty = () => {
