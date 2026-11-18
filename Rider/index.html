@@ -4,33 +4,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GoParcel - Rider Partner App</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-    body { background: #121212; color: #fff; padding-bottom: 70px; }
-    header { background: #000; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; }
-    header h1 { color: #ff6600; font-size: 20px; }
+    body { background: #121212; color: #fff; padding-bottom: 75px; }
+    header { background: #000; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; }
+    header h1 { color: #ff6600; font-size: 19px; }
+    .lang-sel { background: #1a1a1a; color: #ff6600; border: 1px solid #ff6600; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; width: auto; margin: 0; }
     .container { max-width: 500px; margin: auto; padding: 14px; }
     .card { background: #1a1a1a; padding: 15px; border-radius: 12px; margin-bottom: 14px; border: 1px solid #2c2c2c; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
-    .tab-btn { flex: 1; padding: 11px; background: #222; color: #ccc; border-radius: 8px; font-size: 14px; border: 1px solid #333; margin: 0; cursor: pointer; }
+    .tabs { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
+    .tab-btn { flex: 1; padding: 10px; background: #222; color: #ccc; border-radius: 8px; font-size: 13px; border: 1px solid #333; margin: 0; cursor: pointer; white-space: nowrap; }
     .tab-btn.active { background: #ff6600; color: #000; border-color: #ff6600; font-weight: bold; }
-    input, button, a.wa-btn, a.nav-map-btn { width: 100%; padding: 12px; margin: 7px 0; border-radius: 8px; border: 1px solid #333; background: #1e1e1e; color: #fff; font-size: 15px; display: block; text-align: center; text-decoration: none; }
+    input, select, button, a.wa-btn, a.nav-map-btn { width: 100%; padding: 12px; margin: 7px 0; border-radius: 8px; border: 1px solid #333; background: #1e1e1e; color: #fff; font-size: 15px; display: block; text-align: center; text-decoration: none; }
     input { text-align: left; }
     button { background: #ff6600; color: #000; font-weight: bold; border: none; cursor: pointer; }
+    button:disabled { background: #444 !important; color: #888 !important; cursor: not-allowed; }
     a.wa-btn { background: #25D366; color: #000; font-weight: bold; border: none; }
     a.nav-map-btn { background: #1c2e3d; color: #4db8ff; border: 1px solid #4db8ff; font-size: 13px; padding: 9px; font-weight: bold; }
-    .wallet-grid { display: flex; gap: 10px; text-align: center; }
-    .w-box { flex: 1; background: #000; padding: 12px; border-radius: 8px; border: 1px solid #ff6600; }
+    .wallet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; text-align: center; }
+    .w-box { background: #000; padding: 10px; border-radius: 8px; border: 1px solid #ff6600; }
+    .weekly-card { background: linear-gradient(135deg, #1f140b, #121212); border: 1px solid #ff6600; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+    .weekly-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px dashed #333; }
+    .weekly-row:last-child { border-bottom: none; }
     .order-card { background: #222; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #ff6600; }
     .timer-strip { background: #331400; border: 1px solid #ff6600; color: #ffaa66; padding: 6px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 13px; margin-bottom: 8px; }
+    .gps-lock-box { background: #1c1c1c; border: 1px solid #4db8ff; padding: 8px; border-radius: 6px; font-size: 12px; color: #4db8ff; margin: 6px 0; text-align: center; }
     .cam-box { background: #000; border: 2px dashed #ff6600; border-radius: 10px; padding: 10px; text-align: center; margin: 10px 0; }
     .doc-upload-box { background: #111; border: 1px solid #444; padding: 10px; border-radius: 8px; margin: 8px 0; }
     .consent-box { background: #111; border: 1px solid #ff6600; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 13px; color: #ddd; }
-    video, img.preview-img { width: 100%; max-height: 220px; border-radius: 8px; object-fit: cover; }
+    video, img.preview-img { width: 100%; max-height: 200px; border-radius: 8px; object-fit: cover; }
     video { transform: scaleX(-1); }
     .banner-strip { background: #2b1d12; border: 1px solid #ff6600; color: #ffd2b3; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; text-align: center; font-weight: bold; }
+    .upi-box { background: #000; border: 1px dashed #2ecc71; padding: 10px; border-radius: 8px; text-align: center; margin: 8px 0; color: #2ecc71; font-weight: bold; font-size: 14px; }
+    .hist-item { background: #111; padding: 10px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #2ecc71; font-size: 13px; }
+    .sos-row { display: flex; justify-content: space-between; align-items: center; background: #111; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #e74c3c; }
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; border-top: 1px solid #333; display: flex; z-index: 999; }
-    .b-nav-item { flex: 1; padding: 12px; text-align: center; color: #aaa; font-size: 13px; cursor: pointer; }
+    .b-nav-item { flex: 1; padding: 11px 3px; text-align: center; color: #aaa; font-size: 11px; cursor: pointer; }
     .b-nav-item.active { color: #ff6600; font-weight: bold; border-top: 2px solid #ff6600; }
     .hidden { display: none !important; }
   </style>
@@ -38,7 +48,14 @@
 <body>
 <header>
   <h1>GoParcel Rider</h1>
-  <span id="dutyStatusTag" style="color:#e74c3c; font-size:12px; font-weight:bold;">● OFFLINE</span>
+  <div style="display:flex; align-items:center; gap:8px;">
+    <select id="riderLangSelect" class="lang-sel" onchange="changeRiderLang(this.value)">
+      <option value="mr">मराठी</option>
+      <option value="hi">हिंदी</option>
+      <option value="en">English</option>
+    </select>
+    <span id="dutyStatusTag" style="color:#e74c3c; font-size:11px; font-weight:bold;">● OFFLINE</span>
+  </div>
 </header>
 
 <div class="container">
@@ -50,7 +67,6 @@
       <button id="rTabReg" class="tab-btn" onclick="switchRTab('reg')">📝 नवीन रायडर नोंदणी</button>
     </div>
 
-    <!-- Login Section -->
     <div id="rSecLogin">
       <input type="tel" id="rLoginPhone" maxlength="10" placeholder="१० अंकी नोंदणीकृत मोबाईल नंबर">
       <button onclick="startRiderLoginOtp()">नवीन लॉगिन OTP मागवा</button>
@@ -61,7 +77,6 @@
       </div>
     </div>
 
-    <!-- Registration Section -->
     <div id="rSecReg" class="hidden">
       <input type="text" id="rName" placeholder="पूर्ण नाव (आधार कार्डप्रमाणे)">
       <input type="tel" id="rPhone" maxlength="10" placeholder="१० अंकी खरा मोबाईल नंबर">
@@ -73,9 +88,15 @@
       <input type="text" id="rReferCodeInput" placeholder="रेफरल कोड (असल्यास टाका)">
 
       <div class="doc-upload-box">
-        <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">📄 आधार कार्ड / लायसन्स कागदपत्राचा स्पष्ट फोटो निवडा:</label>
-        <input type="file" id="docFileInput" accept="image/*" onchange="handleDocPhoto(this)">
-        <img id="docPreview" class="preview-img hidden" style="margin-top:6px;">
+        <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">📄 १. आधार कार्ड समोरची बाजू (Front Side Photo):</label>
+        <input type="file" id="docFrontInput" accept="image/*" onchange="handleDocPhoto(this, 'front')">
+        <img id="docFrontPreview" class="preview-img hidden" style="margin-top:6px;">
+      </div>
+
+      <div class="doc-upload-box">
+        <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">📄 २. आधार कार्ड मागची बाजू (Back Side Photo):</label>
+        <input type="file" id="docBackInput" accept="image/*" onchange="handleDocPhoto(this, 'back')">
+        <img id="docBackPreview" class="preview-img hidden" style="margin-top:6px;">
       </div>
 
       <div class="cam-box">
@@ -86,12 +107,14 @@
         <button type="button" id="btnSnapReg" onclick="takeSnapshot()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ सेल्फी फोटो घ्या</button>
       </div>
 
-      <!-- Consent Agreement Box -->
       <div class="consent-box">
         <strong style="color:#ff6600; display:block; margin-bottom:4px;">📜 सहमती पत्र (Consent Agreement):</strong>
-        <p id="consentAgreementText" style="font-size:12px; color:#ccc; line-height:1.4; margin-bottom:8px;">
+        <p id="consentAgreementText" style="font-size:12px; color:#ccc; line-height:1.4; margin-bottom:6px;">
           मी GoParcel चे सर्व नियम व वाहतूक अटी पाळेन. प्रत्येक डिलिव्हरीवर प्लॅटफॉर्म कमिशन कपातीस माझी पूर्ण संमती आहे.
         </p>
+        <div style="font-size:11px; color:#4db8ff; margin-bottom:6px;">
+          ⏱️ वेळ: <span id="regConsentClock">--:--:--</span> | 📍 GPS लोकेशन व PDF रेकॉर्ड सेव्ह होईल
+        </div>
         <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:#fff;">
           <input type="checkbox" id="regConsentCheck" style="width:auto; margin:0;"> मला वरील सर्व अटी व शर्ती मान्य आहेत.
         </label>
@@ -110,91 +133,211 @@
   <div id="riderScreen" class="hidden">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <span id="riderLabel" style="font-size:13px; color:#aaa;"></span>
-      <button onclick="logoutRider()" style="width:auto; padding:6px 12px; background:#333; color:#fff; font-size:12px; margin:0;">Logout</button>
+      <button onclick="playAlertSound()" style="width:auto; padding:5px 10px; background:#222; color:#ff6600; border:1px solid #ff6600; font-size:11px; margin:0;">🔔 साऊंड टेस्ट</button>
     </div>
 
     <div id="riderNoticeBanner" class="banner-strip hidden"></div>
 
-    <!-- Rejected KYC Re-upload Banner -->
+    <!-- Rejected KYC Banner -->
     <div id="rejectedBanner" class="card hidden" style="background:#2b1212; border:2px solid #e74c3c;">
       <h4 style="color:#ff6b6b;">❌ तुमची कागदपत्रे / KYC नाकारली गेली आहे!</h4>
       <p id="rejectReasonText" style="font-size:13px; color:#ddd; margin:6px 0;"></p>
       <div class="doc-upload-box">
-        <label style="font-size:12px; color:#4db8ff;">पुन्हा खरा व स्पष्ट कागदपत्राचा फोटो अपलोड करा:</label>
-        <input type="file" accept="image/*" onchange="reuploadKycDoc(this)">
+        <label style="font-size:12px; color:#4db8ff;">पुन्हा आधार कार्ड समोरची बाजू (Front) अपलोड करा:</label>
+        <input type="file" accept="image/*" onchange="reuploadKycDoc(this, 'front')">
+        <label style="font-size:12px; color:#4db8ff; margin-top:6px;">पुन्हा आधार कार्ड मागची बाजू (Back) अपलोड करा:</label>
+        <input type="file" accept="image/*" onchange="reuploadKycDoc(this, 'back')">
       </div>
+    </div>
+
+    <!-- Onboarding Fee Banner -->
+    <div id="onboardingBanner" class="card" style="background:#2b1708; border:2px solid #ff6600;">
+      <h4 style="color:#ff6600;">💳 खाते सक्रिय करा (Onboarding Fee: ₹<span class="dynFee">1000</span>)</h4>
+      <div class="upi-box" id="adminUpiDisplay">UPI ID: Techesupp-2@okhdfcbank</div>
+      <div id="feeSubmittedTag" class="hidden" style="background:#1c252c; color:#4db8ff; padding:8px; border-radius:6px; font-size:12px; margin:6px 0;">
+        ⏳ तुमचा UTR नंबर (<span id="savedUtrShow"></span>) Admin कडे तपासणीसाठी पाठवला आहे.
+      </div>
+      <input type="text" id="feeUtrInput" maxlength="20" placeholder="१२ अंकी UPI UTR / Ref नंबर टाका">
+      <div class="doc-upload-box">
+        <label style="font-size:12px; color:#2ecc71;">📸 पेमेंट स्क्रीनशॉट अपलोड करा:</label>
+        <input type="file" accept="image/*" onchange="handleFeeScreenshot(this)">
+        <img id="feeShotPreview" class="preview-img hidden" style="margin-top:6px;">
+      </div>
+      <button onclick="submitOnboardingUtr()" style="background:#2ecc71;">✅ UTR नंबर व शुल्क तपशील सबमिट करा</button>
     </div>
 
     <!-- Daily Duty Selfie Card -->
     <div id="dailySelfieCard" class="card" style="border:2px solid #ff6600; background:#24180e;">
       <h3 style="color:#ff6600;">📸 आजची ड्युटी सुरू करा (Daily Selfie)</h3>
-      <p style="font-size:12px; color:#ddd; margin:6px 0;">दररोज ऑनलाईन येताना तुमचा ताजा लाईव्ह सेल्फी काढणे अनिवार्य आहे.</p>
       <video id="dutyVideo" autoplay playsinline class="hidden"></video>
       <button onclick="openCamera('duty')" style="background:#3498db; color:#fff;">📷 ड्युटी सेल्फीसाठी कॅमेरा उघडा</button>
       <button id="btnSnapDuty" onclick="submitDailySelfie()" class="hidden" style="background:#2ecc71;">✅ सेल्फी अपलोड करा व ONLINE या</button>
     </div>
 
-    <!-- Onboarding Fee Banner -->
-    <div id="onboardingBanner" class="card" style="background:#2b1708; border-color:#ff6600;">
-      <h4 style="color:#ff6600;">खाते सक्रिय करा (Onboarding Fee: ₹<span class="dynFee">1000</span>)</h4>
-      <button onclick="payOnboarding()">₹<span class="dynFee">1000</span> शुल्क जमा करा</button>
-    </div>
-
-    <!-- Pending Approval Banner -->
-    <div id="approvalBanner" class="card hidden" style="background:#1c252c; border-color:#3498db;">
-      <h4 style="color:#3498db;">⏳ Admin मंजुरीच्या प्रतीक्षेत</h4>
-      <p style="font-size:12px; color:#bbb; margin-top:4px;">तुमचे कागदपत्रे व सेल्फी तपासले जात आहेत.</p>
-    </div>
-
     <!-- SECTION 1: ORDERS & ACTIVE DELIVERY -->
     <div id="secOrders">
       <div class="card">
-        <h3 style="color:#ff6600; margin-bottom:10px;">माझ्या चालू डिलिव्हरी</h3>
+        <h3 style="color:#ff6600; margin-bottom:10px;">🚚 माझ्या चालू डिलिव्हरी (Step-by-Step)</h3>
         <div id="myDeliveries">कोणतीही चालू ऑर्डर नाही.</div>
       </div>
-
       <div class="card">
-        <h3 style="color:#ff6600; margin-bottom:4px;">नवीन उपलब्ध ऑर्डर्स (<span id="radiusLabel">2</span> किमी परिसर)</h3>
+        <h3 style="color:#ff6600; margin-bottom:4px;">🔔 नवीन उपलब्ध ऑर्डर्स (<span id="radiusLabel">2</span> किमी परिसर)</h3>
         <div id="availableOrders">जवळपासच्या ऑर्डर्स शोधत आहे...</div>
       </div>
     </div>
 
-    <!-- SECTION 2: WALLET & PAYOUTS -->
+    <!-- SECTION 2: WEEKLY PROFIT SUMMARY, ANYTIME WITHDRAWAL, BANK ACCOUNT & INSTALLMENT -->
     <div id="secWallet" class="hidden">
       <div class="card">
-        <h3 style="color:#ff6600; margin-bottom:10px;">माझे वॉलेट (Wallet)</h3>
+        <h3 style="color:#ff6600; margin-bottom:10px;">📊 साप्ताहिक कमाई व नफा (Weekly Profit Report)</h3>
+        
+        <!-- Weekly Profit Summary Card -->
+        <div class="weekly-card">
+          <div style="font-size:13px; color:#ff6600; font-weight:bold; margin-bottom:6px;">🗓️ मागील ७ दिवसांचा हिशोब (Weekly Summary):</div>
+          <div class="weekly-row"><span>पूर्ण केलेल्या राईड्स (Weekly Rides):</span><strong id="wkRidesCount">0</strong></div>
+          <div class="weekly-row"><span>एकूण राईड भाडे (Gross Fare):</span><strong>₹<span id="wkGrossFare">0</span></strong></div>
+          <div class="weekly-row"><span>प्लॅटफॉर्म कमिशन कपात:</span><span style="color:#e74c3c;">-₹<span id="wkCommission">0</span></span></div>
+          <div class="weekly-row" style="font-size:15px; padding-top:6px;">
+            <span style="color:#2ecc71; font-weight:bold;">निव्वळ साप्ताहिक नफा (Net Weekly Profit):</span>
+            <strong style="color:#2ecc71;">₹<span id="wkNetProfit">0</span></strong>
+          </div>
+        </div>
+
+        <!-- Available Balance for Anytime Withdrawal -->
         <div class="wallet-grid">
           <div class="w-box">
-            <div style="font-size:12px; color:#aaa;">निव्वळ कमाई (<span id="rPct">80</span>%)</div>
+            <div style="font-size:11px; color:#aaa;">विथड्रॉसाठी शिल्लक (Anytime Balance)</div>
             <div style="font-size:20px; color:#2ecc71; font-weight:bold;">₹<span id="netEarnings">0</span></div>
           </div>
           <div class="w-box">
-            <div style="font-size:12px; color:#aaa;">कमिशन (<span id="cPct">20</span>%)</div>
-            <div style="font-size:20px; color:#ff6600; font-weight:bold;">₹<span id="commDeducted">0</span></div>
+            <div style="font-size:11px; color:#aaa;">एकूण पूर्ण ऑर्डर्स</div>
+            <div style="font-size:20px; color:#4db8ff; font-weight:bold;"><span id="totalCompletedCount">0</span></div>
           </div>
         </div>
-        <button onclick="requestWithdrawal()" style="background:#2ecc71; margin-top:14px;">💳 बँक खात्यात पैसे काढा (Withdraw Request)</button>
+
+        <div class="tabs" style="margin-top:12px;">
+          <button id="wSubWithdraw" class="tab-btn active" onclick="switchWalletSub('withdraw')">🏦 बँक & विथड्रॉ (Anytime)</button>
+          <button id="wSubDeposit" class="tab-btn" onclick="switchWalletSub('deposit')">➕ डिपॉझिट</button>
+          <button id="wSubInstallment" class="tab-btn" onclick="switchWalletSub('installment')">📅 हप्ता पेमेंट</button>
+        </div>
+
+        <!-- Sub-Tab 1: Bank Details & Anytime Withdraw -->
+        <div id="wSecWithdraw">
+          <div style="background:#111; padding:10px; border-radius:8px; border:1px solid #333; margin-top:6px;">
+            <strong style="color:#ff6600; font-size:13px;">🏦 तुमचे बँक खाते तपशील (Admin ला विथड्रॉ साठी दिसेल):</strong>
+            <input type="text" id="bankHolderName" placeholder="खातेधारकाचे पूर्ण नाव">
+            <input type="text" id="bankName" placeholder="बँकेचे नाव (उदा. SBI / Bank of Maharashtra)">
+            <input type="text" id="bankAccNo" placeholder="बँक खाते नंबर (Account Number)">
+            <input type="text" id="bankIfsc" placeholder="IFSC कोड (उदा. SBIN0001234)">
+            <input type="text" id="bankUpiId" placeholder="तुमचा UPI ID (PhonePe / GPay)">
+            <button onclick="saveBankDetails()" style="background:#3498db; color:#fff; font-size:13px;">💾 बँक तपशील सेव्ह करा</button>
+          </div>
+          <p style="font-size:11px; color:#aaa; margin-top:8px;">⚡ तुम्ही कधीही (Anytime) तुमच्या खात्यातील शिल्लक रक्कम काढू शकता:</p>
+          <input type="number" id="withdrawAmtInput" placeholder="काढायची रक्कम टाका (किमान ₹100)">
+          <button onclick="requestWithdrawal()" style="background:#2ecc71;">💳 विथड्रॉवल विनंती पाठवा (Anytime Withdraw)</button>
+        </div>
+
+        <!-- Sub-Tab 2: Deposit Money -->
+        <div id="wSecDeposit" class="hidden">
+          <div class="upi-box" id="depositUpiDisplay">Admin UPI: Techesupp-2@okhdfcbank</div>
+          <input type="number" id="depositAmtInput" placeholder="जमा केलेली रक्कम (₹)">
+          <input type="text" id="depositUtrInput" placeholder="१२ अंकी UPI UTR / Ref नंबर">
+          <button onclick="submitDepositRequest()" style="background:#2ecc71;">➕ डिपॉझिट विनंती सबमिट करा</button>
+        </div>
+
+        <!-- Sub-Tab 3: Installment Payment -->
+        <div id="wSecInstallment" class="hidden">
+          <div style="background:#111; padding:12px; border-radius:8px; border:1px solid #ff6600; margin-top:6px;">
+            <h4 style="color:#ff6600; margin-bottom:6px;">📅 नियमित हप्ता पेमेंट (Installment / Fee Plan)</h4>
+            <p style="font-size:12px; color:#ccc;">तुमचा ठरलेला हप्ता: <strong style="color:#2ecc71; font-size:15px;">₹<span id="riderInstallmentAmt">500</span></strong></p>
+            <div class="upi-box" id="instUpiDisplay">Admin UPI: Techesupp-2@okhdfcbank</div>
+            <input type="number" id="instPayAmt" placeholder="भरलेली हप्ता रक्कम (₹)">
+            <input type="text" id="instPayUtr" placeholder="१२ अंकी UPI UTR / Ref नंबर">
+            <button onclick="submitInstallmentPayment()" style="background:#2ecc71;">✅ हप्त्याचे पेमेंट सबमिट करा</button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- SECTION 3: REFER & PROFILE -->
-    <div id="secRefer" class="hidden">
-      <div class="card" style="text-align:center;">
-        <h3 style="color:#ff6600;">🎁 मित्रांना रेफर करा व बोनस मिळवा!</h3>
-        <p style="font-size:13px; color:#ccc; margin:8px 0;">प्रत्येक नवीन रायडरच्या यशस्वी जॉइनिंगवर तुम्हाला मिळेल <strong style="color:#2ecc71;">₹<span id="dynReferBonus">100</span></strong> बोनस!</p>
-        <div style="background:#000; border:1px dashed #ff6600; padding:10px; border-radius:8px; font-size:18px; font-weight:bold; color:#ff6600; margin:10px 0;" id="myRiderReferCode">GPR0000</div>
-        <a id="shareReferWa" href="#" target="_blank" class="wa-btn">📲 WhatsApp वर मित्रांना शेअर करा</a>
+    <!-- SECTION 3: ORDER HISTORY (WITHOUT CUSTOMER PERSONAL DETAILS) & PAYMENT HISTORY -->
+    <div id="secHistory" class="hidden">
+      <div class="card">
+        <div class="tabs">
+          <button id="hSubOrders" class="tab-btn active" onclick="switchHistSub('orders')">📦 ऑर्डर हिस्ट्री</button>
+          <button id="hSubPayments" class="tab-btn" onclick="switchHistSub('payments')">🧾 पेमेंट & विथड्रॉ हिस्ट्री</button>
+        </div>
+        <div id="hSecOrders">
+          <p style="font-size:11px; color:#888; margin-bottom:8px;">🔒 गोपनीयतेच्या नियमांनुसार पूर्ण झालेल्या ऑर्डर्समध्ये कस्टमरचा मोबाईल/नाव लपवले आहे; फक्त पत्ता आणि कमाई दिसेल.</p>
+          <div id="orderHistoryList">लोड होत आहे...</div>
+        </div>
+        <div id="hSecPayments" class="hidden"><div id="paymentHistoryList">लोड होत आहे...</div></div>
       </div>
     </div>
 
+    <!-- SECTION 4: PROFILE, SETTINGS, REFER & HELP SOS -->
+    <div id="secSettings" class="hidden">
+      <div class="card">
+        <h3 style="color:#ff6600; margin-bottom:8px;">👤 रायडर प्रोफाईल व कागदपत्र स्थिती</h3>
+        <div id="riderProfileDetails" style="font-size:13px; line-height:1.7; color:#ddd; background:#111; padding:10px; border-radius:8px;"></div>
+        <button onclick="downloadRiderConsentPdf()" style="background:#3498db; color:#fff; margin-top:10px;">📄 माझे संमती पत्र PDF डाउनलोड करा</button>
+      </div>
+
+      <div class="card">
+        <h3 style="color:#ff6600; margin-bottom:10px;">🆘 हेल्प आणि इमर्जन्सी सपोर्ट</h3>
+        <div class="sos-row">
+          <div>
+            <strong>👮 पोलीस हेल्पलाईन (Police)</strong>
+            <div style="font-size:12px; color:#aaa;">आपत्कालीन पोलीस मदत - 112</div>
+          </div>
+          <a href="tel:112" class="wa-btn" style="width:auto; padding:8px 14px; background:#e74c3c; color:#fff; margin:0;">📞 112 कॉल</a>
+        </div>
+        <div class="sos-row" style="border-left-color:#ff9800;">
+          <div>
+            <strong>🚒 फायर ब्रिगेड (Fire Brigade)</strong>
+            <div style="font-size:12px; color:#aaa;">अग्निशमन दल सेवा - 101</div>
+          </div>
+          <a href="tel:101" class="wa-btn" style="width:auto; padding:8px 14px; background:#ff9800; color:#000; margin:0;">📞 101 कॉल</a>
+        </div>
+        <div class="sos-row" style="border-left-color:#2ecc71;">
+          <div>
+            <strong>👑 GoParcel Admin सपोर्ट</strong>
+            <div style="font-size:12px; color:#aaa;" id="riderAdminPhoneTxt">+91 9999999999</div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <a id="riderAdminCallBtn" href="tel:+919999999999" class="wa-btn" style="width:auto; padding:8px 12px; background:#3498db; color:#fff; margin:0;">📞 कॉल</a>
+            <a id="riderAdminWaBtn" href="https://wa.me/919999999999" target="_blank" class="wa-btn" style="width:auto; padding:8px 12px; margin:0;">💬 WA</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="color:#ff6600; margin-bottom:8px;">⚙️ ॲप सेटिंग्ज & रेफर बोनस</h3>
+        <label style="font-size:12px; color:#aaa;">ॲप भाषा (Language):</label>
+        <select id="riderSettingsLang" onchange="changeRiderLang(this.value)">
+          <option value="mr">मराठी (Marathi)</option>
+          <option value="hi">हिंदी (Hindi)</option>
+          <option value="en">English</option>
+        </select>
+        <label style="display:flex; align-items:center; justify-content:space-between; background:#111; padding:10px; border-radius:8px; margin:8px 0;">
+          <span>🔔 नवीन ऑर्डर साऊंड अलर्ट</span>
+          <input type="checkbox" id="soundAlertToggle" checked style="width:20px; height:20px; margin:0;">
+        </label>
+        <div style="background:#000; border:1px dashed #ff6600; padding:10px; border-radius:8px; text-align:center; margin:10px 0;">
+          तुमचा रेफर कोड: <strong style="color:#ff6600; font-size:17px;" id="myRiderReferCode">GPR0000</strong><br>
+          <small style="color:#aaa;">प्रति रेफरल बोनस: ₹<span id="dynReferBonus">100</span></small>
+        </div>
+        <a id="shareReferWa" href="#" target="_blank" class="wa-btn">📲 WhatsApp वर मित्रांना रेफर करा</a>
+        <button onclick="logoutRider()" style="background:#e74c3c; color:#fff; margin-top:12px;">🚪 लॉगआउट (Logout)</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Bottom Navigation Bar -->
 <div id="bottomNav" class="bottom-nav hidden">
   <div class="b-nav-item active" onclick="switchBottomTab('Orders', this)">🛵 ऑर्डर्स</div>
-  <div class="b-nav-item" onclick="switchBottomTab('Wallet', this)">💰 वॉलेट</div>
-  <div class="b-nav-item" onclick="switchBottomTab('Refer', this)">🎁 रेफर & बोनस</div>
+  <div class="b-nav-item" onclick="switchBottomTab('Wallet', this)">💰 नफा/विथड्रॉ</div>
+  <div class="b-nav-item" onclick="switchBottomTab('History', this)">📜 हिस्ट्री</div>
+  <div class="b-nav-item" onclick="switchBottomTab('Settings', this)">👤 प्रोफाईल/SOS</div>
 </div>
 
 <canvas id="snapCanvas" width="240" height="240" class="hidden"></canvas>
@@ -216,17 +359,51 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  let adminWaNumber = "919999999999", currentOnboardingFee = 1000, currentCommPct = 20, maxRadiusKm = 2;
-  let orderAlertTimerSec = 45, currentReferBonus = 100;
+  let riderLang = localStorage.getItem("gp_rider_lang") || "mr";
+  let adminWaNumber = "919999999999", adminUpiId = "Techesupp-2@okhdfcbank", currentOnboardingFee = 1000, currentCommPct = 20, maxRadiusKm = 2;
+  let orderAlertTimerSec = 45, currentReferBonus = 100, deliveryRangeMeters = 150, defaultInstallmentAmt = 500;
+  let consentTextGlobal = "मी GoParcel चे सर्व नियम व वाहतूक अटी पाळेन. प्रत्येक डिलिव्हरीवर प्लॅटफॉर्म कमिशन कपातीस माझी पूर्ण संमती आहे.";
   let reqDailySelfie = true, isDutyVerifiedToday = false;
   let isFeePaid = false, isApproved = false, existingRiderName = "", activeRiderId = null, activeRiderName = "";
-  let rLoginReqId = null, rRegReqId = null, regSelfieData = "", docPhotoData = "", activeStream = null;
-  let riderLat = null, riderLng = null, currentNetBalance = 0;
+  let rLoginReqId = null, rRegReqId = null, regSelfieData = "", docFrontData = "", docBackData = "", feeScreenshotData = "", activeStream = null;
+  let riderLat = 18.5204, riderLng = 73.8567, availableWalletBalance = 0, lastPendingOrderCount = 0;
   let docRules = { docAadhaar: true, docLicense: true, docRcBook: false, docPanCard: false };
   let alertCountdownInterval = null;
+  let currentRiderProfile = null;
+  let latestWeeklySummary = { rides: 0, gross: 0, comm: 0, netProfit: 0 };
 
   const todayStr = new Date().toISOString().split('T')[0];
   function getNowTimeStr() { return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+
+  window.changeRiderLang = (lang) => {
+    riderLang = lang;
+    localStorage.setItem("gp_rider_lang", lang);
+    document.getElementById('riderLangSelect').value = lang;
+    document.getElementById('riderSettingsLang').value = lang;
+  };
+  changeRiderLang(riderLang);
+
+  setInterval(() => {
+    const el = document.getElementById('regConsentClock');
+    if (el) el.innerText = new Date().toLocaleTimeString('en-IN');
+  }, 1000);
+
+  window.playAlertSound = () => {
+    if (!document.getElementById('soundAlertToggle').checked) return;
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [520, 780, 1040].forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.18);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + idx * 0.18);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.18 + 0.16);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + idx * 0.18); osc.stop(ctx.currentTime + idx * 0.18 + 0.17);
+      });
+    } catch (e) {}
+  };
 
   function isValidAadhaar(num) {
     if (!/^[2-9]{1}[0-9]{11}$/.test(num)) return false;
@@ -252,34 +429,63 @@
   };
 
   window.switchBottomTab = (tabName, el) => {
-    ['Orders', 'Wallet', 'Refer'].forEach(t => document.getElementById('sec' + t).classList.add('hidden'));
+    ['Orders', 'Wallet', 'History', 'Settings'].forEach(t => document.getElementById('sec' + t).classList.add('hidden'));
     document.getElementById('sec' + tabName).classList.remove('hidden');
     document.querySelectorAll('.b-nav-item').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
+  };
+
+  window.switchWalletSub = (sub) => {
+    document.getElementById('wSecWithdraw').classList.toggle('hidden', sub !== 'withdraw');
+    document.getElementById('wSecDeposit').classList.toggle('hidden', sub !== 'deposit');
+    document.getElementById('wSecInstallment').classList.toggle('hidden', sub !== 'installment');
+    document.getElementById('wSubWithdraw').classList.toggle('active', sub === 'withdraw');
+    document.getElementById('wSubDeposit').classList.toggle('active', sub === 'deposit');
+    document.getElementById('wSubInstallment').classList.toggle('active', sub === 'installment');
+  };
+
+  window.switchHistSub = (sub) => {
+    document.getElementById('hSecOrders').classList.toggle('hidden', sub !== 'orders');
+    document.getElementById('hSecPayments').classList.toggle('hidden', sub !== 'payments');
+    document.getElementById('hSubOrders').classList.toggle('active', sub === 'orders');
+    document.getElementById('hSubPayments').classList.toggle('active', sub === 'payments');
   };
 
   onSnapshot(doc(db, "config", "appSettings"), (snap) => {
     if (snap.exists()) {
       const s = snap.data();
       adminWaNumber = s.adminWa || "919999999999";
+      adminUpiId = s.adminUpi || "Techesupp-2@okhdfcbank";
       currentOnboardingFee = s.onboardingFee ?? 1000;
       currentCommPct = s.commission ?? 20;
       maxRadiusKm = s.pickupRadiusKm ?? 2;
       orderAlertTimerSec = s.orderTimerSec ?? 45;
       currentReferBonus = s.riderReferBonus ?? 100;
+      deliveryRangeMeters = s.deliveryRangeMeters ?? 150;
+      defaultInstallmentAmt = s.installmentAmount ?? 500;
       reqDailySelfie = s.reqDailySelfie ?? true;
       docRules = { docAadhaar: s.docAadhaar ?? true, docLicense: s.docLicense ?? true, docRcBook: s.docRcBook ?? false, docPanCard: s.docPanCard ?? false };
-      
+      if (s.consentText) {
+        consentTextGlobal = s.consentText;
+        document.getElementById('consentAgreementText').innerText = s.consentText;
+      }
+
+      document.getElementById('adminUpiDisplay').innerText = "UPI ID: " + adminUpiId;
+      document.getElementById('depositUpiDisplay').innerText = "Admin UPI: " + adminUpiId;
+      document.getElementById('instUpiDisplay').innerText = "Admin UPI: " + adminUpiId;
+      document.getElementById('riderInstallmentAmt').innerText = defaultInstallmentAmt;
       document.getElementById('rAadhaar').classList.toggle('hidden', !docRules.docAadhaar);
       document.getElementById('rLicense').classList.toggle('hidden', !docRules.docLicense);
       document.getElementById('rRcBook').classList.toggle('hidden', !docRules.docRcBook);
       document.getElementById('rPanCard').classList.toggle('hidden', !docRules.docPanCard);
       document.querySelectorAll('.dynFee').forEach(el => el.innerText = currentOnboardingFee);
-      document.getElementById('cPct').innerText = currentCommPct;
-      document.getElementById('rPct').innerText = 100 - currentCommPct;
       document.getElementById('radiusLabel').innerText = maxRadiusKm;
       document.getElementById('dynReferBonus').innerText = currentReferBonus;
-      if (s.consentText) document.getElementById('consentAgreementText').innerText = s.consentText;
+
+      const cleanWa = adminWaNumber.replace(/\D/g, '');
+      document.getElementById('riderAdminPhoneTxt').innerText = "+" + cleanWa;
+      document.getElementById('riderAdminCallBtn').href = "tel:+" + cleanWa;
+      document.getElementById('riderAdminWaBtn').href = `https://wa.me/${cleanWa}`;
 
       const b = document.getElementById('riderNoticeBanner');
       if (s.riderBannerText) { b.innerText = "📢 " + s.riderBannerText; b.classList.remove('hidden'); }
@@ -303,21 +509,31 @@
     reader.readAsDataURL(file);
   }
 
-  window.handleDocPhoto = (input) => {
+  window.handleDocPhoto = (input, side) => {
     if (input.files && input.files[0]) {
       compressImageFile(input.files[0], (base64) => {
-        docPhotoData = base64;
-        const prev = document.getElementById('docPreview');
-        prev.src = base64; prev.classList.remove('hidden');
+        if (side === 'front') { docFrontData = base64; const p = document.getElementById('docFrontPreview'); p.src = base64; p.classList.remove('hidden'); }
+        else { docBackData = base64; const p = document.getElementById('docBackPreview'); p.src = base64; p.classList.remove('hidden'); }
       });
     }
   };
 
-  window.reuploadKycDoc = (input) => {
+  window.handleFeeScreenshot = (input) => {
+    if (input.files && input.files[0]) {
+      compressImageFile(input.files[0], (base64) => {
+        feeScreenshotData = base64;
+        const p = document.getElementById('feeShotPreview'); p.src = base64; p.classList.remove('hidden');
+      });
+    }
+  };
+
+  window.reuploadKycDoc = (input, side) => {
     if (input.files && input.files[0] && activeRiderId) {
       compressImageFile(input.files[0], async (base64) => {
-        await updateDoc(doc(db, "riders", activeRiderId), { kycPhoto: base64, kycRejected: false, rejectReason: "" });
-        alert("✅ नवीन कागदपत्रांचा फोटो Admin कडे पाठवला आहे!");
+        const updateObj = side === 'front' ? { kycPhoto: base64 } : { kycPhotoBack: base64 };
+        updateObj.kycRejected = false; updateObj.rejectReason = "";
+        await updateDoc(doc(db, "riders", activeRiderId), updateObj);
+        alert("✅ नवीन कागदपत्र फोटो Admin कडे पाठवला आहे!");
       });
     }
   };
@@ -353,6 +569,12 @@
     alert("✅ आजचा लाईव्ह सेल्फी व्हेरिफाय झाला! आता तुम्ही ONLINE आहात.");
   };
 
+  function buildLangOtpWaText(roleLabel, name, phone, timeStr, lang) {
+    if (lang === 'en') return `Hello GoParcel Admin, I am ${roleLabel} ${name} (${phone}) [Lang: English] at ${timeStr}. Please send my OTP.`;
+    if (lang === 'hi') return `नमस्ते GoParcel Admin, मैं ${roleLabel} ${name} (${phone}) [भाषा: हिंदी] समय ${timeStr} पर लॉगिन/पंजीकरण कर रहा हूँ। कृपया OTP भेजें।`;
+    return `नमस्कार GoParcel Admin, मी ${roleLabel} ${name} (${phone}) [भाषा: मराठी] आत्ता (${timeStr}) विनंती करत आहे. कृपया OTP पाठवा.`;
+  }
+
   window.startRiderLoginOtp = async () => {
     const phone = document.getElementById('rLoginPhone').value.trim();
     if (phone.length !== 10 || isNaN(phone)) return alert("कृपया १० अंकी मोबाईल नंबर टाका!");
@@ -361,9 +583,11 @@
     existingRiderName = snap.data().name || "Rider";
     const secretOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const timeStr = getNowTimeStr();
-    const reqRef = await addDoc(collection(db, "otpRequests"), { role: "Rider (Login)", name: existingRiderName, phone, otp: secretOtp, timeStr, status: "Pending", createdAt: Date.now() });
+    const reqRef = await addDoc(collection(db, "otpRequests"), {
+      role: "Rider (Login)", name: existingRiderName, phone, otp: secretOtp, lang: riderLang, timeStr, status: "Pending", createdAt: Date.now()
+    });
     rLoginReqId = reqRef.id;
-    document.getElementById('rLoginWaLink').href = `https://wa.me/${adminWaNumber}?text=${encodeURIComponent(`नमस्कार GoParcel Admin, मी रायडर ${existingRiderName} (${phone}) आत्ता (${timeStr}) लॉगिन करत आहे. कृपया OTP पाठवा.`)}`;
+    document.getElementById('rLoginWaLink').href = `https://wa.me/${adminWaNumber}?text=${encodeURIComponent(buildLangOtpWaText("Rider", existingRiderName, phone, timeStr, riderLang))}`;
     document.getElementById('rLoginOtpBox').classList.remove('hidden');
   };
 
@@ -377,6 +601,24 @@
     localStorage.setItem("gp_verified_rider_id", rid); localStorage.setItem("gp_verified_rider_name", label);
     startRiderSession(rid, label);
   };
+
+  function createRiderConsentPdf(rec) {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+    pdf.setFontSize(16);
+    pdf.text("GoParcel - Rider Partner Consent Agreement", 15, 20);
+    pdf.setFontSize(11);
+    pdf.text(`Rider Name: ${rec.name}`, 15, 35);
+    pdf.text(`Mobile: ${rec.phone}`, 15, 43);
+    pdf.text(`Vehicle No: ${rec.summary}`, 15, 51);
+    pdf.text(`Registration Timestamp: ${rec.timestampStr}`, 15, 59);
+    pdf.text(`GPS Location: Lat ${rec.lat}, Lng ${rec.lng}`, 15, 67);
+    pdf.text("Agreement Terms Accepted:", 15, 80);
+    const lines = pdf.splitTextToSize(rec.agreementText, 180);
+    pdf.text(lines, 15, 88);
+    pdf.text("Status: DIGITALLY SIGNED & AGREED BY RIDER", 15, 130);
+    return pdf.output('datauristring');
+  }
 
   window.startRiderRegOtp = async () => {
     const name = document.getElementById('rName').value.trim();
@@ -392,7 +634,7 @@
     if (!name || phone.length !== 10 || !vehicleNo) return alert("कृपया नाव, मोबाईल आणि गाडीचा नंबर भरा!");
     if (docRules.docAadhaar && !isValidAadhaar(aadhaar)) return alert("❌ चुकीचा आधार नंबर! कृपया अचूक १२ अंकी खरा आधार नंबर टाका.");
     if (docRules.docLicense && license.length < 8) return alert("❌ चुकीचा ड्रायव्हिंग लायसन्स नंबर!");
-    if (!docPhotoData) return alert("❌ कृपया कागदपत्रांचा (आधार/लायसन्स) स्पष्ट फोटो अपलोड करा!");
+    if (!docFrontData || !docBackData) return alert("❌ कृपया आधार कार्डची समोरची (Front) आणि मागची (Back) दोन्ही बाजू अपलोड करा!");
     if (!regSelfieData) return alert("❌ कृपया कॅमेऱ्याने तुमचा मूळ सेल्फी फोटो काढा!");
     if (!consentOk) return alert("❌ कृपया सहमती पत्रास (Consent Agreement) संमती द्या!");
 
@@ -416,18 +658,35 @@
     const kycSummary = [aadhaar ? `Aadhaar:${aadhaar}` : '', license ? `DL:${license}` : '', rc ? `RC:${rc}` : '', pan ? `PAN:${pan}` : ''].filter(Boolean).join(' | ');
     const secretOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const timeStr = getNowTimeStr();
+    const fullTimestamp = new Date().toLocaleString('en-IN');
+
+    const consentRec = {
+      role: "Rider (Registration)",
+      name, phone,
+      timestampStr: fullTimestamp,
+      lat: riderLat,
+      lng: riderLng,
+      summary: `Vehicle: ${vehicleNo}`,
+      agreementText: consentTextGlobal,
+      createdAt: Date.now()
+    };
+    consentRec.pdfDataUri = createRiderConsentPdf(consentRec);
+    await addDoc(collection(db, "consentRecords"), consentRec);
 
     await setDoc(doc(db, "riders", "rider_" + phone), {
       name, phone, vehicleNo, aadhaarNo: aadhaar, licenseNo: license,
-      kycDoc: kycSummary, kycPhoto: docPhotoData, regSelfie: regSelfieData,
+      kycDoc: kycSummary, kycPhoto: docFrontData, kycPhotoBack: docBackData, regSelfie: regSelfieData,
       referredBy, referCode: "GPR" + phone.slice(-4),
-      consentAccepted: true, consentTime: serverTimestamp(),
+      lang: riderLang,
+      consentAccepted: true, consentTime: fullTimestamp, consentPdf: consentRec.pdfDataUri,
       kycRejected: false, rejectReason: ""
     }, { merge: true });
 
-    const reqRef = await addDoc(collection(db, "otpRequests"), { role: "Rider (New)", name, phone, otp: secretOtp, timeStr, status: "Pending", createdAt: Date.now() });
+    const reqRef = await addDoc(collection(db, "otpRequests"), {
+      role: "Rider (New)", name, phone, otp: secretOtp, lang: riderLang, timeStr, status: "Pending", createdAt: Date.now()
+    });
     rRegReqId = reqRef.id;
-    document.getElementById('rRegWaLink').href = `https://wa.me/${adminWaNumber}?text=${encodeURIComponent(`नमस्कार GoParcel Admin, मी नवीन रायडर ${name} (${phone}) आत्ता (${timeStr}) नोंदणी करत आहे. कृपया OTP पाठवा.`)}`;
+    document.getElementById('rRegWaLink').href = `https://wa.me/${adminWaNumber}?text=${encodeURIComponent(buildLangOtpWaText("New Rider", name, phone, timeStr, riderLang))}`;
     document.getElementById('rRegOtpBox').classList.remove('hidden');
     btn.innerText = "कागदपत्रे तपासा व OTP मागवा";
   };
@@ -446,37 +705,121 @@
     startRiderSession(rid, label);
   };
 
+  window.downloadRiderConsentPdf = () => {
+    if (currentRiderProfile && currentRiderProfile.consentPdf) {
+      const a = document.createElement('a');
+      a.href = currentRiderProfile.consentPdf;
+      a.download = `Rider_Consent_${currentRiderProfile.phone}.pdf`;
+      a.click();
+    } else alert("संमती पत्र PDF उपलब्ध नाही.");
+  };
+
   window.logoutRider = () => { localStorage.removeItem("gp_verified_rider_id"); localStorage.removeItem("gp_verified_rider_name"); location.reload(); };
-  window.payOnboarding = async () => { await updateDoc(doc(db, "riders", activeRiderId), { feePaid: true, paidAmount: currentOnboardingFee }); alert("शुल्क जमा झाले!"); };
+
+  window.submitOnboardingUtr = async () => {
+    const utr = document.getElementById('feeUtrInput').value.trim();
+    if (utr.length < 6) return alert("कृपया योग्य UPI UTR / Ref नंबर टाका!");
+    await updateDoc(doc(db, "riders", activeRiderId), {
+      feeUtr: utr, feeScreenshot: feeScreenshotData || "", feeStatus: "Submitted", paidAmount: currentOnboardingFee, feeSubmittedAt: serverTimestamp()
+    });
+    alert("✅ तुमचा UTR नंबर व पेमेंट तपशील Admin कडे व्हेरिफिकेशनसाठी पाठवला आहे!");
+  };
 
   window.acceptOrder = async (orderId) => {
     if (reqDailySelfie && !isDutyVerifiedToday) return alert("आधी आजचा लाईव्ह ड्युटी सेल्फी काढून ONLINE या!");
-    if (!isFeePaid && currentOnboardingFee > 0) return alert(`आधी ₹${currentOnboardingFee} ऑनबोर्डिंग शुल्क भरा!`);
+    if (!isFeePaid && currentOnboardingFee > 0) return alert(`आधी ₹${currentOnboardingFee} ऑनबोर्डिंग शुल्क जमा करून Admin कडून व्हेरिफाय करून घ्या!`);
     if (!isApproved) return alert("तुमच्या खात्याला अजून Admin ची मंजुरी मिळालेली नाही!");
     clearInterval(alertCountdownInterval);
     await updateDoc(doc(db, "orders", orderId), { status: "Accepted", riderId: activeRiderId, riderEmail: activeRiderName });
   };
 
-  window.completeOrderWithPin = async (orderId, expectedPin) => {
+  window.markReachedPickup = async (orderId) => {
+    await updateDoc(doc(db, "orders", orderId), { status: "ReachedPickup", reachedPickupAt: serverTimestamp() });
+    alert("📍 पिकअप पॉईंटवर पोहोचल्याची सूचना कस्टमरला पाठवली आहे!");
+  };
+
+  window.markPickedUp = async (orderId) => {
+    await updateDoc(doc(db, "orders", orderId), { status: "PickedUp", pickedUpAt: serverTimestamp() });
+    alert("📦 पार्सल पिकअप झाले! आता ड्रॉप लोकेशनकडे जा.");
+  };
+
+  window.completeOrderWithPin = async (orderId, expectedPin, dropLat, dropLng) => {
+    if (dropLat && dropLng && riderLat && riderLng) {
+      const distMeters = Math.round(getDistanceKm(riderLat, riderLng, dropLat, dropLng) * 1000);
+      if (distMeters > deliveryRangeMeters) {
+        return alert(`🚫 तुम्ही डिलिव्हरी लोकेशनपासून अजून ${distMeters} मीटर दूर आहात! ${deliveryRangeMeters} मीटरच्या आत जाणे अनिवार्य आहे.`);
+      }
+    }
     if (expectedPin) {
       const enteredPin = prompt("कस्टमरकडून ४-अंकी डिलिव्हरी PIN विचारून टाका:");
       if (!enteredPin) return;
-      if (enteredPin.trim() !== expectedPin) return alert("❌ चुकीचा डिलिव्हरी PIN! कस्टमरच्या ॲपमधील अचूक ४-अंकी PIN टाका.");
+      if (enteredPin.trim() !== expectedPin) return alert("❌ चुकीचा डिलिव्हरी PIN!");
     }
-    await updateDoc(doc(db, "orders", orderId), { status: "Delivered", deliveredAt: serverTimestamp() });
-    alert("🎉 डिलिव्हरी यशस्वीरित्या पूर्ण झाली! कमाई वॉलेटमध्ये जमा झाली आहे.");
+    await updateDoc(doc(db, "orders", orderId), {
+      status: "Delivered",
+      deliveredAt: serverTimestamp(),
+      deliveredTimestampMs: Date.now(),
+      deliveredDateStr: new Date().toLocaleString('en-IN')
+    });
+    alert("🎉 डिलिव्हरी यशस्वीरित्या पूर्ण झाली!");
   };
 
+  window.saveBankDetails = async () => {
+    const bankData = {
+      holderName: document.getElementById('bankHolderName').value.trim(),
+      bankName: document.getElementById('bankName').value.trim(),
+      accountNo: document.getElementById('bankAccNo').value.trim(),
+      ifsc: document.getElementById('bankIfsc').value.trim().toUpperCase(),
+      upiId: document.getElementById('bankUpiId').value.trim()
+    };
+    if (!bankData.holderName || (!bankData.accountNo && !bankData.upiId)) return alert("खातेधारकाचे नाव आणि बँक खाते नंबर किंवा UPI ID भरा!");
+    await updateDoc(doc(db, "riders", activeRiderId), { bankDetails: bankData });
+    alert("✅ बँक खाते तपशील सेव्ह झाले!");
+  };
+
+  // Anytime Withdrawal Request (बँक डिटेल्स व वीकली नफा अहवालासह Admin कडे पाठवणे)
   window.requestWithdrawal = async () => {
-    if (currentNetBalance < 100) return alert("विथड्रॉवलसाठी वॉलेटमध्ये किमान ₹100 शिल्लक आवश्यक आहे.");
-    await addDoc(collection(db, "payoutRequests"), {
+    const amt = Number(document.getElementById('withdrawAmtInput').value);
+    if (!amt || amt < 100) return alert("किमान ₹100 रक्कम टाका.");
+    if (amt > availableWalletBalance) return alert(`तुमच्या वॉलेटमध्ये फक्त ₹${availableWalletBalance} शिल्लक आहेत.`);
+    const snap = await getDoc(doc(db, "riders", activeRiderId));
+    const bd = snap.data()?.bankDetails;
+    if (!bd || (!bd.accountNo && !bd.upiId)) return alert("आधी बँक खाते तपशील भरून सेव्ह करा!");
+    await addDoc(collection(db, "walletTransactions"), {
       riderId: activeRiderId,
       riderName: activeRiderName,
-      amount: currentNetBalance,
+      type: "Withdraw",
+      amount: amt,
+      bankDetails: bd,
+      weeklySnapshot: latestWeeklySummary,
       status: "Pending",
-      requestedAt: serverTimestamp()
+      createdAt: serverTimestamp(),
+      timeStr: new Date().toLocaleString('en-IN')
     });
-    alert("✅ तुमची पेमेंट विथड्रॉवल विनंती Admin कडे पाठवली आहे!");
+    document.getElementById('withdrawAmtInput').value = '';
+    alert("✅ तुमची Anytime विथड्रॉवल विनंती बँक तपशीलांसह Admin कडे पाठवली आहे!");
+  };
+
+  window.submitDepositRequest = async () => {
+    const amt = Number(document.getElementById('depositAmtInput').value);
+    const utr = document.getElementById('depositUtrInput').value.trim();
+    if (!amt || amt < 10 || utr.length < 6) return alert("योग्य रक्कम व UTR नंबर टाका.");
+    await addDoc(collection(db, "walletTransactions"), {
+      riderId: activeRiderId, riderName: activeRiderName, type: "Deposit", amount: amt, utr, status: "Pending", createdAt: serverTimestamp(), timeStr: new Date().toLocaleString('en-IN')
+    });
+    document.getElementById('depositAmtInput').value = ''; document.getElementById('depositUtrInput').value = '';
+    alert("✅ डिपॉझिट विनंती Admin कडे पाठवली आहे!");
+  };
+
+  window.submitInstallmentPayment = async () => {
+    const amt = Number(document.getElementById('instPayAmt').value);
+    const utr = document.getElementById('instPayUtr').value.trim();
+    if (!amt || amt < 50 || utr.length < 6) return alert("योग्य हप्ता रक्कम आणि १२ अंकी UTR नंबर टाका.");
+    await addDoc(collection(db, "walletTransactions"), {
+      riderId: activeRiderId, riderName: activeRiderName, type: "Installment", amount: amt, utr, status: "Pending", createdAt: serverTimestamp(), timeStr: new Date().toLocaleString('en-IN')
+    });
+    document.getElementById('instPayAmt').value = ''; document.getElementById('instPayUtr').value = '';
+    alert("✅ तुमचे हप्त्याचे पेमेंट (UTR सह) Admin कडे तपासणीसाठी पाठवले आहे!");
   };
 
   function startGpsTracking(rid) {
@@ -497,26 +840,42 @@
 
     const myCode = "GPR" + rid.slice(-4);
     document.getElementById('myRiderReferCode').innerText = myCode;
-    document.getElementById('shareReferWa').href = `https://wa.me/?text=${encodeURIComponent(`GoParcel रायडर बना आणि दररोज चांगली कमाई करा! माझा रेफरल कोड वापरा: ${myCode}`)}`;
-
+    document.getElementById('shareReferWa').href = `https://wa.me/?text=${encodeURIComponent(`GoParcel रायडर बना! रेफरल कोड: ${myCode}`)}`;
     startGpsTracking(rid);
 
     onSnapshot(doc(db, "riders", rid), (snap) => {
       if (snap.exists()) {
         const r = snap.data();
+        currentRiderProfile = r;
         isFeePaid = !!r.feePaid; isApproved = !!r.approved;
         isDutyVerifiedToday = (r.lastDutyDate === todayStr);
         if (r.lat && r.lng) { riderLat = r.lat; riderLng = r.lng; }
         const needSelfie = reqDailySelfie && !isDutyVerifiedToday;
 
+        document.getElementById('riderProfileDetails').innerHTML = `
+          नाव: <strong>${r.name}</strong><br>
+          मोबाईल: ${r.phone}<br>
+          गाडी नंबर: <strong>${r.vehicleNo}</strong><br>
+          KYC स्टेटस: <strong style="color:${r.approved ? '#2ecc71' : '#ff6600'}">${r.approved ? '✅ Approved' : '⏳ Pending'}</strong><br>
+          संमती वेळ: ${r.consentTime || '-'}
+        `;
+
+        if (r.bankDetails) {
+          document.getElementById('bankHolderName').value = r.bankDetails.holderName || '';
+          document.getElementById('bankName').value = r.bankDetails.bankName || '';
+          document.getElementById('bankAccNo').value = r.bankDetails.accountNo || '';
+          document.getElementById('bankIfsc').value = r.bankDetails.ifsc || '';
+          document.getElementById('bankUpiId').value = r.bankDetails.upiId || '';
+        }
+
         document.getElementById('rejectedBanner').classList.toggle('hidden', !r.kycRejected);
         if (r.kycRejected) document.getElementById('rejectReasonText').innerText = "कारण: " + (r.rejectReason || "कागदपत्र स्पष्ट नाही.");
+        if (r.feeUtr && !isFeePaid) { document.getElementById('feeSubmittedTag').classList.remove('hidden'); document.getElementById('savedUtrShow').innerText = r.feeUtr; }
 
         document.getElementById('dailySelfieCard').classList.toggle('hidden', !needSelfie);
         document.getElementById('onboardingBanner').classList.toggle('hidden', isFeePaid || currentOnboardingFee === 0);
-        document.getElementById('approvalBanner').classList.toggle('hidden', isApproved);
         const tag = document.getElementById('dutyStatusTag');
-        if (!needSelfie && isApproved) { tag.innerText = `● ONLINE (${maxRadiusKm}km Radius)`; tag.style.color = "#2ecc71"; }
+        if (!needSelfie && isApproved) { tag.innerText = `● ONLINE (${maxRadiusKm}km)`; tag.style.color = "#2ecc71"; }
         else { tag.innerText = "● OFFLINE / PENDING"; tag.style.color = "#ff6600"; }
       }
     });
@@ -525,8 +884,7 @@
       const div = document.getElementById('availableOrders');
       div.innerHTML = "";
       clearInterval(alertCountdownInterval);
-      let foundNearby = 0;
-      let secLeft = orderAlertTimerSec;
+      let foundNearby = 0, secLeft = orderAlertTimerSec;
 
       snap.forEach(d => {
         const o = d.data();
@@ -535,50 +893,119 @@
           foundNearby++;
           const net = Math.round(o.fare * ((100 - currentCommPct) / 100));
           div.innerHTML += `<div class="order-card">
-            <div class="timer-strip">⏱️ ऑर्डर अलर्ट टायमर: <span class="orderTimerVal">${secLeft}</span> सेकंद शिल्लक</div>
+            <div class="timer-strip">⏱️ नवीन ऑर्डर अलर्ट: <span class="orderTimerVal">${secLeft}</span> सेकंद शिल्लक</div>
             <div style="display:flex; justify-content:space-between;"><b>${o.vehicle} - ${o.parcel}</b><span style="color:#4db8ff; font-size:12px;">📍 ${awayKm.toFixed(1)} km दूर</span></div>
             <small>🟢 Pickup: ${o.pickup}<br>🔴 Drop: ${o.drop}</small><br>
             <div style="margin:6px 0; color:#2ecc71;">तुमची कमाई: <b>₹${net}</b> (भाडे: ₹${o.fare})</div>
-            <button onclick="acceptOrder('${d.id}')">ऑर्डर स्वीकारा (Accept)</button>
+            <button onclick="acceptOrder('${d.id}')">✅ ऑर्डर स्वीकारा (Accept)</button>
           </div>`;
         }
       });
 
       if (foundNearby > 0) {
+        if (foundNearby > lastPendingOrderCount) playAlertSound();
         alertCountdownInterval = setInterval(() => {
           secLeft--;
           document.querySelectorAll('.orderTimerVal').forEach(el => el.innerText = Math.max(0, secLeft));
           if (secLeft <= 0) clearInterval(alertCountdownInterval);
         }, 1000);
-      } else {
-        div.innerHTML = `तुमच्या ${maxRadiusKm} किमी परिसरात सध्या नवीन ऑर्डर नाही.`;
-      }
+      } else div.innerHTML = `तुमच्या ${maxRadiusKm} किमी परिसरात सध्या नवीन ऑर्डर नाही.`;
+      lastPendingOrderCount = foundNearby;
     });
 
+    let rideEarningsTotal = 0, completedRidesCount = 0;
+    const sevenDaysAgoMs = Date.now() - (7 * 24 * 60 * 60 * 1000);
+
     onSnapshot(query(collection(db, "orders"), where("riderId", "==", rid)), (snap) => {
-      const div = document.getElementById('myDeliveries');
-      div.innerHTML = "";
-      let totalNet = 0, totalComm = 0;
+      const div = document.getElementById('myDeliveries'), histDiv = document.getElementById('orderHistoryList');
+      div.innerHTML = ""; histDiv.innerHTML = "";
+      rideEarningsTotal = 0; completedRidesCount = 0;
+      let wkRides = 0, wkGross = 0, wkComm = 0, wkNet = 0;
+
       snap.forEach(d => {
         const o = d.data();
+        const fareNum = Number(o.fare || 0);
+        const net = Math.round(fareNum * ((100 - currentCommPct) / 100));
+        const comm = fareNum - net;
+
         if (o.status === "Delivered") {
-          totalNet += Math.round(o.fare * ((100 - currentCommPct) / 100));
-          totalComm += Math.round(o.fare * (currentCommPct / 100));
+          rideEarningsTotal += net;
+          completedRidesCount++;
+
+          // Weekly Calculation (मागील ७ दिवस)
+          const delivMs = o.deliveredTimestampMs || Date.now();
+          if (delivMs >= sevenDaysAgoMs) {
+            wkRides++;
+            wkGross += fareNum;
+            wkComm += comm;
+            wkNet += net;
+          }
+
+          // ऑर्डर हिस्ट्री: कस्टमरचे नाव किंवा मोबाईल नंबर पूर्णपणे लपवून फक्त पत्ता आणि कमाई दाखवणे
+          histDiv.innerHTML += `<div class="hist-item">
+            <div style="display:flex; justify-content:space-between;">
+              <strong>📦 ${o.vehicle} • ${o.parcel}</strong>
+              <span style="color:#2ecc71; font-weight:bold;">+₹${net}</span>
+            </div>
+            <div style="font-size:12px; color:#ddd; margin-top:4px;">
+              🟢 पिकअप: ${o.pickup}<br>
+              🔴 डिलिव्हरी पत्ता: ${o.drop}
+            </div>
+            <div style="font-size:10px; color:#888; margin-top:4px;">
+              🕒 ${o.deliveredDateStr || 'Completed'} | एकण भाडे: ₹${fareNum} (कमिशन: ₹${comm})
+            </div>
+          </div>`;
         } else {
           const gMapsUrl = o.pickupLat ? `https://www.google.com/maps/dir/?api=1&destination=${o.dropLat},${o.dropLng}&waypoints=${o.pickupLat},${o.pickupLng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.pickup)}`;
-          const custPhoneClean = (o.customerPhone || o.phone || "").replace(/\D/g, '');
-          const waCustBtn = custPhoneClean ? `<a href="https://wa.me/91${custPhoneClean.slice(-10)}?text=${encodeURIComponent(`नमस्कार, मी GoParcel रायडर ${activeRiderName} बोलतोय. तुमची ऑर्डर पिकअपसाठी निघालो आहे.`)}" target="_blank" class="wa-btn" style="font-size:13px; padding:9px;">📲 कस्टमरला WhatsApp करा</a>` : '';
-          div.innerHTML += `<div class="order-card">
-            <b>${o.vehicle} (${o.status})</b> - ₹${o.fare}<br><small>🟢 ${o.pickup} ➔ 🔴 ${o.drop}</small>
-            <a href="${gMapsUrl}" target="_blank" class="nav-map-btn">🗺️ Google Maps वर रस्ता पहा</a>
-            ${waCustBtn}
-            <button onclick="completeOrderWithPin('${d.id}', '${o.deliveryPin || ''}')" style="background:#2ecc71; margin-top:6px;">🔐 PIN टाकून डिलिव्हरी पूर्ण करा</button>
-          </div>`;
+          let stepBtnHtml = '';
+          if (o.status === "Accepted") stepBtnHtml = `<button onclick="markReachedPickup('${d.id}')" style="background:#3498db; color:#fff;">📍 पिकअप पॉईंटवर पोहोचलो (Reached Pickup)</button>`;
+          else if (o.status === "ReachedPickup") stepBtnHtml = `<button onclick="markPickedUp('${d.id}')" style="background:#ff9800; color:#000;">📦 पार्सल घेतले (Confirm Pickup)</button>`;
+          else if (o.status === "PickedUp") {
+            const distToDropM = (o.dropLat && o.dropLng && riderLat && riderLng) ? Math.round(getDistanceKm(riderLat, riderLng, o.dropLat, o.dropLng) * 1000) : 0;
+            const inRange = distToDropM <= deliveryRangeMeters;
+            stepBtnHtml = `<div class="gps-lock-box">डिलिव्हरी अंतर: <strong>${distToDropM}m</strong> (रेंज: ${deliveryRangeMeters}m आत)</div><button ${inRange ? '' : 'disabled'} onclick="completeOrderWithPin('${d.id}', '${o.deliveryPin || ''}', ${o.dropLat || 0}, ${o.dropLng || 0})" style="background:#2ecc71;">${inRange ? '🔐 PIN टाकून डिलिव्हरी पूर्ण करा' : `🔒 डिलिव्हर करण्यासाठी ${deliveryRangeMeters}m जवळ जा`}</button>`;
+          }
+          div.innerHTML += `<div class="order-card"><b>${o.vehicle} (${o.status})</b> - कमाई: ₹${net}<br><small>🟢 ${o.pickup} ➔ 🔴 ${o.drop}</small><a href="${gMapsUrl}" target="_blank" class="nav-map-btn">🗺️ Google Maps वर रस्ता पहा</a>${stepBtnHtml}</div>`;
         }
       });
-      currentNetBalance = totalNet;
-      document.getElementById('netEarnings').innerText = totalNet;
-      document.getElementById('commDeducted').innerText = totalComm;
+
+      latestWeeklySummary = { rides: wkRides, gross: wkGross, comm: wkComm, netProfit: wkNet };
+      document.getElementById('wkRidesCount').innerText = wkRides;
+      document.getElementById('wkGrossFare').innerText = wkGross;
+      document.getElementById('wkCommission').innerText = wkComm;
+      document.getElementById('wkNetProfit').innerText = wkNet;
+
+      if (!div.innerHTML) div.innerHTML = "कोणतीही चालू ऑर्डर नाही.";
+      if (!histDiv.innerHTML) histDiv.innerHTML = "अजून पूर्ण झालेल्या ऑर्डर्स नाहीत.";
+      document.getElementById('totalCompletedCount').innerText = completedRidesCount;
+      recalcWalletBalance(rideEarningsTotal, rid);
+    });
+  }
+
+  function recalcWalletBalance(rideEarnings, rid) {
+    onSnapshot(query(collection(db, "walletTransactions"), where("riderId", "==", rid)), (snap) => {
+      const payDiv = document.getElementById('paymentHistoryList');
+      payDiv.innerHTML = "";
+      let approvedDeposits = 0, deductedWithdrawals = 0;
+
+      snap.forEach(d => {
+        const t = d.data();
+        const amt = Number(t.amount || 0);
+        if (t.type === "Deposit" && t.status === "Approved") approvedDeposits += amt;
+        if (t.type === "Withdraw" && (t.status === "Paid" || t.status === "Pending")) deductedWithdrawals += amt;
+
+        const color = t.type === "Deposit" ? "#2ecc71" : (t.type === "Installment" ? "#4db8ff" : "#ff6600");
+        const label = t.type === "Deposit" ? "➕ डिपॉझिट" : (t.type === "Installment" ? "📅 हप्ता पेमेंट" : "🏦 बँक विथड्रॉवल");
+        payDiv.innerHTML += `<div class="hist-item" style="border-left-color:${color};">
+          <div style="display:flex; justify-content:space-between;"><strong>${label}</strong><span style="color:${color}; font-weight:bold;">₹${amt}</span></div>
+          <div style="font-size:11px; color:#aaa; margin-top:3px;">स्टेटस: <b>${t.status}</b> ${t.utr ? '| UTR: ' + t.utr : ''}</div>
+          <div style="font-size:10px; color:#777;">🕒 ${t.timeStr || ''}</div>
+        </div>`;
+      });
+
+      if (!payDiv.innerHTML) payDiv.innerHTML = "अजून कोणताही व्यवहार नाही.";
+      availableWalletBalance = Math.max(0, rideEarnings + approvedDeposits - deductedWithdrawals);
+      document.getElementById('netEarnings').innerText = availableWalletBalance;
     });
   }
 
