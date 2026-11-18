@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>GP Rider - GoParcel Partner App</title>
-  <!-- ॲप लोगो व आयकॉन लिंक -->
   <link rel="icon" type="image/png" href="https://madhavdevkar111-rgb.github.io/goparcellive/Rider/logo.png">
   <link rel="apple-touch-icon" href="https://madhavdevkar111-rgb.github.io/goparcellive/Rider/logo.png">
   <style>
@@ -57,42 +56,41 @@
 
 <div id="riderTcModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <h3 style="color:#ff6600; margin-bottom:10px;">📜 GP Rider Partner Agreement (T&C)</h3>
-    <p><b>1. Independent Partner:</b> You are an independent delivery partner and not a permanent employee of GoParcel.</p>
-    <p style="margin-top:8px;"><b>2. Vehicle & Legal Compliance:</b> Valid insurance, PUC, RC, and driving license are the rider's sole responsibility.</p>
-    <p style="margin-top:8px;"><b>3. Prohibited Items:</b> Carrying alcohol, narcotics/drugs, explosives, or illegal goods is strictly prohibited.</p>
-    <button onclick="document.getElementById('riderTcModal').classList.add('hidden')" style="margin-top:14px;">Close</button>
+    <h3 id="modalTcHead" style="color:#ff6600; margin-bottom:10px;">📜 GP Rider Partner Agreement (T&C)</h3>
+    <p id="modalTc1"><b>1. Independent Partner:</b> You are an independent delivery partner and not a permanent employee of GoParcel.</p>
+    <p id="modalTc2" style="margin-top:8px;"><b>2. Vehicle & Legal Compliance:</b> Valid insurance, PUC, RC, and driving license are the rider's sole responsibility.</p>
+    <p id="modalTc3" style="margin-top:8px;"><b>3. Prohibited Items:</b> Carrying alcohol, narcotics/drugs, explosives, or illegal goods is strictly prohibited.</p>
+    <button id="modalCloseBtn" onclick="document.getElementById('riderTcModal').classList.add('hidden')" style="margin-top:14px;">Close</button>
   </div>
 </div>
 
 <div class="container">
-  <!-- सर्व परवानग्यांची स्मार्ट स्ट्रिप (GPS, Overlay, Battery, Notification, Camera, Storage) -->
   <div id="smartPermBox" class="perm-strip">
-    <div style="color:#ff944d; font-weight:bold; margin-bottom:6px;">⚠️ ॲपच्या परवानग्या व सेटिंग्ज तपासा:</div>
+    <div id="txtPermHead" style="color:#ff944d; font-weight:bold; margin-bottom:6px;">⚠️ ॲपच्या परवानग्या व सेटिंग्ज तपासा:</div>
     
     <div id="permItemGps" class="perm-alert-item">
-      <span>📍 जीपीएस लोकेशन (GPS Location)</span>
-      <button type="button" onclick="requestGpsPermission()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">चालू करा</button>
+      <span id="txtPermGps">📍 जीपीएस लोकेशन (GPS Location)</span>
+      <button type="button" id="btnPermGps" onclick="requestGpsPermission()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">चालू करा</button>
     </div>
     
     <div id="permItemOverlay" class="perm-alert-item">
-      <span>📱 इतर ॲप्सवर वरती दाखवणे (Display over other apps)</span>
-      <button type="button" onclick="openOverlaySettings()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">सेटिंग उघडा</button>
+      <span id="txtPermOverlay">📱 इतर ॲप्सवर वरती दाखवणे (Display over other apps)</span>
+      <button type="button" id="btnPermOverlay" onclick="openOverlaySettings()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">सेटिंग उघडा</button>
     </div>
     
     <div id="permItemBattery" class="perm-alert-item">
-      <span>🔋 अनरिस्ट्रिक्टेड बॅटरी (Battery Optimization)</span>
-      <button type="button" onclick="openBatterySettings()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">बॅटरी सेटिंग</button>
+      <span id="txtPermBattery">🔋 अनरिस्ट्रिक्टेड बॅटरी (Battery Optimization)</span>
+      <button type="button" id="btnPermBattery" onclick="openBatterySettings()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">बॅटरी सेटिंग</button>
     </div>
 
     <div id="permItemNotif" class="perm-alert-item">
-      <span>🔔 पुश नोटिफिकेशन (Notifications)</span>
-      <button type="button" onclick="requestNotificationPermission()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">परवानगी द्या</button>
+      <span id="txtPermNotif">🔔 पुश नोटिफिकेशन (Notifications)</span>
+      <button type="button" id="btnPermNotif" onclick="requestNotificationPermission()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">परवानगी द्या</button>
     </div>
 
     <div id="permItemCam" class="perm-alert-item" style="border:none;">
-      <span>📷 कॅमेरा व स्टोरेज (Camera & Storage)</span>
-      <button type="button" onclick="requestCameraPermission()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">तपासा</button>
+      <span id="txtPermCam">📷 कॅमेरा व स्टोरेज (Camera & Storage)</span>
+      <button type="button" id="btnPermCam" onclick="requestCameraPermission()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">तपासा</button>
     </div>
   </div>
 
@@ -119,7 +117,7 @@
         <a id="rLoginWaLink" href="#" target="_blank" class="wa-btn">📲 Admin ला WhatsApp वर कळवा</a>
         <input type="number" id="rLoginOtpInput" placeholder="Admin ने दिलेला ६ अंकी OTP टाका">
         <button id="btnVerifyLogin" onclick="verifyRiderLoginOtp()" style="background:#2ecc71;">डॅशबोर्ड उघडा (Login)</button>
-        <button type="button" onclick="startRiderLoginOtp()" style="background:#262b36; color:#ff944d; font-size:12px; padding:9px;">🔄 Resend OTP (जुना OTP बाद होईल)</button>
+        <button type="button" id="btnResendLoginOtp" onclick="startRiderLoginOtp()" style="background:#262b36; color:#ff944d; font-size:12px; padding:9px;">🔄 Resend OTP (जुना OTP बाद होईल)</button>
       </div>
     </div>
 
@@ -129,16 +127,15 @@
 
       <label id="lblVehType" style="font-size:12px; color:#ff6600; display:block; margin-top:6px;">वाहनाचा प्रकार निवडा (Vehicle Type):</label>
       <select id="rVehicleType" onchange="toggleOwnerDetails(this.value)">
-        <option value="2-Wheeler">🏍️ 2-Wheeler (Bike / Scooter - स्वतःची गाडी)</option>
-        <option value="3-Wheeler">🛺 3-Wheeler (Auto Tempo)</option>
-        <option value="Mini Tempo">🚚 Mini Tempo / Truck (टाटा एसी / मालट्रक)</option>
+        <option id="opt2w" value="2-Wheeler">🏍️ 2-Wheeler (Bike / Scooter - स्वतःची गाडी)</option>
+        <option id="opt3w" value="3-Wheeler">🛺 3-Wheeler (Auto Tempo)</option>
+        <option id="optTempo" value="Mini Tempo">🚚 Mini Tempo / Truck (टाटा एसी / मालट्रक)</option>
       </select>
 
       <input type="text" id="rVehicle" placeholder="गाडीचा नंबर (उदा. MH12AB1234)">
 
-      <!-- वाहन मालक तपशील बॉक्स -->
       <div id="ownerDetailsBox" class="doc-upload-box hidden" style="border: 1px dashed #ff6600; background: #16191f;">
-        <label style="font-size:12px; color:#ff944d; display:block; margin-bottom:6px;">👤 वाहन मालक तपशील (Vehicle Owner Details):</label>
+        <label id="lblOwnerBoxTitle" style="font-size:12px; color:#ff944d; display:block; margin-bottom:6px;">👤 वाहन मालक तपशील (Vehicle Owner Details):</label>
         <input type="text" id="rOwnerName" placeholder="गाडी मालकाचे पूर्ण नाव (Owner Name)" style="margin-bottom:6px;">
         <input type="tel" id="rOwnerPhone" maxlength="10" placeholder="मालकाचा १० अंकी मोबाईल नंबर" style="margin:0;">
       </div>
@@ -170,7 +167,7 @@
         <span id="lblPartnerDeclText">मी स्वतःच्या जबाबदारीवर आणि सर्व सरकारी व वाहतूक नियमांचे पालन करून डिलिव्हरी सेवा देईन.</span>
         <label class="tc-check-label">
           <input type="checkbox" id="chkRiderLegalAgree">
-          <span>मी <span class="tc-link" onclick="event.preventDefault(); document.getElementById('riderTcModal').classList.remove('hidden');">रायडर नियम व अटी (T&C)</span> वाचल्या असून मला त्या मान्य आहेत.</span>
+          <span id="lblTcCheckboxText">मी <span class="tc-link" onclick="event.preventDefault(); document.getElementById('riderTcModal').classList.remove('hidden');">रायडर नियम व अटी (T&C)</span> वाचल्या असून मला त्या मान्य आहेत.</span>
         </label>
       </div>
 
@@ -180,7 +177,7 @@
         <a id="rRegWaLink" href="#" target="_blank" class="wa-btn">📲 Admin ला WhatsApp वर कळवा</a>
         <input type="number" id="rRegOtpInput" placeholder="Admin ने दिलेला ६ अंकी OTP टाका">
         <button id="btnVerifyReg" onclick="verifyRiderRegOtp()" style="background:#2ecc71;">नोंदणी पूर्ण करा (Register)</button>
-        <button type="button" onclick="startRiderRegOtp()" style="background:#262b36; color:#ff944d; font-size:12px; padding:9px;">🔄 Resend OTP (जुना OTP बाद होईल)</button>
+        <button type="button" id="btnResendRegOtp" onclick="startRiderRegOtp()" style="background:#262b36; color:#ff944d; font-size:12px; padding:9px;">🔄 Resend OTP (जुना OTP बाद होईल)</button>
       </div>
     </div>
   </div>
@@ -189,7 +186,7 @@
   <div id="riderScreen" class="hidden">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <span id="riderLabel" style="font-size:13px; color:#bbb; font-weight:600;"></span>
-      <button onclick="logoutRider()" style="width:auto; padding:6px 12px; background:#262b36; color:#fff; font-size:12px; margin:0;">Logout</button>
+      <button id="btnLogout" onclick="logoutRider()" style="width:auto; padding:6px 12px; background:#262b36; color:#fff; font-size:12px; margin:0;">Logout</button>
     </div>
 
     <div class="duty-bar">
@@ -200,10 +197,9 @@
       <button id="btnToggleDuty" onclick="toggleRiderDuty()" style="width:auto; padding:8px 16px; margin:0; font-size:12px; background:#2ecc71;">ONLINE या</button>
     </div>
 
-    <!-- वाहननिहाय वेटिंग टाईम व चार्ज कार्ड -->
     <div id="waitingSection" class="card" style="border: 1.5px dashed #ff6600; background: #1a160d;">
-      <h4 style="color: #ff944d; font-size: 14px;">⏱️ ग्राहकाची प्रतीक्षा व वेटिंग चार्ज</h4>
-      <p style="font-size: 12px; color: #ccc; margin: 4px 0;" id="waitingRuleDesc">वाहन प्रकारानुसार मोफत वेळ व चार्ज लागू होईल.</p>
+      <h4 id="txtWaitingTitle" style="color: #ff944d; font-size: 14px;">⏱️ ग्राहकाची प्रतीक्षा व वेटिंग चार्ज</h4>
+      <p id="waitingRuleDesc" style="font-size: 12px; color: #ccc; margin: 4px 0;">वाहन प्रकारानुसार मोफत वेळ व चार्ज लागू होईल.</p>
       
       <div style="font-size: 20px; font-weight: bold; color: #2ecc71; text-align: center; margin: 6px 0;" id="waitingTimerDisplay">
         00:00 मि. (प्रतीक्षेत)
@@ -213,7 +209,7 @@
         वेटिंग चार्ज: ₹0.00
       </div>
       
-      <button type="button" onclick="startVehicleWaitingTimer()" style="background: #3498db; font-size: 12px; padding: 8px; font-weight: bold;">
+      <button type="button" id="btnStartWaiting" onclick="startVehicleWaitingTimer()" style="background: #3498db; font-size: 12px; padding: 8px; font-weight: bold;">
         ⏳ लोकेशनवर पोहोचलो - वेटिंग सुरू करा
       </button>
     </div>
@@ -262,25 +258,192 @@
 
   let currentRiderVehicleType = "2-Wheeler";
 
-  // भाषा बदलण्याची सोय (Language translation dictionary & function)
+  // 🌐 संपूर्ण भाषा शब्दकोश (Full Translation Dictionary for Placeholders & Text)
   const translations = {
-    mr: { portalTitle: "GP Rider पार्टनर पोर्टल", loginTab: "🔑 जुना रायडर लॉगिन", regTab: "📝 नवीन रायडर नोंदणी" },
-    hi: { portalTitle: "GP Rider पार्टनर पोर्टल", loginTab: "🔑 पुराना राइडर लॉगिन", regTab: "📝 नया राइडर पंजीकरण" },
-    en: { portalTitle: "GP Rider Partner Portal", loginTab: "🔑 Existing Rider Login", regTab: "📝 New Rider Registration" }
+    mr: {
+      portalTitle: "GP Rider पार्टनर पोर्टल",
+      loginTab: "🔑 जुना रायडर लॉगिन",
+      regTab: "📝 नवीन रायडर नोंदणी",
+      loginPhonePH: "१० अंकी नोंदणीकृत मोबाईल नंबर",
+      reqOtpBtn: "नवीन लॉगिन OTP मागवा",
+      verifyLoginBtn: "डॅशबोर्ड उघडा (Login)",
+      resendOtpBtn: "🔄 Resend OTP (जुना OTP बाद होईल)",
+      namePH: "पूर्ण नाव (आधार कार्डप्रमाणे)",
+      phonePH: "१० अंकी खरा मोबाईल नंबर",
+      vehTypeLbl: "वाहनाचा प्रकार निवडा (Vehicle Type):",
+      opt2w: "🏍️ 2-Wheeler (Bike / Scooter - स्वतःची गाडी)",
+      opt3w: "🛺 3-Wheeler (Auto Tempo)",
+      optTempo: "🚚 Mini Tempo / Truck (टाटा एसी / मालट्रक)",
+      vehNumPH: "गाडीचा नंबर (उदा. MH12AB1234)",
+      ownerTitle: "👤 वाहन मालक तपशील (Vehicle Owner Details):",
+      ownerNamePH: "गाडी मालकाचे पूर्ण नाव (Owner Name)",
+      ownerPhonePH: "मालकाचा १० अंकी मोबाईल नंबर",
+      refPH: "रेफर करणाऱ्या रायडरचा १० अंकी नंबर",
+      aadhaarBoxLbl: "🪪 आधार कार्ड नंबर व Live Camera फोटो:",
+      aadhaarNumPH: "१२ अंकी आधार कार्ड नंबर",
+      scanAadhaarBtn: "📷 आधार कार्ड स्कॅन करा",
+      selfieTitle: "📸 नोंदणीसाठी तुमचा मूळ थेट सेल्फी काढा:",
+      selfieBtn: "🤳 फ्रंट कॅमेरा उघडा",
+      snapRegBtn: "✅ सेल्फी फोटो घ्या",
+      declTitle: "📜 GP Rider पार्टनर घोषणापत्र:",
+      declText: "मी स्वतःच्या जबाबदारीवर आणि सर्व सरकारी व वाहतूक नियमांचे पालन करून डिलिव्हरी सेवा देईन.",
+      tcCheckText: "मी रायडर नियम व अटी (T&C) वाचल्या असून मला त्या मान्य आहेत.",
+      startRegBtn: "कागदपत्रे तपासा व OTP मागवा",
+      verifyRegBtn: "नोंदणी पूर्ण करा (Register)",
+      logoutBtn: "Logout",
+      dutySub: "ड्युटी स्थिती बदला",
+      onlineBtn: "ONLINE या",
+      waitingTitle: "⏱️ ग्राहकाची प्रतीक्षा व वेटिंग चार्ज",
+      waitingRuleDesc: "वाहन प्रकारानुसार मोफत वेळ व चार्ज लागू होईल.",
+      startWaitingBtn: "⏳ लोकेशनवर पोहोचलो - वेटिंग सुरू करा",
+      walletTitle: "माझे वॉलेट (Wallet)",
+      netLabel: "ऑर्डर कमाई",
+      bonusLabel: "बोनस (Refer/Join)",
+      commLabel: "कमिशन",
+      activeDelTitle: "माझ्या चालू डिलिव्हरी",
+      newOrdersTitle: "नवीन उपलब्ध ऑर्डर्स",
+      permHead: "⚠️ ॲपच्या परवानग्या व सेटिंग्ज तपासा:"
+    },
+    hi: {
+      portalTitle: "GP Rider पार्टनर पोर्टल",
+      loginTab: "🔑 पुराना राइडर लॉगिन",
+      regTab: "📝 नया राइडर पंजीकरण",
+      loginPhonePH: "१० अंकों का पंजीकृत मोबाइल नंबर",
+      reqOtpBtn: "नया लॉगिन OTP मंगाएं",
+      verifyLoginBtn: "डैशबोर्ड खोलें (Login)",
+      resendOtpBtn: "🔄 Resend OTP (पुराना OTP अमान्य होगा)",
+      namePH: "पूरा नाम (आधार कार्ड के अनुसार)",
+      phonePH: "१० अंकों का असली मोबाइल नंबर",
+      vehTypeLbl: "वाहन का प्रकार चुनें (Vehicle Type):",
+      opt2w: "🏍️ 2-Wheeler (Bike / Scooter - खुद की गाड़ी)",
+      opt3w: "🛺 3-Wheeler (Auto Tempo)",
+      optTempo: "🚚 Mini Tempo / Truck (टाटा एसी / मालट्रक)",
+      vehNumPH: "गाड़ी नंबर (उदा. MH12AB1234)",
+      ownerTitle: "👤 वाहन मालिक विवरण (Vehicle Owner Details):",
+      ownerNamePH: "गाड़ी मालिक का पूरा नाम (Owner Name)",
+      ownerPhonePH: "मालिक का १० अंकों का मोबाइल नंबर",
+      refPH: "रेफर करने वाले राइडर का १० अंकों का नंबर",
+      aadhaarBoxLbl: "🪪 आधार कार्ड नंबर और Live Camera फोटो:",
+      aadhaarNumPH: "१२ अंकों का आधार कार्ड नंबर",
+      scanAadhaarBtn: "📷 आधार कार्ड स्कैन करें",
+      selfieTitle: "📸 पंजीकरण के लिए अपनी मूल लाइव सेल्फी लें:",
+      selfieBtn: "🤳 फ्रंट कैमरा खोलें",
+      snapRegBtn: "✅ सेल्फी फोटो लें",
+      declTitle: "📜 GP Rider पार्टनर घोषणा:",
+      declText: "मैं अपनी जिम्मेदारी पर और सभी सरकारी व यातायात नियमों का पालन करके डिलीवरी सेवा दूंगा.",
+      tcCheckText: "मैंने राइडर नियम व शर्तें (T&C) पढ़ ली हैं और मुझे स्वीकार हैं.",
+      startRegBtn: "दस्तावेज़ जांचें और OTP मंगाएं",
+      verifyRegBtn: "पंजीकरण पूरा करें (Register)",
+      logoutBtn: "Logout",
+      dutySub: "ड्यूटी स्थिति बदलें",
+      onlineBtn: "ONLINE आएं",
+      waitingTitle: "⏱️ ग्राहक की प्रतीक्षा और वेटिंग चार्ज",
+      waitingRuleDesc: "वाहन प्रकार के अनुसार मुफ्त समय और चार्ज लागू होगा.",
+      startWaitingBtn: "⏳ लोकेशन पर पहुंचे - वेटिंग शुरू करें",
+      walletTitle: "मेरा वॉलेट (Wallet)",
+      netLabel: "ऑर्डर कमाई",
+      bonusLabel: "बोनस (Refer/Join)",
+      commLabel: "कमीशन",
+      activeDelTitle: "मेरी चालू डिलीवरी",
+      newOrdersTitle: "नई उपलब्ध ऑर्डर्स",
+      permHead: "⚠️ ऐप की अनुमतियां और सेटिंग्स जांचें:"
+    },
+    en: {
+      portalTitle: "GP Rider Partner Portal",
+      loginTab: "🔑 Existing Rider Login",
+      regTab: "📝 New Rider Registration",
+      loginPhonePH: "10-digit registered mobile number",
+      reqOtpBtn: "Request Login OTP",
+      verifyLoginBtn: "Open Dashboard (Login)",
+      resendOtpBtn: "🔄 Resend OTP (Old OTP will expire)",
+      namePH: "Full Name (as per Aadhaar)",
+      phonePH: "10-digit valid mobile number",
+      vehTypeLbl: "Select Vehicle Type:",
+      opt2w: "🏍️ 2-Wheeler (Bike / Scooter - Own Vehicle)",
+      opt3w: "🛺 3-Wheeler (Auto Tempo)",
+      optTempo: "🚚 Mini Tempo / Truck",
+      vehNumPH: "Vehicle Number (e.g. MH12AB1234)",
+      ownerTitle: "👤 Vehicle Owner Details:",
+      ownerNamePH: "Owner Full Name",
+      ownerPhonePH: "Owner 10-digit Mobile Number",
+      refPH: "Referrer's 10-digit Rider Number",
+      aadhaarBoxLbl: "🪪 Aadhaar Number & Live Camera Photo:",
+      aadhaarNumPH: "12-digit Aadhaar Number",
+      scanAadhaarBtn: "📷 Scan Aadhaar Card",
+      selfieTitle: "📸 Take a live selfie for registration:",
+      selfieBtn: "🤳 Open Front Camera",
+      snapRegBtn: "✅ Take Selfie Photo",
+      declTitle: "📜 GP Rider Partner Declaration:",
+      declText: "I will provide delivery services at my own responsibility and follow all traffic regulations.",
+      tcCheckText: "I have read and agree to the Rider Terms & Conditions (T&C).",
+      startRegBtn: "Verify Documents & Request OTP",
+      verifyRegBtn: "Complete Registration",
+      logoutBtn: "Logout",
+      dutySub: "Change Duty Status",
+      onlineBtn: "Go ONLINE",
+      waitingTitle: "⏱️ Customer Waiting & Charges",
+      waitingRuleDesc: "Free waiting time and charges apply based on vehicle type.",
+      startWaitingBtn: "⏳ Reached Location - Start Waiting",
+      walletTitle: "My Wallet",
+      netLabel: "Order Earnings",
+      bonusLabel: "Bonus (Refer/Join)",
+      commLabel: "Commission",
+      activeDelTitle: "My Active Deliveries",
+      newOrdersTitle: "New Available Orders",
+      permHead: "⚠️ Check App Permissions & Settings:"
+    }
   };
 
   window.changeAppLang = (lang) => {
     localStorage.setItem("gp_rider_lang", lang);
     const t = translations[lang] || translations["mr"];
-    const pt = document.getElementById('txtPortalTitle');
-    const lt = document.getElementById('rTabLogin');
-    const rt = document.getElementById('rTabReg');
-    if(pt) pt.innerText = t.portalTitle;
-    if(lt) lt.innerText = t.loginTab;
-    if(rt) rt.innerText = t.regTab;
+    
+    document.getElementById('txtPortalTitle').innerText = t.portalTitle;
+    document.getElementById('rTabLogin').innerText = t.loginTab;
+    document.getElementById('rTabReg').innerText = t.regTab;
+    document.getElementById('rLoginPhone').placeholder = t.loginPhonePH;
+    document.getElementById('btnReqLoginOtp').innerText = t.reqOtpBtn;
+    document.getElementById('btnVerifyLogin').innerText = t.verifyLoginBtn;
+    document.getElementById('btnResendLoginOtp').innerText = t.resendOtpBtn;
+
+    document.getElementById('rName').placeholder = t.namePH;
+    document.getElementById('rPhone').placeholder = t.phonePH;
+    document.getElementById('lblVehType').innerText = t.vehTypeLbl;
+    document.getElementById('opt2w').innerText = t.opt2w;
+    document.getElementById('opt3w').innerText = t.opt3w;
+    document.getElementById('optTempo').innerText = t.optTempo;
+    document.getElementById('rVehicle').placeholder = t.vehNumPH;
+    document.getElementById('lblOwnerBoxTitle').innerText = t.ownerTitle;
+    document.getElementById('rOwnerName').placeholder = t.ownerNamePH;
+    document.getElementById('rOwnerPhone').placeholder = t.ownerPhonePH;
+    document.getElementById('rReferredBy').placeholder = t.refPH;
+    document.getElementById('lblAadhaarBox').innerText = t.aadhaarBoxLbl;
+    document.getElementById('rAadhaar').placeholder = t.aadhaarNumPH;
+    document.getElementById('btnScanAadhaar').innerText = t.scanAadhaarBtn;
+    document.getElementById('lblSelfieTitle').innerText = t.selfieTitle;
+    document.getElementById('btnOpenSelfie').innerText = t.selfieBtn;
+    document.getElementById('btnSnapReg').innerText = t.snapRegBtn;
+    document.getElementById('lblPartnerDeclTitle').innerText = t.declTitle;
+    document.getElementById('lblPartnerDeclText').innerText = t.declText;
+    document.getElementById('lblTcCheckboxText').innerHTML = t.tcCheckText;
+    document.getElementById('btnStartReg').innerText = t.startRegBtn;
+    document.getElementById('btnVerifyReg').innerText = t.verifyRegBtn;
+    document.getElementById('btnResendRegOtp').innerText = t.resendOtpBtn;
+
+    document.getElementById('btnLogout').innerText = t.logoutBtn;
+    document.getElementById('txtDutySub').innerText = t.dutySub;
+    document.getElementById('btnToggleDuty').innerText = t.onlineBtn;
+    document.getElementById('txtWaitingTitle').innerText = t.waitingTitle;
+    document.getElementById('waitingRuleDesc').innerText = t.waitingRuleDesc;
+    document.getElementById('btnStartWaiting').innerText = t.startWaitingBtn;
+    document.getElementById('txtWalletTitle').innerText = t.walletTitle;
+    document.getElementById('txtNetLabel').innerText = t.netLabel;
+    document.getElementById('txtBonusLabel').innerText = t.bonusLabel;
+    document.getElementById('txtCommLabel').innerText = t.commLabel;
+    document.getElementById('txtActiveDelTitle').innerText = t.activeDelTitle;
+    document.getElementById('txtNewOrdersTitle').innerText = t.newOrdersTitle;
   };
 
-  // वाहन मालक तपशील बॉक्स ऑन/ऑफ करणे
   window.toggleOwnerDetails = (vehType) => {
     currentRiderVehicleType = vehType;
     const ownerBox = document.getElementById('ownerDetailsBox');
@@ -293,7 +456,6 @@
     }
   };
 
-  // वाहननिहाय वेटिंग नियम
   function getVehicleWaitingRules(vehicleType) {
     if (vehicleType === "3-Wheeler") {
       return { freeSec: 360, ratePerMin: 2.00, desc: "३-व्हीलर: पहिली ६ मिनिटे मोफत, नंतर ₹२/मिनिट" };
@@ -310,7 +472,6 @@
   window.startVehicleWaitingTimer = () => {
     clearInterval(waitingInterval);
     waitingSeconds = 0;
-    
     const rules = getVehicleWaitingRules(currentRiderVehicleType);
     document.getElementById('waitingRuleDesc').innerText = rules.desc;
     alert(`⏳ वेटिंग टाईम सुरू झाला आहे! ${rules.desc}`);
@@ -334,7 +495,6 @@
       } else {
         let extraMinutesDecimal = (waitingSeconds - rules.freeSec) / 60;
         fee = extraMinutesDecimal * rules.ratePerMin;
-        
         if(timerDisplay) {
           timerDisplay.innerText = `${timerText} (चार्ज लागू!)`;
           timerDisplay.style.color = "#e74c3c";
@@ -346,15 +506,19 @@
     }, 1000);
   };
 
-  // 📱 सिस्टीम परवानग्या आणि सेटिंग्स उघडण्याचे हक्काचे फंक्शन्स (Permissions Handlers)
+  // 📱 बॅकग्राउंड परवानग्या व ओव्हरले सेटिंग उघडण्यासाठी मजबूत Intents
   window.openOverlaySettings = () => {
     alert("कृपया फोनच्या Settings > Apps > GP Rider मध्ये जाऊन 'Display over other apps' परवानगी Allow करा.");
-    // WebView fallback intent
-    try { window.location.href = "intent://settings/application_details?package=" + window.location.hostname + "#Intent;scheme=package;end;"; } catch(e){}
+    try {
+      window.location.href = "intent://settings/application_details?package=" + window.location.hostname + "#Intent;scheme=package;end;";
+    } catch(e) {}
   };
 
   window.openBatterySettings = () => {
     alert("कृपया फोनच्या Settings > Apps > GP Rider > Battery मध्ये जाऊन 'Unrestricted' किंवा 'No restriction' निवडा.");
+    try {
+      window.location.href = "intent:#Intent;action=android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS;end;";
+    } catch(e) {}
   };
 
   window.requestGpsPermission = () => {
@@ -385,7 +549,7 @@
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => {
         alert("✅ कॅमेरा आणि स्टोरेज परवानगी सक्रिय आहे!");
-        stream.getTracks().forEach(track => track.stop()); // बंद करणे
+        stream.getTracks().forEach(track => track.stop());
         document.getElementById('permItemCam').style.display = 'none';
       })
       .catch(err => {
@@ -393,7 +557,6 @@
       });
   };
 
-  // टॅब स्विचिंग (Login / Reg)
   window.switchRTab = (mode) => {
     const isLogin = mode === 'login';
     document.getElementById('rSecLogin').classList.toggle('hidden', !isLogin);
