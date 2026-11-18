@@ -65,7 +65,6 @@
 </div>
 
 <div class="container">
-  <!-- परवानग्यांची स्मार्ट स्ट्रिप (आता सर्व भाषांमध्ये बदलेल) -->
   <div id="smartPermBox" class="perm-strip">
     <div id="txtPermHead" style="color:#ff944d; font-weight:bold; margin-bottom:6px;">⚠️ ॲपच्या परवानग्या व सेटिंग्ज तपासा:</div>
     
@@ -259,7 +258,7 @@
 
   let currentRiderVehicleType = "2-Wheeler";
 
-  // 🌐 संपूर्ण परवानग्या आणि फॉर्मसह भाषा शब्दकोश
+  // 🌐 संपूर्ण परवानग्या आणि फॉर्मसह बहुभाषिक शब्दकोश (Multi-lingual Dictionary)
   const translations = {
     mr: {
       portalTitle: "GP Rider पार्टनर पोर्टल",
@@ -313,7 +312,9 @@
       permNotifText: "🔔 पुश नोटिफिकेशन (Notifications)",
       permNotifBtn: "परवानगी द्या",
       permCamText: "📷 कॅमेरा व स्टोरेज (Camera & Storage)",
-      permCamBtn: "तपासा"
+      permCamBtn: "तपासा",
+      errGpsMissing: "⚠️ कृपया सुरू ठेवण्यापूर्वी जीपीएस लोकेशन (GPS) परवानगी चालू करा!",
+      errCamMissing: "⚠️ कृपया नोंदणीसाठी कॅमेरा आणि स्टोरेज परवानगी चालू करा!"
     },
     hi: {
       portalTitle: "GP Rider पार्टनर पोर्टल",
@@ -367,7 +368,9 @@
       permNotifText: "🔔 पुश नोटिफिकेशन (Notifications)",
       permNotifBtn: "अनुमति दें",
       permCamText: "📷 कैमरा और स्टोरेज (Camera & Storage)",
-      permCamBtn: "जांचें"
+      permCamBtn: "जांचें",
+      errGpsMissing: "⚠️ कृपया जारी रखने से पहले GPS Location की अनुमति चालू करें!",
+      errCamMissing: "⚠️ कृपया पंजीकरण के लिए Camera और Storage की अनुमति चालू करें!"
     },
     en: {
       portalTitle: "GP Rider Partner Portal",
@@ -421,7 +424,9 @@
       permNotifText: "🔔 Push Notifications",
       permNotifBtn: "Allow",
       permCamText: "📷 Camera & Storage",
-      permCamBtn: "Check"
+      permCamBtn: "Check",
+      errGpsMissing: "⚠️ Please enable GPS Location permission before proceeding!",
+      errCamMissing: "⚠️ Please enable Camera and Storage permissions for registration!"
     }
   };
 
@@ -474,7 +479,6 @@
     document.getElementById('txtActiveDelTitle').innerText = t.activeDelTitle;
     document.getElementById('txtNewOrdersTitle').innerText = t.newOrdersTitle;
 
-    // परवानग्यांच्या स्ट्रिपमधील भाषा बदलणे
     document.getElementById('txtPermHead').innerText = t.permHead;
     document.getElementById('txtPermGps').innerText = t.permGpsText;
     document.getElementById('btnPermGps').innerText = t.permGpsBtn;
@@ -499,6 +503,77 @@
       ownerBox.classList.remove('hidden');
     }
   };
+
+  // 🚀 ॲप लोड होताच (App Start) सर्व परवानग्यांचे सिस्टम पॉप-अप्स ट्रिगर करणे
+  function requestAllStartupPermissions() {
+    // १. GPS / Location Popup
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const gpsItem = document.getElementById('permItemGps');
+        if(gpsItem) gpsItem.style.display = 'none';
+      }, err => {
+        console.log("GPS prompt requested");
+      }, { enableHighAccuracy: true });
+    }
+
+    // २. Notification Popup
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          const notifItem = document.getElementById('permItemNotif');
+          if(notifItem) notifItem.style.display = 'none';
+        }
+      });
+    }
+
+    // ३. Camera Popup check
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          stream.getTracks().forEach(track => track.stop());
+          const camItem = document.getElementById('permItemCam');
+          if(camItem) camItem.style.display = 'none';
+        })
+        .catch(err => {
+          console.log("Camera prompt requested");
+        });
+    }
+  }
+
+  // 📝 रजिस्ट्रेशन करताना परवानग्या तपासण्याचे फंक्शन (Language Aware Validation)
+  window.checkPermissionsBeforeReg = () => {
+    const currentLang = localStorage.getItem("gp_rider_lang") || "mr";
+    const t = translations[currentLang] || translations["mr"];
+
+    // जीपीएस चेक
+    let gpsChecked = false;
+    const gpsItem = document.getElementById('permItemGps');
+    if (gpsItem && gpsItem.style.display === 'none') {
+      gpsChecked = true;
+    }
+
+    // कॅमेरा चेक
+    let camChecked = false;
+    const camItem = document.getElementById('permItemCam');
+    if (camItem && camItem.style.display === 'none') {
+      camChecked = true;
+    }
+
+    // जर परवानगी बाकी असेल तर निवडलेल्या भाषेत वॉर्निंग दाखवणे
+    if (!gpsChecked) {
+      alert(t.errGpsMissing);
+      requestGpsPermission();
+      return false;
+    }
+    if (!camChecked) {
+      alert(t.errCamMissing);
+      requestCameraPermission();
+      return false;
+    }
+    return true;
+  };
+
+  // (टीप: तुम्ही जिथे तुमची मुख्य `startRiderRegOtp()` फंक्शन कॉल करता, तिथे सर्वात वर `if(!checkPermissionsBeforeReg()) return;` हे जोडावे.)
 
   function getVehicleWaitingRules(vehicleType) {
     if (vehicleType === "3-Wheeler") {
@@ -550,15 +625,11 @@
     }, 1000);
   };
 
-  // 📱 परवानग्या आणि सेटिंग्स उघडण्यासाठी अधिकृत WebView / Android Intents
   window.openOverlaySettings = () => {
     alert("कृपया फोनच्या Settings > Apps > GP Rider मध्ये जाऊन 'Display over other apps' (इतर ॲप्सवर वरती दाखवणे) परवानगी Allow करा.");
     try {
-      // Android package manager setting intent
       window.location.href = "intent:#Intent;action=android.settings.action.MANAGE_OVERLAY_PERMISSION;end;";
-    } catch(e) {
-      try { window.location.href = "app-settings:"; } catch(err){}
-    }
+    } catch(e) {}
   };
 
   window.openBatterySettings = () => {
@@ -616,6 +687,9 @@
     const savedLang = localStorage.getItem("gp_rider_lang") || "mr";
     document.getElementById('appLangSelect').value = savedLang;
     changeAppLang(savedLang);
+
+    // ॲप चालू होताच परवानग्यांचे ऑटो पॉप-अप्स मागवणे
+    setTimeout(requestAllStartupPermissions, 1500);
   });
 </script>
 </body>
