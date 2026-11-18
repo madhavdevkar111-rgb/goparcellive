@@ -29,6 +29,8 @@
     .searching-radar { background: linear-gradient(135deg, #0d2b18, #121212); border: 1px solid #2ecc71; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 12px; }
     .radar-dot { width: 14px; height: 14px; background: #2ecc71; border-radius: 50%; margin: 0 auto 8px; animation: radarPing 1.4s infinite; }
     @keyframes radarPing { 0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 14px rgba(46, 204, 113, 0); } 100% { transform: scale(0.9); } }
+    .temp-block-card { background: #3b0909; border: 2px solid #ff3b30; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 14px; }
+    .warn-badge { background: #e74c3c; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; display: inline-block; margin: 6px 0; }
     .wallet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; text-align: center; }
     .w-box { background: #000; padding: 10px; border-radius: 8px; border: 1px solid #ff6600; }
     .weekly-card { background: linear-gradient(135deg, #1f140b, #121212); border: 1px solid #ff6600; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
@@ -46,7 +48,7 @@
     .owner-section { background: #141c24; border: 1px solid #4db8ff; border-radius: 10px; padding: 10px; margin: 10px 0; }
     .mode-pill { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #2b180a; color: #ff6600; border: 1px solid #ff6600; float: right; }
     .consent-box { background: #111; border: 1px solid #ff6600; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 13px; color: #ddd; }
-    video, img.preview-img { width: 100%; max-height: 200px; border-radius: 8px; object-fit: cover; }
+    video, img.preview-img { width: 100%; max-height: 210px; border-radius: 8px; object-fit: cover; }
     video { transform: scaleX(-1); }
     .banner-strip { background: #2b1d12; border: 1px solid #ff6600; color: #ffd2b3; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; text-align: center; font-weight: bold; }
     .upi-box { background: #000; border: 1px dashed #2ecc71; padding: 10px; border-radius: 8px; text-align: center; margin: 8px 0; color: #2ecc71; font-weight: bold; font-size: 14px; }
@@ -102,7 +104,6 @@
       <button id="rTabReg" class="tab-btn" onclick="switchRTab('reg')">📝 नवीन रायडर नोंदणी</button>
     </div>
 
-    <!-- Login with 10-Min Auto Timer & Resend -->
     <div id="rSecLogin">
       <input type="tel" id="rLoginPhone" maxlength="10" placeholder="१० अंकी नोंदणीकृत मोबाईल नंबर">
       <button id="rTxtBtnLoginOtp" onclick="startRiderLoginOtp()">नवीन लॉगिन OTP मागवा</button>
@@ -115,19 +116,16 @@
       </div>
     </div>
 
-    <!-- Registration with Gender, Vehicle Type, Driver & Owner Separate Documents -->
     <div id="rSecReg" class="hidden">
       <input type="text" id="rName" placeholder="पूर्ण नाव (आधार कार्डप्रमाणे)">
       <input type="tel" id="rPhone" maxlength="10" placeholder="१० अंकी खरा मोबाईल नंबर">
       
-      <!-- Gender Selection (Male / Female) -->
       <select id="rGender" style="border-color:#ff6600;">
         <option value="Male">पुरुष (Male)</option>
         <option value="Female">महिला (Female)</option>
       </select>
 
-      <!-- Vehicle Type Selection (Including Bolero & Truck) -->
-      <label style="font-size:12px; color:#ff6600; margin-top:6px; display:block;">🚚 वाहनाचा प्रकार निवडा (Vehicle Category):</label>
+      <label style="font-size:12px; color:#ff6600; margin-top:6px; display:block;">🚚 वाहनाचा प्रकार निवडा:</label>
       <select id="rVehCategory" onchange="handleVehicleCategoryChange()">
         <option value="2-Wheeler">🏍️ 2-Wheeler (बाईक / स्कूटर)</option>
         <option value="3-Wheeler">🛺 3-Wheeler (रिक्षा / टेम्पो)</option>
@@ -136,7 +134,6 @@
         <option value="Truck">🚛 Truck / मोठा टेम्पो</option>
       </select>
 
-      <!-- Driver vs Vehicle Owner Role Selection -->
       <select id="rOwnerRole" onchange="handleVehicleCategoryChange()" style="border-color:#4db8ff;">
         <option value="SelfOwner">मी स्वतः गाडी मालक व ड्रायव्हर आहे (Self Owner)</option>
         <option value="HiredDriver">मी ड्रायव्हर आहे (गाडी मालक वेगळा आहे)</option>
@@ -149,11 +146,10 @@
       <input type="text" id="rPanCard" class="hidden" placeholder="पॅन कार्ड नंबर">
       <input type="text" id="rReferCodeInput" placeholder="रेफरल कोड (ऐच्छिक)">
 
-      <!-- Driver Documents Section -->
-      <div style="font-size:13px; color:#ff6600; font-weight:bold; margin-top:10px;">📋 ड्रायव्हरचे कागदपत्रे (Driver Documents):</div>
+      <div style="font-size:13px; color:#ff6600; font-weight:bold; margin-top:10px;">📋 ड्रायव्हरचे कागदपत्रे:</div>
       <div id="boxDocFront" class="doc-upload-box">
         <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">
-          📄 १. ड्रायव्हर Aadhaar Front <span id="badgeModeFront" class="mode-pill">File / Camera</span>
+          📄 १. Aadhaar Front <span id="badgeModeFront" class="mode-pill">File / Camera</span>
         </label>
         <input type="file" id="docFrontInput" accept="image/*" onchange="handleDocPhoto(this, 'front')">
         <img id="docFrontPreview" class="preview-img hidden" style="margin-top:6px;">
@@ -161,7 +157,7 @@
 
       <div id="boxDocBack" class="doc-upload-box">
         <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">
-          📄 २. ड्रायव्हर Aadhaar Back <span id="badgeModeBack" class="mode-pill">File / Camera</span>
+          📄 २. Aadhaar Back <span id="badgeModeBack" class="mode-pill">File / Camera</span>
         </label>
         <input type="file" id="docBackInput" accept="image/*" onchange="handleDocPhoto(this, 'back')">
         <img id="docBackPreview" class="preview-img hidden" style="margin-top:6px;">
@@ -177,7 +173,7 @@
 
       <div id="boxDocRc" class="doc-upload-box hidden">
         <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">
-          🚘 ४. गाडीचे RC Book <span id="badgeModeRc" class="mode-pill">File / Camera</span>
+          🚘 ४. RC Book <span id="badgeModeRc" class="mode-pill">File / Camera</span>
         </label>
         <input type="file" id="docRcInput" accept="image/*" onchange="handleDocPhoto(this, 'rc')">
         <img id="docRcPreview" class="preview-img hidden" style="margin-top:6px;">
@@ -191,37 +187,33 @@
         <img id="docPanPreview" class="preview-img hidden" style="margin-top:6px;">
       </div>
 
-      <!-- Vehicle Owner Documents Section (Auto-Shown for Big Vehicles / Hired Driver) -->
       <div id="ownerDocsSection" class="owner-section hidden">
-        <strong style="color:#4db8ff; font-size:13px; display:block; margin-bottom:6px;">🏢 गाडी मालकाचे कागदपत्रे (Vehicle Owner Documents):</strong>
-        <input type="text" id="rOwnerName" placeholder="गाडी मालकाचे पूर्ण नाव (Owner Name)">
+        <strong style="color:#4db8ff; font-size:13px; display:block; margin-bottom:6px;">🏢 गाडी मालकाचे कागदपत्रे (Vehicle Owner):</strong>
+        <input type="text" id="rOwnerName" placeholder="गाडी मालकाचे पूर्ण नाव">
         <input type="tel" id="rOwnerPhone" maxlength="10" placeholder="गाडी मालकाचा मोबाईल नंबर">
-
         <div id="boxOwnerAadhaar" class="doc-upload-box">
-          <label style="font-size:12px; color:#2ecc71;">📄 मालकाचे आधार कार्ड (Owner Aadhaar Photo):</label>
+          <label style="font-size:12px; color:#2ecc71;">📄 मालकाचे आधार कार्ड:</label>
           <input type="file" id="ownerAadhaarInput" accept="image/*" onchange="handleDocPhoto(this, 'ownerAadhaar')">
           <img id="docOwnerAadhaarPreview" class="preview-img hidden" style="margin-top:6px;">
         </div>
-
         <div id="boxOwnerRc" class="doc-upload-box">
-          <label style="font-size:12px; color:#2ecc71;">🚘 मालकाचे RC Book / Permit Photo:</label>
+          <label style="font-size:12px; color:#2ecc71;">🚘 मालकाचे RC Book / Permit:</label>
           <input type="file" id="ownerRcInput" accept="image/*" onchange="handleDocPhoto(this, 'ownerRc')">
           <img id="docOwnerRcPreview" class="preview-img hidden" style="margin-top:6px;">
         </div>
-
         <div id="boxOwnerNoc" class="doc-upload-box">
-          <label style="font-size:12px; color:#2ecc71;">📝 मालकाचे संमती पत्र / करारनामा (Owner NOC Photo):</label>
+          <label style="font-size:12px; color:#2ecc71;">📝 मालकाचे संमती पत्र / NOC:</label>
           <input type="file" id="ownerNocInput" accept="image/*" onchange="handleDocPhoto(this, 'ownerNoc')">
           <img id="docOwnerNocPreview" class="preview-img hidden" style="margin-top:6px;">
         </div>
       </div>
 
       <div class="cam-box">
-        <p style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 Live Selfie (Admin मंजुरीनंतरच Online होता येईल):</p>
+        <p style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 मूळ नोंदणी सेल्फी (Face Recognition Reference):</p>
         <video id="regVideo" autoplay playsinline class="hidden"></video>
         <img id="regPreview" class="preview-img hidden" style="transform:scaleX(-1);">
-        <button type="button" onclick="openCamera('reg')" style="background:#333; color:#fff; font-size:13px;">📷 Open Camera</button>
-        <button type="button" id="btnSnapReg" onclick="takeSnapshot()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ Capture Selfie</button>
+        <button type="button" onclick="openCamera('reg')" style="background:#333; color:#fff; font-size:13px;">📷 फ्रंट कॅमेरा उघडा</button>
+        <button type="button" id="btnSnapReg" onclick="takeSnapshot()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ मूळ सेल्फी घ्या</button>
       </div>
 
       <div class="consent-box">
@@ -255,17 +247,40 @@
       <button id="rTxtBtnSound" onclick="enableAudioAndTest()" style="width:auto; padding:6px 10px; background:#222; color:#2ecc71; border:1px solid #2ecc71; font-size:11px; margin:0;">🔊 रिंगटोन चालू</button>
     </div>
 
-    <!-- Selfie Approval Lock Status Banner -->
-    <div id="selfieApprovalLockCard" class="card hidden" style="background:#2b1212; border:2px solid #e74c3c; text-align:center;">
-      <h4 style="color:#ff6b6b;">🔒 सेल्फी व्हेरिफिकेशन प्रलंबित (Selfie Approval Pending)</h4>
-      <p style="font-size:12px; color:#ddd; margin-top:5px;">Admin ने तुमचा सेल्फी Approve केल्याशिवाय तुम्ही ONLINE होऊ शकत नाही.</p>
+    <!-- 60-Minute Temporary Block Card (Triggered after 4 Selfie Rejections) -->
+    <div id="tempBlockCard" class="temp-block-card hidden">
+      <h3 style="color:#ff453a;">⛔ तुमचे खाते ६० मिनिटांसाठी तात्पुरते ब्लॉक (Temporary Block) केले आहे!</h3>
+      <p style="font-size:12px; color:#ddd; margin:8px 0;">सलग ४ वेळा सेल्फी चेहरा न जुळल्यामुळे (Selfie Rejected 4/4) हा तात्पुरता ब्लॉक लागू झाला आहे.</p>
+      <div style="background:#000; border:1px solid #ff453a; padding:10px; border-radius:8px; font-size:20px; font-weight:bold; color:#ff453a; margin-top:8px;">
+        ⏳ शिल्लक वेळ: <span id="tempBlockTimerTxt">60:00</span>
+      </div>
     </div>
 
-    <!-- Online Searching Orders Radar Animation (In 3 Languages) -->
+    <!-- Account Approval Pending by Admin -->
+    <div id="accountPendingCard" class="card hidden" style="background:#1c252c; border:2px solid #3498db; text-align:center;">
+      <h4 style="color:#3498db;">⏳ प्रोफाईल अप्रूव्हल प्रलंबित (Profile Approval Pending)</h4>
+      <p style="font-size:12px; color:#ddd; margin-top:5px;">Admin ने तुमचे प्रोफाईल Approve केल्याशिवाय तुम्हाला ऑर्डर पडणार नाहीत.</p>
+    </div>
+
+    <!-- Face-Match Duty Selfie Card (Every 2 Hours + Whenever Going Offline -> Online) -->
+    <div id="dutyFaceMatchCard" class="card hidden" style="border:2px solid #ff6600; background:#24180e; text-align:center;">
+      <h3 style="color:#ff6600;">📸 फेस मॅच सेल्फी अनिवार्य (Face Verification)</h3>
+      <p id="facePromptReason" style="font-size:12px; color:#ffd2b3; margin:6px 0;">
+        ऑनलाईन येण्यासाठी किंवा दर २ तासांनी तुमचा ताजा लाईव्ह सेल्फी काढा (नोंदणीच्या सेल्फीशी चेहरा जुळणे आवश्यक आहे).
+      </p>
+      <div id="selfieWarningBadge" class="warn-badge hidden">⚠️ चेहरा जुळला नाही! Warning: 1 / 4</div>
+      <video id="dutyVideo" autoplay playsinline class="hidden" style="margin-top:8px;"></video>
+      <button type="button" onclick="openCamera('duty')" style="background:#3498db; color:#fff;">📷 फेस सेल्फी कॅमेरा उघडा</button>
+      <button type="button" id="btnSnapDuty" onclick="verifyFaceAndGoOnline()" class="hidden" style="background:#2ecc71;">✅ सेल्फी तपासा व ONLINE व्हा</button>
+    </div>
+
+    <!-- Online Searching Orders Radar Animation (In 3 Languages + 2-Hour Countdown) -->
     <div id="searchingRadarBox" class="searching-radar hidden">
       <div class="radar-dot"></div>
       <strong id="txtSearchingRadar" style="color:#2ecc71; font-size:15px;">🔍 नवीन ऑर्डर शोधत आहे...</strong>
-      <div style="font-size:11px; color:#aaa; margin-top:3px;">GPS Active • Ready to accept orders</div>
+      <div style="font-size:11px; color:#aaa; margin-top:4px;">
+        GPS Active • पुढील सेल्फी तपासणी: <strong id="nextSelfieTimerTxt" style="color:#ffaa66;">02:00:00</strong>
+      </div>
     </div>
 
     <div id="ringingAlertBox" class="ringing-banner hidden">
@@ -308,14 +323,6 @@
         <img id="feeShotPreview" class="preview-img hidden" style="margin-top:6px;">
       </div>
       <button onclick="submitOnboardingUtr()" style="background:#2ecc71;">✅ Submit UTR</button>
-    </div>
-
-    <!-- Daily Duty Selfie Card -->
-    <div id="dailySelfieCard" class="card" style="border:2px solid #ff6600; background:#24180e;">
-      <h3 style="color:#ff6600;">📸 Daily Duty Selfie</h3>
-      <video id="dutyVideo" autoplay playsinline class="hidden"></video>
-      <button onclick="openCamera('duty')" style="background:#3498db; color:#fff;">📷 Open Camera</button>
-      <button id="btnSnapDuty" onclick="submitDailySelfie()" class="hidden" style="background:#2ecc71;">✅ Submit Duty Selfie</button>
     </div>
 
     <!-- SECTION 1: ORDERS + LIVE CHAT -->
@@ -386,7 +393,6 @@
           <button id="rTxtBtnWithdraw" onclick="requestWithdrawal()" style="background:#2ecc71;">💳 विथड्रॉवल विनंती पाठवा</button>
         </div>
 
-        <!-- Deposit with Direct GPay, PhonePe, BHIM, Any UPI App -->
         <div id="wSecDeposit" class="hidden">
           <div class="upi-box" id="depositUpiDisplay">Admin UPI: Techesupp-2@okhdfcbank</div>
           <input type="number" id="depositAmtInput" placeholder="Deposit Amount (₹)" oninput="updateRiderDepositLinks()">
@@ -414,7 +420,7 @@
       </div>
     </div>
 
-    <!-- SECTION 4: PROFILE, SETTINGS & SOS (WITH AMBULANCE 108) -->
+    <!-- SECTION 4: PROFILE, SETTINGS & SOS -->
     <div id="secSettings" class="hidden">
       <div class="card">
         <h3 id="rTxtProfHead" style="color:#ff6600; margin-bottom:8px;">👤 रायडर प्रोफाईल</h3>
@@ -519,14 +525,14 @@
   const db = getFirestore(app);
   let riderLang = localStorage.getItem("gp_rider_lang") || "mr";
   let adminWaNumber = "919999999999", adminUpiId = "Techesupp-2@okhdfcbank", currentOnboardingFee = 1000, currentCommPct = 20, maxRadiusKm = 10;
-  let currentReferBonus = 100, deliveryRangeMeters = 150;
+  let currentReferBonus = 100, deliveryRangeMeters = 150, selfieIntervalHours = 2, tempBlockMinutes = 60;
   let consentTextGlobal = "मी GoParcel चे सर्व नियम व वाहतूक अटी पाळेन.";
-  let reqDailySelfie = true, isDutyVerifiedToday = false;
   let isFeePaid = false, isApproved = false, isSelfieApproved = false, isRiderOnline = false;
+  let selfieExpiresAt = 0, selfieRejectCount = 0, tempBlockUntil = 0;
   let existingRiderName = "", activeRiderId = null, activeRiderName = "";
   let rLoginReqId = null, rRegReqId = null, rLoginExpiresAt = 0, rRegExpiresAt = 0, rOtpTimerInt = null;
   let regSelfieData = "", feeScreenshotData = "", activeStream = null;
-  let docPhotos = { front: "", back: "", license: "", rc: "", pan: "" };
+  let docPhotos = { front: "", back: "", license: "", rc: "", pan: "", ownerAadhaar: "", ownerRc: "", ownerNoc: "" };
   let riderLat = null, riderLng = null, currentWalletBalance = 0, lastKnownOrderIds = new Set(), isFirstOrderLoad = true;
   let docRules = {
     docAadhaar: true, modeAadhaar: "both", docAadhaarBack: true, modeAadhaarBack: "both",
@@ -623,7 +629,6 @@
   };
   changeRiderLang(riderLang);
 
-  // मोठ्या गाड्यांसाठी मालक कागदपत्रे आपोआप दाखवणे
   window.handleVehicleCategoryChange = () => {
     const veh = document.getElementById('rVehCategory').value;
     const role = document.getElementById('rOwnerRole').value;
@@ -632,15 +637,50 @@
     document.getElementById('ownerDocsSection').classList.toggle('hidden', !showOwner);
   };
 
-  const todayStr = new Date().toISOString().split('T')[0];
   function getNowTimeStr() { return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
 
-  setInterval(() => {
-    const el = document.getElementById('regConsentClock');
-    if (el) el.innerText = new Date().toLocaleTimeString('en-IN');
+  // दर सेकंदाला २ तासांचा सेल्फी टायमर आणि ६० मिनिटांचा ब्लॉक टायमर तपासणे
+  setInterval(async () => {
+    const clockEl = document.getElementById('regConsentClock');
+    if (clockEl) clockEl.innerText = new Date().toLocaleTimeString('en-IN');
+
+    if (!activeRiderId) return;
+    const now = Date.now();
+
+    // 1. Check 60-Minute Temporary Block Countdown
+    const blockCard = document.getElementById('tempBlockCard');
+    if (tempBlockUntil > now) {
+      blockCard.classList.remove('hidden');
+      const rem = tempBlockUntil - now;
+      const m = String(Math.floor(rem / 60000)).padStart(2, '0');
+      const s = String(Math.floor((rem % 60000) / 1000)).padStart(2, '0');
+      document.getElementById('tempBlockTimerTxt').innerText = `${m}:${s}`;
+    } else if (!blockCard.classList.contains('hidden')) {
+      blockCard.classList.add('hidden');
+      // ब्लॉक संपल्यावर वॉर्निंग रीसेट करणे
+      await updateDoc(doc(db, "riders", activeRiderId), { tempBlockUntil: 0, selfieRejectCount: 0 });
+    }
+
+    // 2. Check 2-Hour Periodic Selfie Expiry while Online
+    if (isRiderOnline && selfieExpiresAt > 0) {
+      const remSelfie = selfieExpiresAt - now;
+      if (remSelfie <= 0) {
+        // २ तास पूर्ण झाले -> आपोआप OFFLINE करा आणि नवीन सेल्फी मागा
+        isRiderOnline = false;
+        isSelfieApproved = false;
+        await updateDoc(doc(db, "riders", activeRiderId), { isOnline: false, selfieApproved: false });
+        document.getElementById('facePromptReason').innerText = "⏰ २ तास पूर्ण झाले आहेत! ड्युटी सुरू ठेवण्यासाठी कृपया नवीन लाईव्ह सेल्फी काढा.";
+        updateDutyUiState();
+      } else {
+        const h = String(Math.floor(remSelfie / 3600000)).padStart(2, '0');
+        const m = String(Math.floor((remSelfie % 3600000) / 60000)).padStart(2, '0');
+        const s = String(Math.floor((remSelfie % 60000) / 1000)).padStart(2, '0');
+        document.getElementById('nextSelfieTimerTxt').innerText = `${h}:${m}:${s}`;
+      }
+    }
   }, 1000);
 
-  // अत्यंत मोठ्या आवाजात सायरन रिंगटोन + व्हायब्रेशन (Ultra-Loud Dual Siren + Strong Vibration)
+  // अत्यंत मोठ्या आवाजात सायरन रिंगटोन
   window.enableAudioAndTest = () => {
     if ("Notification" in window && Notification.permission !== "granted") Notification.requestPermission();
     triggerUltraLoudRing();
@@ -653,26 +693,19 @@
     try {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === 'suspended') audioCtx.resume();
-
       const freqs = [960, 1440, 960, 1680, 1920];
       freqs.forEach((f, idx) => {
         const osc1 = audioCtx.createOscillator();
         const osc2 = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc1.type = 'sawtooth';
-        osc2.type = 'square';
+        osc1.type = 'sawtooth'; osc2.type = 'square';
         osc1.frequency.setValueAtTime(f, audioCtx.currentTime + idx * 0.15);
         osc2.frequency.setValueAtTime(f * 1.25, audioCtx.currentTime + idx * 0.15);
-
         gain.gain.setValueAtTime(1.0, audioCtx.currentTime + idx * 0.15);
         gain.gain.exponentialRampToValueAtTime(0.05, audioCtx.currentTime + idx * 0.15 + 0.14);
-
-        osc1.connect(gain); osc2.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc1.start(audioCtx.currentTime + idx * 0.15);
-        osc2.start(audioCtx.currentTime + idx * 0.15);
-        osc1.stop(audioCtx.currentTime + idx * 0.15 + 0.15);
-        osc2.stop(audioCtx.currentTime + idx * 0.15 + 0.15);
+        osc1.connect(gain); osc2.connect(gain); gain.connect(audioCtx.destination);
+        osc1.start(audioCtx.currentTime + idx * 0.15); osc2.start(audioCtx.currentTime + idx * 0.15);
+        osc1.stop(audioCtx.currentTime + idx * 0.15 + 0.15); osc2.stop(audioCtx.currentTime + idx * 0.15 + 0.15);
       });
     } catch (e) {}
   }
@@ -692,6 +725,46 @@
     if ("vibrate" in navigator) navigator.vibrate(0);
     document.getElementById('ringingAlertBox').classList.add('hidden');
   };
+
+  // फोटो फिंगरप्रिंट (Face Visual Signature Comparison) फंक्शन
+  function computeImageSignature(base64Url) {
+    return new Promise((resolve) => {
+      if (!base64Url) return resolve(null);
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = 16; c.height = 16;
+        const ctx = c.getContext('2d');
+        // मध्यभागातील चेहऱ्याचा भाग क्रॉप करून तपासणे
+        const sx = img.width * 0.2, sy = img.height * 0.15, sw = img.width * 0.6, sh = img.height * 0.7;
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 16, 16);
+        const data = ctx.getImageData(0, 0, 16, 16).data;
+        const gray = [];
+        let sum = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          const g = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+          gray.push(g);
+          sum += g;
+        }
+        const avg = sum / gray.length;
+        resolve(gray.map(v => v >= avg ? 1 : 0));
+      };
+      img.onerror = () => resolve(null);
+      img.src = base64Url;
+    });
+  }
+
+  async function compareFaceSelfies(regImgBase64, liveImgBase64) {
+    const sig1 = await computeImageSignature(regImgBase64);
+    const sig2 = await computeImageSignature(liveImgBase64);
+    if (!sig1 || !sig2) return true; // जर Admin ने थेट जोडलेला रायडर असेल तर
+    let matches = 0;
+    for (let i = 0; i < sig1.length; i++) {
+      if (sig1[i] === sig2[i]) matches++;
+    }
+    const similarityPct = (matches / sig1.length) * 100;
+    return similarityPct >= 62; // चेहऱ्याची रचना जुळल्यास True
+  }
 
   function isValidAadhaar(num) {
     if (!/^[2-9]{1}[0-9]{11}$/.test(num)) return false;
@@ -755,7 +828,8 @@
       maxRadiusKm = Number(s.pickupRadiusKm ?? 10);
       currentReferBonus = s.riderReferBonus ?? 100;
       deliveryRangeMeters = s.deliveryRangeMeters ?? 150;
-      reqDailySelfie = s.reqDailySelfie ?? true;
+      selfieIntervalHours = Number(s.selfieIntervalHours ?? 2);
+      tempBlockMinutes = Number(s.tempBlockMinutes ?? 60);
 
       docRules = {
         docAadhaar: s.docAadhaar ?? true, modeAadhaar: s.modeAadhaar ?? "both",
@@ -895,32 +969,105 @@
     document.getElementById('btnSnapReg').classList.add('hidden');
   };
 
-  window.submitDailySelfie = async () => {
-    const selfieImg = captureBase64(document.getElementById('dutyVideo'));
-    await updateDoc(doc(db, "riders", activeRiderId), { dailySelfie: selfieImg, lastDutyDate: todayStr, lastSelfieTime: serverTimestamp() });
-    alert("✅ Duty Selfie Submitted!");
+  // ऑटोमॅटिक फेस मॅचिंग + ४ वॉर्निंग + ६० मिनिटांचा टेम्पोररी ब्लॉक
+  window.verifyFaceAndGoOnline = async () => {
+    if (tempBlockUntil > Date.now()) {
+      return alert("⛔ तुमचे खाते ६० मिनिटांसाठी तात्पुरते ब्लॉक आहे!");
+    }
+    const liveImg = captureBase64(document.getElementById('dutyVideo'));
+    document.getElementById('btnSnapDuty').classList.add('hidden');
+
+    const refImg = currentRiderProfile?.regSelfie || "";
+    const isMatched = await compareFaceSelfies(refImg, liveImg);
+
+    if (isMatched) {
+      // चेहरा जुळला -> ऑटोमॅटिक सेल्फी Approve + २ तासांचा टायमर + ONLINE
+      const nextExpiry = Date.now() + (selfieIntervalHours * 60 * 60 * 1000);
+      await updateDoc(doc(db, "riders", activeRiderId), {
+        dailySelfie: liveImg,
+        selfieApproved: true,
+        selfieStatus: "Auto Face-Matched",
+        selfieRejectCount: 0,
+        selfieExpiresAt: nextExpiry,
+        isOnline: true,
+        lastSelfieTime: serverTimestamp()
+      });
+      alert("✅ चेहरा यशस्वीरित्या जुळला (Face Matched)! तुम्ही आता २ तासांसाठी ONLINE आहात.");
+    } else {
+      // चेहरा जुळला नाही -> Warning +1 (4 वेळा रिजेक्ट झाल्यास 60 Min Block)
+      const newCount = (selfieRejectCount || 0) + 1;
+      if (newCount >= 4) {
+        const blockEnd = Date.now() + (tempBlockMinutes * 60 * 1000);
+        await updateDoc(doc(db, "riders", activeRiderId), {
+          dailySelfie: liveImg,
+          selfieApproved: false,
+          selfieStatus: "Rejected (4/4 - Blocked 60m)",
+          selfieRejectCount: 4,
+          tempBlockUntil: blockEnd,
+          isOnline: false
+        });
+        alert(`⛔ चेहरा जुळला नाही (Warning 4/4)! तुमचे खाते ${tempBlockMinutes} मिनिटांसाठी तात्पुरते ब्लॉक केले आहे.`);
+      } else {
+        await updateDoc(doc(db, "riders", activeRiderId), {
+          dailySelfie: liveImg,
+          selfieApproved: false,
+          selfieStatus: `Rejected (Warning ${newCount}/4)`,
+          selfieRejectCount: newCount,
+          isOnline: false
+        });
+        alert(`⚠️ चेहरा जुळला नाही! सेल्फी रिजेक्ट झाला आहे (Warning ${newCount} / 4). ४ वेळा रिजेक्ट झाल्यास १ तासासाठी ब्लॉक व्हाल!`);
+      }
+    }
   };
 
-  // Online / Offline Toggle Button Logic (Requires Admin Selfie Approval)
+  // Online / Offline Toggle Button (ऑफलाईन जाऊन परत ऑनलाईन येताना नेहमी सेल्फी मागेल)
   window.toggleRiderDuty = async () => {
-    if (!isSelfieApproved) {
-      return alert("🔒 तुमचा सेल्फी अजून Admin ने Approve केलेला नाही. सेल्फी मंजूर झाल्यावरच तुम्ही ONLINE होऊ शकता.");
+    if (tempBlockUntil > Date.now()) {
+      return alert("⛔ तुमचे खाते ६० मिनिटांसाठी तात्पुरते ब्लॉक आहे!");
     }
     if (!isApproved) {
-      return alert("⏳ तुमचे खाते Admin मंजुरीच्या प्रतीक्षेत आहे.");
+      return alert("⏳ तुमचे प्रोफाईल अजून Admin ने Approve केलेले नाही!");
     }
-    isRiderOnline = !isRiderOnline;
-    await updateDoc(doc(db, "riders", activeRiderId), { isOnline: isRiderOnline });
+
+    if (isRiderOnline) {
+      // रायडर स्वतःहून OFFLINE जात आहे -> पुढच्या वेळी ऑनलाईन येताना नवीन सेल्फी अनिवार्य राहील
+      await updateDoc(doc(db, "riders", activeRiderId), {
+        isOnline: false,
+        selfieApproved: false,
+        selfieExpiresAt: 0
+      });
+    } else {
+      // रायडर OFFLINE वरून परत ONLINE येण्याचा प्रयत्न करत आहे
+      if (!isSelfieApproved || selfieExpiresAt <= Date.now()) {
+        document.getElementById('dutyFaceMatchCard').classList.remove('hidden');
+        document.getElementById('facePromptReason').innerText = "📸 ऑनलाईन येण्यासाठी कृपया तुमचा ताजा लाईव्ह सेल्फी काढा.";
+        alert("📸 ऑनलाईन येण्यासाठी आधी खालील कॅमेऱ्याने तुमचा लाईव्ह सेल्फी व्हेरिफाय करा!");
+      } else {
+        await updateDoc(doc(db, "riders", activeRiderId), { isOnline: true });
+      }
+    }
   };
 
   function updateDutyUiState() {
     const btn = document.getElementById('dutyToggleBtn');
     const radar = document.getElementById('searchingRadarBox');
-    const lockCard = document.getElementById('selfieApprovalLockCard');
+    const faceCard = document.getElementById('dutyFaceMatchCard');
+    const accPending = document.getElementById('accountPendingCard');
+    const warnBadge = document.getElementById('selfieWarningBadge');
 
-    lockCard.classList.toggle('hidden', isSelfieApproved);
+    accPending.classList.toggle('hidden', isApproved);
 
-    if (isRiderOnline && isSelfieApproved && isApproved) {
+    if (selfieRejectCount > 0 && selfieRejectCount < 4) {
+      warnBadge.classList.remove('hidden');
+      warnBadge.innerText = `⚠️ सेल्फी रिजेक्ट! Warning: ${selfieRejectCount} / 4`;
+    } else {
+      warnBadge.classList.add('hidden');
+    }
+
+    const selfieValid = isSelfieApproved && (selfieExpiresAt > Date.now());
+    faceCard.classList.toggle('hidden', selfieValid || tempBlockUntil > Date.now());
+
+    if (isRiderOnline && selfieValid && isApproved && tempBlockUntil <= Date.now()) {
       btn.innerText = "● ONLINE";
       btn.className = "duty-btn duty-online";
       radar.classList.remove('hidden');
@@ -931,7 +1078,6 @@
     }
   }
 
-  // 10-Minute OTP Timer for Rider Login & Registration
   function startRiderOtpTimer(mode) {
     clearInterval(rOtpTimerInt);
     const exp = Date.now() + (10 * 60 * 1000);
@@ -1042,7 +1188,7 @@
     if (docRules.docAadhaar && (!isValidAadhaar(aadhaar) || !docPhotos.front)) return alert("❌ Invalid Aadhaar or missing Front photo!");
     if (docRules.docAadhaarBack && !docPhotos.back) return alert("❌ Upload Aadhaar Back photo!");
     if (docRules.docLicense && (license.length < 8 || !docPhotos.license)) return alert("❌ Upload Driving License!");
-    if (!regSelfieData) return alert("❌ Capture Live Selfie!");
+    if (!regSelfieData) return alert("❌ Capture Registration Selfie!");
     if (!consentOk) return alert("❌ Accept Consent Agreement!");
 
     const allRiders = await getDocs(collection(db, "riders"));
@@ -1077,7 +1223,7 @@
       ownerAadhaarPhoto: docPhotos.ownerAadhaar || "", ownerRcPhoto: docPhotos.ownerRc || "", ownerNocPhoto: docPhotos.ownerNoc || "",
       regSelfie: regSelfieData, referredBy, referCode: "GPR" + phone.slice(-4),
       lang: riderLang, consentAccepted: true, consentTime: fullTimestamp, consentPdf: consentRec.pdfDataUri,
-      selfieApproved: false, isOnline: false, kycRejected: false, rejectReason: ""
+      selfieApproved: false, selfieRejectCount: 0, tempBlockUntil: 0, isOnline: false, kycRejected: false, rejectReason: ""
     }, { merge: true });
 
     const reqRef = await addDoc(collection(db, "otpRequests"), {
@@ -1157,12 +1303,12 @@
 
   window.acceptOrder = async (orderId) => {
     stopOrderRingtone();
-    if (!isSelfieApproved) return alert("🔒 Selfie Approval Pending by Admin!");
+    if (tempBlockUntil > Date.now()) return alert("⛔ Account Temporarily Blocked!");
+    if (!isSelfieApproved || selfieExpiresAt <= Date.now()) return alert("📸 Please complete Face Selfie verification first!");
     if (!isRiderOnline) return alert("⚠️ Please switch to ONLINE first!");
     if (currentWalletBalance < 0) return alert("🚫 Negative Wallet Balance! Please Deposit first.");
-    if (reqDailySelfie && !isDutyVerifiedToday) return alert("Upload Daily Selfie first!");
     if (!isFeePaid && currentOnboardingFee > 0) return alert(`Pay ₹${currentOnboardingFee} Onboarding Fee first!`);
-    if (!isApproved) return alert("Pending Admin Approval!");
+    if (!isApproved) return alert("Pending Admin Profile Approval!");
 
     const orderRef = doc(db, "orders", orderId);
     try {
@@ -1275,15 +1421,15 @@
         isApproved = !!r.approved;
         isSelfieApproved = !!r.selfieApproved;
         isRiderOnline = !!r.isOnline;
-        isDutyVerifiedToday = (r.lastDutyDate === todayStr);
+        selfieExpiresAt = Number(r.selfieExpiresAt || 0);
+        selfieRejectCount = Number(r.selfieRejectCount || 0);
+        tempBlockUntil = Number(r.tempBlockUntil || 0);
+
         if (r.lat && r.lng) { riderLat = r.lat; riderLng = r.lng; }
-        const needSelfie = reqDailySelfie && !isDutyVerifiedToday;
 
         document.getElementById('riderProfileDetails').innerHTML = `
-          Name: <strong>${r.name}</strong> (${r.gender || 'Male'})<br>
-          Mobile: ${r.phone}<br>
-          Vehicle: <strong>${r.vehCategory || ''} - ${r.vehicleNo}</strong><br>
-          Selfie Approval: <strong style="color:${isSelfieApproved ? '#2ecc71' : '#e74c3c'}">${isSelfieApproved ? '✅ Approved' : '⏳ Pending'}</strong><br>
+          Name: <strong>${r.name}</strong> (${r.gender || 'Male'})<br>Mobile: ${r.phone}<br>Vehicle: <strong>${r.vehCategory || ''} - ${r.vehicleNo}</strong><br>
+          Selfie Status: <strong style="color:${isSelfieApproved ? '#2ecc71' : '#e74c3c'}">${r.selfieStatus || (isSelfieApproved ? '✅ Approved' : '⏳ Pending')}</strong><br>
           Account KYC: <strong style="color:${r.approved ? '#2ecc71' : '#ff6600'}">${r.approved ? '✅ Approved' : '⏳ Pending'}</strong>
         `;
 
@@ -1299,7 +1445,6 @@
         if (r.kycRejected) document.getElementById('rejectReasonText').innerText = r.rejectReason || "";
         if (r.feeUtr && !isFeePaid) { document.getElementById('feeSubmittedTag').classList.remove('hidden'); document.getElementById('savedUtrShow').innerText = r.feeUtr; }
 
-        document.getElementById('dailySelfieCard').classList.toggle('hidden', !needSelfie);
         document.getElementById('onboardingBanner').classList.toggle('hidden', isFeePaid || currentOnboardingFee === 0);
         updateDutyUiState();
       }
@@ -1309,9 +1454,10 @@
       const div = document.getElementById('availableOrders');
       div.innerHTML = "";
 
-      if (!isRiderOnline || !isSelfieApproved) {
+      const selfieValid = isSelfieApproved && (selfieExpiresAt > Date.now());
+      if (!isRiderOnline || !selfieValid || !isApproved || tempBlockUntil > Date.now()) {
         stopOrderRingtone();
-        div.innerHTML = `<div style="color:#aaa; font-size:13px; padding:8px;">⚠️ ऑर्डर पाहण्यासाठी कृपया वरून <b>ONLINE</b> व्हा.</div>`;
+        div.innerHTML = `<div style="color:#aaa; font-size:13px; padding:8px;">⚠️ ऑर्डर पाहण्यासाठी फेस सेल्फी व्हेरिफाय करून <b>ONLINE</b> व्हा.</div>`;
         return;
       }
 
