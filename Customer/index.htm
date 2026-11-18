@@ -8,30 +8,49 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-    body { background: #0f0f0f; color: #fff; padding-bottom: 75px; }
+    body { background: #0f0f0f; color: #fff; padding-bottom: 85px; }
     header { background: #000; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; }
     header h1 { color: #ff6600; font-size: 20px; }
     .lang-sel { background: #1a1a1a; color: #ff6600; border: 1px solid #ff6600; padding: 5px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; width: auto; margin: 0; }
     .container { max-width: 520px; margin: auto; padding: 14px; }
-    .card { background: #1a1a1a; padding: 15px; border-radius: 12px; margin-bottom: 14px; border: 1px solid #2c2c2c; }
+    .card { background: #1a1a1a; padding: 15px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #2c2c2c; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
     input, select, button, a.btn-link { width: 100%; padding: 12px; margin: 7px 0; border-radius: 8px; border: 1px solid #333; background: #111; color: #fff; font-size: 15px; display: block; text-decoration: none; }
     button, a.btn-link { background: #ff6600; color: #000; font-weight: bold; border: none; cursor: pointer; text-align: center; }
-    .loc-btn-row { display: flex; gap: 8px; margin-bottom: 6px; }
     .btn-gps { background: #1c2e3d; color: #4db8ff; border: 1px solid #4db8ff; font-size: 13px; padding: 9px; margin: 4px 0; }
-    #custMap { height: 260px; width: 100%; border-radius: 10px; margin: 10px 0; border: 2px solid #444; z-index: 1; }
-    .veh-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
-    .veh-box { background: #111; border: 2px solid #333; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; }
-    .veh-box.active { border-color: #ff6600; background: #2b180a; }
+    #custMap, #liveTrackMap { height: 240px; width: 100%; border-radius: 10px; margin: 10px 0; border: 2px solid #444; z-index: 1; }
+    #liveTrackMap { border-color: #2ecc71; height: 260px; }
+    .veh-grid, .pay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
+    .pay-grid { grid-template-columns: repeat(2, 1fr); }
+    .veh-box, .pay-box { background: #111; border: 2px solid #333; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; }
+    .veh-box.active, .pay-box.active { border-color: #ff6600; background: #2b180a; }
+    .qr-card { background: #fff; color: #000; border-radius: 12px; padding: 14px; text-align: center; margin: 10px 0; border: 3px solid #2ecc71; }
+    .qr-card img { width: 190px; height: 190px; margin: 8px auto; display: block; }
     .banner-strip { background: #2b1d12; border: 1px solid #ff6600; color: #ffd2b3; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; text-align: center; font-weight: bold; }
     .pin-badge { background: #ff6600; color: #000; padding: 3px 9px; border-radius: 6px; font-weight: bold; font-size: 16px; letter-spacing: 2px; }
     .sos-row { display: flex; justify-content: space-between; align-items: center; background: #111; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #e74c3c; }
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; border-top: 1px solid #333; display: flex; z-index: 999; }
-    .b-nav { flex: 1; padding: 11px 4px; text-align: center; color: #aaa; font-size: 12px; cursor: pointer; }
-    .b-nav.active { color: #ff6600; font-weight: bold; border-top: 2px solid #ff6600; }
     .consent-box { background: #111; border: 1px solid #ff6600; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 12px; color: #ddd; }
     table.order-tbl { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
     table.order-tbl th, table.order-tbl td { border: 1px solid #333; padding: 8px; text-align: left; }
     table.order-tbl th { background: #222; color: #ff6600; }
+
+    .bottom-nav {
+      position: fixed; bottom: 8px; left: 10px; right: 10px; max-width: 500px; margin: auto;
+      background: rgba(18, 18, 18, 0.96); backdrop-filter: blur(10px);
+      border: 1px solid #333; border-radius: 18px; display: flex; padding: 6px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85); z-index: 999;
+    }
+    .b-nav {
+      flex: 1; padding: 7px 4px; text-align: center; color: #888; font-size: 11px;
+      cursor: pointer; border-radius: 12px; transition: all 0.25s ease;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .b-nav svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .b-nav.active {
+      background: linear-gradient(135deg, #ff6600, #e65c00); color: #000; font-weight: bold;
+      box-shadow: 0 4px 12px rgba(255, 102, 0, 0.4); transform: translateY(-2px);
+    }
+    .b-nav.active svg { stroke: #000; }
+    .live-pulse { display: inline-block; width: 9px; height: 9px; background: #2ecc71; border-radius: 50%; margin-right: 5px; box-shadow: 0 0 8px #2ecc71; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -73,31 +92,39 @@
     <!-- TAB 1: BOOK PARCEL -->
     <div id="cTabBook">
       <div class="card">
-        <div class="loc-btn-row">
-          <button type="button" class="btn-gps" onclick="useCurrentGpsLocation('pickup')">📍 माझे सध्याचे लोकेशन घ्या (Current Pickup)</button>
-        </div>
-
-        <label style="font-size:12px; color:#2ecc71;">🟢 पिकअप पत्ता (नकाशावर हिरवा मार्कर ओढून सरकवा)</label>
+        <button type="button" class="btn-gps" onclick="useCurrentGpsLocation('pickup')">📍 माझे सध्याचे लोकेशन घ्या (Current Pickup)</button>
+        <label style="font-size:12px; color:#2ecc71;">🟢 पिकअप पत्ता (नकाशावर हिरवा मार्कर सरकवा)</label>
         <input type="text" id="pickupInput" placeholder="पिकअप पत्ता टाका">
-        
-        <label style="font-size:12px; color:#e74c3c;">🔴 ड्रॉप पत्ता (नकाशावर लाल मार्कर ओढून सरकवा)</label>
+        <label style="font-size:12px; color:#e74c3c;">🔴 ड्रॉप पत्ता (नकाशावर लाल मार्कर सरकवा)</label>
         <input type="text" id="dropInput" placeholder="ड्रॉप पत्ता टाका">
 
         <div id="custMap"></div>
-        <p style="font-size:11px; color:#4db8ff; margin-bottom:6px;">💡 टीप: नकाशावरील 🟢 (Pickup) आणि 🔴 (Drop) मार्कर बोटाने धरून (Drag) अचूक जागेवर सरकवा.</p>
-
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#aaa;">
           <span>अंतर (KM):</span>
           <input type="number" id="distKmInput" value="3" min="1" step="0.5" style="width:90px; padding:4px 8px; margin:0;" oninput="recalcPrices()">
         </div>
 
-        <select id="parcelSelect">
-          <option value="Documents">कागदपत्रे (Documents)</option>
-          <option value="Tiffin / Food">जेवण / डबा (Food)</option>
-          <option value="Electronics">इलेक्ट्रॉनिक्स वस्तू</option>
-          <option value="Groceries">किराणा / घरगुती सामान</option>
-          <option value="Other">इतर पार्सल</option>
-        </select>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:6px;">
+          <div>
+            <label style="font-size:11px; color:#aaa;">📦 पार्सल प्रकार:</label>
+            <select id="parcelSelect" style="margin:3px 0;">
+              <option value="Documents">कागदपत्रे (Docs)</option>
+              <option value="Tiffin / Food">जेवण / डबा (Food)</option>
+              <option value="Electronics">इलेक्ट्रॉनिक्स वस्तू</option>
+              <option value="Groceries">किराणा / सामान</option>
+              <option value="Other">इतर पार्सल</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px; color:#ff6600; font-weight:bold;">⚖️ पार्सल वजन (Weight):</label>
+            <select id="weightSelect" style="margin:3px 0; border-color:#ff6600;">
+              <option value="1-5 kg">1 kg ते 5 kg (हलके)</option>
+              <option value="5-15 kg">5 kg ते 15 kg (मध्यम)</option>
+              <option value="15-50 kg">15 kg ते 50 kg (जड)</option>
+              <option value="50+ kg">50 kg पेक्षा जास्त</option>
+            </select>
+          </div>
+        </div>
 
         <div class="veh-grid">
           <div class="veh-box active" onclick="pickVeh('2-Wheeler', this)">
@@ -120,6 +147,30 @@
           </div>
         </div>
 
+        <!-- Payment Mode Selection: COD vs Online Dynamic QR Code (No UTR Hassle) -->
+        <label style="font-size:12px; color:#ff6600; font-weight:bold; margin-top:6px; display:block;">💳 पेमेंट पद्धत निवडा (Payment Method):</label>
+        <div class="pay-grid">
+          <div class="pay-box active" onclick="selectPayMode('COD', this)">
+            <div style="font-size:20px;">💵</div>
+            <div style="font-size:13px; font-weight:bold;">Cash on Delivery</div>
+            <div style="font-size:10px; color:#aaa;">रोख पेमेंट (COD)</div>
+          </div>
+          <div class="pay-box" onclick="selectPayMode('ONLINE', this)">
+            <div style="font-size:20px;">📱</div>
+            <div style="font-size:13px; font-weight:bold;">Online Payment</div>
+            <div style="font-size:10px; color:#2ecc71;">QR स्कॅन करा (No UTR)</div>
+          </div>
+        </div>
+
+        <!-- Auto-Generated Dynamic UPI QR Code Box (No UTR input required) -->
+        <div id="onlineQrBox" class="qr-card hidden">
+          <strong style="font-size:15px; color:#000;">📲 खालील QR कोड स्कॅन करून पेमेंट करा</strong>
+          <div style="font-size:12px; color:#333; margin-top:2px;">रक्कम: <strong id="qrAmountText" style="color:#e65c00; font-size:16px;">₹30</strong> (ऑटो-भरलेली रक्कम)</div>
+          <img id="dynamicUpiQrImg" src="" alt="UPI Payment QR">
+          <div style="font-size:11px; color:#444;">UPI ID: <strong id="qrUpiIdLabel">Techesupp-2@okhdfcbank</strong></div>
+          <div style="font-size:11px; color:#008000; font-weight:bold; margin-top:4px;">✅ पेमेंट पूर्ण झाल्यावर खालील 'पार्सल बुक करा' बटन दाबा (UTR टाकण्याची गरज नाही)</div>
+        </div>
+
         <!-- Consent Agreement -->
         <div class="consent-box">
           <strong style="color:#ff6600;">📜 ऑर्डर संमती पत्र (Consent Agreement):</strong>
@@ -136,25 +187,34 @@
         </div>
 
         <div style="background:#111; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-          <span>एकूण भाडे:</span>
+          <span>एकूण भाडे (<span id="selectedPayBadge" style="color:#ff6600;">COD</span>):</span>
           <strong id="finalFareDisplay" style="font-size:20px; color:#2ecc71;">₹30</strong>
         </div>
 
-        <button onclick="placeOrder()">📦 संमतीसह पार्सल बुक करा (Book Now)</button>
+        <button id="btnBookOrder" onclick="placeOrder()">📦 पार्सल बुक करा (Book Now)</button>
       </div>
     </div>
 
-    <!-- TAB 2: MY ORDERS -->
+    <!-- TAB 2: MY ORDERS + LIVE RIDER GPS TRACKING -->
     <div id="cTabOrders" class="hidden">
+      <div id="liveRiderTrackingCard" class="card hidden" style="border: 2px solid #2ecc71;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3 style="color:#2ecc71; font-size:16px;"><span class="live-pulse"></span>रायडर लाईव्ह लोकेशन ट्रॅकिंग</h3>
+          <span id="liveRiderDistTag" style="font-size:11px; background:#1c2e3d; color:#4db8ff; padding:3px 8px; border-radius:6px;">GPS Active</span>
+        </div>
+        <p id="liveRiderStatusBanner" style="font-size:12px; color:#ddd; margin-top:4px;">रायडर तुमच्याकडे येत आहे...</p>
+        <div id="liveTrackMap"></div>
+      </div>
+
       <div class="card" style="overflow-x:auto;">
-        <h3 style="color:#ff6600; margin-bottom:8px;">🚚 माझ्या ऑर्डर्स व लाईव्ह स्थिती</h3>
+        <h3 style="color:#ff6600; margin-bottom:8px;">🚚 माझ्या ऑर्डर्स व स्थिती</h3>
         <table class="order-tbl">
           <thead>
             <tr>
               <th>पत्ता (Pickup ➔ Drop)</th>
-              <th>वाहन & भाडे</th>
-              <th>स्थिती (Status)</th>
-              <th>डिलिव्हरी PIN</th>
+              <th>वाहन, वजन & पेमेंट</th>
+              <th>स्थिती</th>
+              <th>PIN</th>
             </tr>
           </thead>
           <tbody id="custOrdersTableBody">
@@ -221,10 +281,22 @@
 </div>
 
 <div id="custBottomNav" class="bottom-nav hidden">
-  <div class="b-nav active" onclick="switchCustTab('Book', this)">📦 बुक करा</div>
-  <div class="b-nav" onclick="switchCustTab('Orders', this)">🚚 ऑर्डर्स</div>
-  <div class="b-nav" onclick="switchCustTab('Profile', this)">👤 प्रोफाईल</div>
-  <div class="b-nav" onclick="switchCustTab('Help', this)">🆘 हेल्प</div>
+  <div class="b-nav active" onclick="switchCustTab('Book', this)">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>होम / बुक</span>
+  </div>
+  <div class="b-nav" onclick="switchCustTab('Orders', this)">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+    <span>लाईव्ह ट्रॅक</span>
+  </div>
+  <div class="b-nav" onclick="switchCustTab('Profile', this)">
+    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>प्रोफाईल</span>
+  </div>
+  <div class="b-nav" onclick="switchCustTab('Help', this)">
+    <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    <span>हेल्प SOS</span>
+  </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -247,9 +319,8 @@
   const db = getFirestore(app);
 
   let currentLang = localStorage.getItem("gp_cust_lang") || "mr";
-  let custOtpReqId = null;
-  let custGpsLat = 18.5204, custGpsLng = 73.8567;
-  let lastConsentRecord = null;
+  let custOtpReqId = null, custGpsLat = 18.5204, custGpsLng = 73.8567, lastConsentRecord = null;
+  let liveTrackMap = null, liveRiderMarker = null, livePickupMarker = null, liveDropMarker = null, trackedRiderUnsub = null, currentTrackedRiderId = null;
 
   const uiTranslations = {
     mr: { loginTitle: "कस्टमर लॉगिन", reqOtp: "OTP मागवा (Request OTP)", namePh: "तुमचे पूर्ण नाव", phonePh: "१० अंकी मोबाईल नंबर" },
@@ -279,11 +350,12 @@
     minFare: 30, rate2W: 10, rate3W: 18, rateTempo: 25,
     surgeActive: false, surgeMultiplier: 1.2, timingAlertText: "",
     custBannerText: "", consentText: "मी GoParcel च्या सर्व अटी व नियमांशी सहमत आहे. पार्सलमध्ये कोणतीही बेकायदेशीर वस्तू नाही.",
-    adminWa: "919999999999"
+    adminWa: "919999999999", adminUpi: "Techesupp-2@okhdfcbank"
   };
 
   let custUser = JSON.parse(localStorage.getItem("gp_cust_user") || "null");
   let chosenVehicle = "2-Wheeler";
+  let chosenPaymentMode = "COD";
   let map, pMarker, dMarker, routeLine;
   let pLat = 18.5204, pLng = 73.8567, dLat = 18.5314, dLng = 73.8446;
 
@@ -311,7 +383,9 @@
       appCfg.custBannerText = s.custBannerText || "";
       if (s.consentText) appCfg.consentText = s.consentText;
       appCfg.adminWa = s.adminWa || "919999999999";
+      appCfg.adminUpi = s.adminUpi || "Techesupp-2@okhdfcbank";
 
+      document.getElementById('qrUpiIdLabel').innerText = appCfg.adminUpi;
       document.getElementById('orderConsentText').innerText = appCfg.consentText;
       document.getElementById('lblRate2W').innerText = appCfg.rate2W;
       document.getElementById('lblRate3W').innerText = appCfg.rate3W;
@@ -386,6 +460,7 @@
     document.querySelectorAll('.b-nav').forEach(b => b.classList.remove('active'));
     el.classList.add('active');
     if (tab === 'Book' && map) setTimeout(() => map.invalidateSize(), 200);
+    if (tab === 'Orders' && liveTrackMap) setTimeout(() => liveTrackMap.invalidateSize(), 250);
   };
 
   function startCustApp() {
@@ -400,7 +475,6 @@
     listenOrders();
   }
 
-  // Reverse Geocoding द्वारे पत्ता शोधणे
   async function fetchAddressFromCoords(lat, lng, inputId) {
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
@@ -420,15 +494,10 @@
     recalcPrices();
   }
 
-  // Current Location GPS घेणे
   window.useCurrentGpsLocation = (target, silent = false) => {
-    if (!("geolocation" in navigator)) {
-      if (!silent) alert("तुमच्या ब्राउझरमध्ये GPS लोकेशन उपलब्ध नाही.");
-      return;
-    }
+    if (!("geolocation" in navigator)) { if (!silent) alert("GPS उपलब्ध नाही."); return; }
     navigator.geolocation.getCurrentPosition((pos) => {
-      custGpsLat = pos.coords.latitude;
-      custGpsLng = pos.coords.longitude;
+      custGpsLat = pos.coords.latitude; custGpsLng = pos.coords.longitude;
       if (target === 'pickup') {
         pLat = custGpsLat; pLng = custGpsLng;
         dLat = pLat + 0.012; dLng = pLng + 0.012;
@@ -441,53 +510,21 @@
         fetchAddressFromCoords(pLat, pLng, 'pickupInput');
         fetchAddressFromCoords(dLat, dLng, 'dropInput');
       }
-    }, (err) => {
-      if (!silent) alert("कृपया मोबाईलचे GPS Location (Allow) चालू करा!");
-    }, { enableHighAccuracy: true });
+    }, () => { if (!silent) alert("कृपया GPS Location चालू करा!"); }, { enableHighAccuracy: true });
   };
 
   function initMap() {
     if (map) return;
     map = L.map('custMap').setView([pLat, pLng], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
     const greenPin = L.divIcon({ html: '<div style="font-size:26px; line-height:1;">🟢</div>', className: '', iconSize: [28, 28], iconAnchor: [14, 14] });
     const redPin = L.divIcon({ html: '<div style="font-size:26px; line-height:1;">🔴</div>', className: '', iconSize: [28, 28], iconAnchor: [14, 14] });
 
-    // Draggable Pickup & Drop मार्कर्स (बोटाने धरून सरकवता येतील)
-    pMarker = L.marker([pLat, pLng], { icon: greenPin, draggable: true }).addTo(map).bindPopup("🟢 Pickup (सरकवा)");
-    dMarker = L.marker([dLat, dLng], { icon: redPin, draggable: true }).addTo(map).bindPopup("🔴 Drop (सरकवा)");
+    pMarker = L.marker([pLat, pLng], { icon: greenPin, draggable: true }).addTo(map).bindPopup("🟢 Pickup");
+    dMarker = L.marker([dLat, dLng], { icon: redPin, draggable: true }).addTo(map).bindPopup("🔴 Drop");
 
-    pMarker.on('dragend', () => {
-      const pos = pMarker.getLatLng();
-      pLat = pos.lat; pLng = pos.lng;
-      updateDistanceAndLine();
-      fetchAddressFromCoords(pLat, pLng, 'pickupInput');
-    });
-
-    dMarker.on('dragend', () => {
-      const pos = dMarker.getLatLng();
-      dLat = pos.lat; dLng = pos.lng;
-      updateDistanceAndLine();
-      fetchAddressFromCoords(dLat, dLng, 'dropInput');
-    });
-
-    // नकाशावर क्लिक केल्यासही जवळचा मार्कर सरकेल
-    map.on('click', (e) => {
-      const distToP = map.distance([e.latlng.lat, e.latlng.lng], [pLat, pLng]);
-      const distToD = map.distance([e.latlng.lat, e.latlng.lng], [dLat, dLng]);
-      if (distToP < distToD) {
-        pLat = e.latlng.lat; pLng = e.latlng.lng;
-        pMarker.setLatLng([pLat, pLng]);
-        fetchAddressFromCoords(pLat, pLng, 'pickupInput');
-      } else {
-        dLat = e.latlng.lat; dLng = e.latlng.lng;
-        dMarker.setLatLng([dLat, dLng]);
-        fetchAddressFromCoords(dLat, dLng, 'dropInput');
-      }
-      updateDistanceAndLine();
-    });
-
+    pMarker.on('dragend', () => { const pos = pMarker.getLatLng(); pLat = pos.lat; pLng = pos.lng; updateDistanceAndLine(); fetchAddressFromCoords(pLat, pLng, 'pickupInput'); });
+    dMarker.on('dragend', () => { const pos = dMarker.getLatLng(); dLat = pos.lat; dLng = pos.lng; updateDistanceAndLine(); fetchAddressFromCoords(dLat, dLng, 'dropInput'); });
     updateDistanceAndLine();
   }
 
@@ -497,6 +534,26 @@
     el.classList.add('active');
     recalcPrices();
   };
+
+  // पेमेंट मोड निवडणे (COD vs Online Dynamic QR Code)
+  window.selectPayMode = (mode, el) => {
+    chosenPaymentMode = mode;
+    document.querySelectorAll('.pay-box').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('selectedPayBadge').innerText = mode === 'COD' ? 'Cash on Delivery (COD)' : 'Online Paid (UPI QR)';
+    document.getElementById('onlineQrBox').classList.toggle('hidden', mode !== 'ONLINE');
+    document.getElementById('btnBookOrder').innerText = mode === 'COD' ? '📦 COD ऑर्डर बुक करा (Book Now)' : '✅ पेमेंट झाले, ऑर्डर बुक करा';
+    recalcPrices();
+  };
+
+  function generateDynamicUpiQr(amount) {
+    // प्रत्येक वेळी अचूक रकमेसह नवीन डायनॅमिक UPI QR कोड जनरेट करणे (UTR गरज नाही)
+    const trRef = "GP" + Date.now();
+    const upiUri = `upi://pay?pa=${encodeURIComponent(appCfg.adminUpi)}&pn=${encodeURIComponent("GoParcel")}&am=${amount}&cu=INR&tr=${trRef}&tn=${encodeURIComponent("GoParcel Delivery")}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
+    document.getElementById('dynamicUpiQrImg').src = qrUrl;
+    document.getElementById('qrAmountText').innerText = "₹" + amount;
+  }
 
   window.recalcPrices = () => {
     const km = Math.max(1, Number(document.getElementById('distKmInput').value) || 1);
@@ -513,6 +570,7 @@
     if (chosenVehicle === "3-Wheeler") final = f3;
     if (chosenVehicle === "Mini Tempo") final = ft;
     document.getElementById('finalFareDisplay').innerText = "₹" + final;
+    if (chosenPaymentMode === 'ONLINE') generateDynamicUpiQr(final);
     return final;
   };
 
@@ -525,7 +583,7 @@
     docPdf.text(`Role: ${record.role}`, 15, 35);
     docPdf.text(`Name: ${record.name}`, 15, 43);
     docPdf.text(`Mobile: ${record.phone}`, 15, 51);
-    docPdf.text(`Timestamp (Timer): ${record.timestampStr}`, 15, 59);
+    docPdf.text(`Timestamp: ${record.timestampStr}`, 15, 59);
     docPdf.text(`GPS Location: Lat ${record.lat}, Lng ${record.lng}`, 15, 67);
     docPdf.text(`Details: ${record.summary}`, 15, 75);
     docPdf.text("Agreement Terms Accepted:", 15, 88);
@@ -539,9 +597,7 @@
     if (!lastConsentRecord) return alert("आधी किमान एक ऑर्डर बुक करून संमती द्या.");
     const uri = createConsentPdfDataUri(lastConsentRecord);
     const a = document.createElement('a');
-    a.href = uri;
-    a.download = `GoParcel_Consent_${custUser.phone}.pdf`;
-    a.click();
+    a.href = uri; a.download = `GoParcel_Consent_${custUser.phone}.pdf`; a.click();
   };
 
   window.placeOrder = async () => {
@@ -553,19 +609,16 @@
     if (!pickup || !drop) return alert("कृपया पिकअप आणि ड्रॉप पत्ता टाका!");
 
     const fare = recalcPrices();
+    const weight = document.getElementById('weightSelect').value;
     const pin = Math.floor(1000 + Math.random() * 9000).toString();
     const nowTime = new Date().toLocaleString('en-IN');
 
     const consentRec = {
       role: "Customer (Order Booking)",
-      name: custUser.name,
-      phone: custUser.phone,
-      timestampStr: nowTime,
-      lat: pLat,
-      lng: pLng,
-      summary: `Order: ${pickup} -> ${drop} (${chosenVehicle}, Rs.${fare})`,
-      agreementText: appCfg.consentText,
-      createdAt: Date.now()
+      name: custUser.name, phone: custUser.phone, timestampStr: nowTime,
+      lat: pLat, lng: pLng,
+      summary: `Order: ${pickup} -> ${drop} (${chosenVehicle}, ${weight}, ${chosenPaymentMode}, Rs.${fare})`,
+      agreementText: appCfg.consentText, createdAt: Date.now()
     };
     consentRec.pdfDataUri = createConsentPdfDataUri(consentRec);
     lastConsentRecord = consentRec;
@@ -580,7 +633,9 @@
       dropLat: Number(dLat), dropLng: Number(dLng),
       distanceKm: Number(document.getElementById('distKmInput').value),
       parcel: document.getElementById('parcelSelect').value,
+      parcelWeight: weight,
       vehicle: chosenVehicle,
+      paymentMode: chosenPaymentMode, // COD किंवा ONLINE
       fare,
       deliveryPin: pin,
       consentAccepted: true,
@@ -589,9 +644,58 @@
       createdAt: serverTimestamp()
     });
 
-    alert(`✅ ऑर्डर बुक झाली! तुमचा डिलिव्हरी PIN: ${pin}`);
+    alert(`✅ ऑर्डर बुक झाली! (${chosenPaymentMode} | वजन: ${weight})\nतुमचा डिलिव्हरी PIN: ${pin}`);
     switchCustTab('Orders', document.querySelectorAll('.b-nav')[1]);
   };
+
+  function startTrackingActiveRider(order) {
+    const trackCard = document.getElementById('liveRiderTrackingCard');
+    trackCard.classList.remove('hidden');
+
+    const oPickLat = Number(order.pickupLat || pLat);
+    const oPickLng = Number(order.pickupLng || pLng);
+    const oDropLat = Number(order.dropLat || dLat);
+    const oDropLng = Number(order.dropLng || dLng);
+
+    if (!liveTrackMap) {
+      liveTrackMap = L.map('liveTrackMap').setView([oPickLat, oPickLng], 14);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(liveTrackMap);
+      const greenIcon = L.divIcon({ html: '<div style="font-size:24px;">🟢</div>', className: '', iconSize: [26, 26], iconAnchor: [13, 13] });
+      const redIcon = L.divIcon({ html: '<div style="font-size:24px;">🔴</div>', className: '', iconSize: [26, 26], iconAnchor: [13, 13] });
+      const riderBikeIcon = L.divIcon({ html: '<div style="font-size:30px; filter:drop-shadow(0 0 6px #ff6600);">🛵</div>', className: '', iconSize: [32, 32], iconAnchor: [16, 16] });
+
+      livePickupMarker = L.marker([oPickLat, oPickLng], { icon: greenIcon }).addTo(liveTrackMap).bindPopup("🟢 Pickup");
+      liveDropMarker = L.marker([oDropLat, oDropLng], { icon: redIcon }).addTo(liveTrackMap).bindPopup("🔴 Drop");
+      liveRiderMarker = L.marker([oPickLat, oPickLng], { icon: riderBikeIcon }).addTo(liveTrackMap).bindPopup("🛵 रायडर");
+    } else {
+      livePickupMarker.setLatLng([oPickLat, oPickLng]);
+      liveDropMarker.setLatLng([oDropLat, oDropLng]);
+    }
+    setTimeout(() => liveTrackMap.invalidateSize(), 250);
+
+    if (currentTrackedRiderId !== order.riderId) {
+      if (trackedRiderUnsub) trackedRiderUnsub();
+      currentTrackedRiderId = order.riderId;
+
+      trackedRiderUnsub = onSnapshot(doc(db, "riders", order.riderId), (rSnap) => {
+        if (rSnap.exists()) {
+          const rData = rSnap.data();
+          if (rData.lat && rData.lng) {
+            const rPos = [Number(rData.lat), Number(rData.lng)];
+            liveRiderMarker.setLatLng(rPos);
+            liveTrackMap.panTo(rPos);
+            const targetCoords = (order.status === "PickedUp") ? [oDropLat, oDropLng] : [oPickLat, oPickLng];
+            const distKm = (liveTrackMap.distance(rPos, targetCoords) / 1000).toFixed(2);
+            document.getElementById('liveRiderDistTag').innerText = `📍 ${distKm} km दूर`;
+            document.getElementById('liveRiderStatusBanner').innerText =
+              order.status === "PickedUp"
+                ? `🚚 रायडर (${rData.name}) पार्सल घेऊन डिलिव्हरी लोकेशनकडे येत आहे (${distKm} km बाकी)`
+                : `🛵 रायडर (${rData.name}) पिकअप पॉईंटकडे येत आहे (${distKm} km बाकी)`;
+          }
+        }
+      });
+    }
+  }
 
   function listenOrders() {
     onSnapshot(query(collection(db, "orders"), where("customerPhone", "==", custUser.phone)), (snap) => {
@@ -600,22 +704,27 @@
       if (snap.empty) {
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">अजून कोणतीही ऑर्डर नाही.</td></tr>';
         cardsBox.innerHTML = "";
+        document.getElementById('liveRiderTrackingCard').classList.add('hidden');
         return;
       }
       tbody.innerHTML = "";
       cardsBox.innerHTML = "";
+      let activeTrackOrder = null;
 
       snap.forEach(d => {
         const o = d.data();
-        let statusMsg = o.status;
-        let statusColor = "#ff6600";
+        if (o.riderId && (o.status === "Accepted" || o.status === "ReachedPickup" || o.status === "PickedUp")) {
+          activeTrackOrder = o;
+        }
+        let statusMsg = o.status, statusColor = "#ff6600";
+        if (o.status === "Accepted") { statusMsg = "🛵 रायडर ऑर्डर घेऊन निघाला!"; statusColor = "#4db8ff"; }
         if (o.status === "ReachedPickup") { statusMsg = "📍 रायडर पिकअपवर पोहोचला!"; statusColor = "#4db8ff"; }
         if (o.status === "PickedUp") { statusMsg = "🚚 पार्सल निघाले आहे!"; statusColor = "#ff9800"; }
         if (o.status === "Delivered") { statusMsg = "✅ डिलिव्हर झाले!"; statusColor = "#2ecc71"; }
 
         tbody.innerHTML += `<tr>
           <td>🟢 ${o.pickup}<br>🔴 ${o.drop}</td>
-          <td><b>${o.vehicle}</b><br><span style="color:#2ecc71;">₹${o.fare}</span></td>
+          <td><b>${o.vehicle}</b> (${o.parcelWeight || '1-5 kg'})<br><span style="color:#2ecc71;">₹${o.fare}</span> • <small>${o.paymentMode || 'COD'}</small></td>
           <td style="color:${statusColor}; font-weight:bold;">${statusMsg}</td>
           <td><span class="pin-badge">${o.deliveryPin}</span></td>
         </tr>`;
@@ -623,16 +732,22 @@
         const riderCleanName = o.riderEmail ? o.riderEmail.split('(')[0].trim() : 'रायडर शोधत आहे...';
         cardsBox.innerHTML += `<div class="card">
           <div style="display:flex; justify-content:space-between;">
-            <strong>${o.vehicle} - ${o.parcel}</strong>
+            <strong>${o.vehicle} • ${o.parcel} (${o.parcelWeight || '1-5 kg'})</strong>
             <span style="color:${statusColor}; font-weight:bold;">${statusMsg}</span>
           </div>
           <p style="font-size:12px; color:#ccc; margin:6px 0;">🟢 ${o.pickup}<br>🔴 ${o.drop}</p>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-            <span style="font-size:12px; color:#aaa;">रायडर: <b>${riderCleanName}</b></span>
+            <span style="font-size:12px; color:#aaa;">रायडर: <b>${riderCleanName}</b> | <b>${o.paymentMode || 'COD'}</b></span>
             <span>PIN: <span class="pin-badge">${o.deliveryPin}</span></span>
           </div>
         </div>`;
       });
+
+      if (activeTrackOrder) startTrackingActiveRider(activeTrackOrder);
+      else {
+        document.getElementById('liveRiderTrackingCard').classList.add('hidden');
+        if (trackedRiderUnsub) { trackedRiderUnsub(); trackedRiderUnsub = null; currentTrackedRiderId = null; }
+      }
     });
   }
 
