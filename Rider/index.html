@@ -20,8 +20,7 @@
     input[type="text"], input[type="tel"], input[type="number"], select { text-align: left; }
     button { background: linear-gradient(135deg, #ff6600, #ff8533); color: #000; font-weight: 800; border: none; cursor: pointer; }
     a.wa-btn { background: #25D366; color: #000; font-weight: 800; border: none; }
-    .perm-strip { background: #16191f; border: 1px solid #282d37; padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 12px; }
-    .perm-alert-item { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; padding: 4px 0; border-bottom: 1px dashed #282d37; }
+    .otp-timer-strip { background: #1c2e3d; color: #4db8ff; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; text-align: center; margin: 6px 0; }
     .doc-upload-box { background: #101318; border: 1px solid #333b48; padding: 12px; border-radius: 12px; margin: 8px 0; }
     img.preview-img { width: 100%; max-height: 180px; border-radius: 10px; object-fit: cover; margin-top: 8px; }
     .duty-bar { display: flex; justify-content: space-between; align-items: center; background: #0d0f12; padding: 10px 14px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #2c323d; }
@@ -34,19 +33,6 @@
 </header>
 
 <div class="container">
-  <!-- परवानग्या व सेटिंग्ज बार -->
-  <div class="perm-strip">
-    <div style="color:#ff944d; font-weight:bold; margin-bottom:6px;">⚠️ ॲप परवानग्या व सेटिंग्ज:</div>
-    <div class="perm-alert-item">
-      <span>📍 जीपीएस लोकेशन (GPS Location)</span>
-      <button type="button" onclick="alert('✅ जीपीएस परवानग्या ॲपमध्ये सक्रिय आहेत!')" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">तपासा</button>
-    </div>
-    <div class="perm-alert-item" style="border:none;">
-      <span>📷 कॅमेरा व स्टोरेज (Camera & Storage)</span>
-      <button type="button" onclick="alert('✅ कॅमेरा परवानगी सक्रिय आहे!')" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">तपासा</button>
-    </div>
-  </div>
-
   <div id="authScreen" class="card">
     <div class="tabs">
       <button id="rTabLogin" class="tab-btn active" onclick="switchRTab('login')">🔑 जुना लॉगिन</button>
@@ -56,17 +42,19 @@
     <!-- जुना रायडर लॉगिन -->
     <div id="rSecLogin">
       <input type="tel" id="rLoginPhone" maxlength="10" placeholder="१० अंकी नोंदणीकृत मोबाईल नंबर">
-      <button type="button" onclick="startRiderLoginOtp()">WhatsApp द्वारे OTP मागवा</button>
+      <button type="button" onclick="startRiderLoginOtp()">नवीन लॉगिन OTP मागवा</button>
+      
       <div id="rLoginOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #2f3542; padding-top:10px;">
+        <div class="otp-timer-strip">⏳ ॲडमिनकडे OTP विनंती पाठवली आहे!</div>
         <a id="rLoginWaBtn" href="#" target="_blank" class="wa-btn" style="margin-bottom:8px;">📲 Admin ला WhatsApp वर मेसेज पाठवा</a>
         <input type="number" id="rLoginOtpInput" placeholder="Admin ने दिलेला ६ अंकी OTP टाका">
-        <button type="button" onclick="verifyRiderLoginOtp()" style="background:#2ecc71; margin-top:8px;">डॅशबोर्ड उघडा</button>
+        <button type="button" onclick="verifyRiderLoginOtp()" style="background:#2ecc71; margin-top:8px;">डॅशबोर्ड उघडा (Login)</button>
       </div>
     </div>
 
     <!-- नवीन रायडर नोंदणी -->
     <div id="rSecReg" class="hidden">
-      <input type="text" id="rName" placeholder="पूर्ण नाव">
+      <input type="text" id="rName" placeholder="पूर्ण नाव (आधार कार्डप्रमाणे)">
       <input type="tel" id="rPhone" maxlength="10" placeholder="१० अंकी मोबाईल नंबर">
       <input type="text" id="rVehicle" placeholder="गाडीचा नंबर (उदा. MH12AB1234)">
       <input type="tel" id="rAadhaar" maxlength="12" placeholder="आधार कार्ड नंबर">
@@ -78,9 +66,10 @@
         <button type="button" onclick="document.getElementById('aadhaarFrontInput').click()" style="background:#162838; color:#4db8ff; font-size:12px;">📷 फोटो काढा</button>
       </div>
 
-      <button type="button" onclick="startRiderRegOtp()">नोंदणी पूर्ण करा व WhatsApp द्वारे OTP मागवा</button>
+      <button type="button" onclick="startRiderRegOtp()">नोंदणी पूर्ण करा व OTP मागवा</button>
 
       <div id="rRegWaBox" class="hidden" style="margin-top:10px; border-top:1px solid #2f3542; padding-top:10px;">
+        <div class="otp-timer-strip">⏳ नोंदणी यशस्वी! WhatsApp द्वारे ॲडमिनकडे OTP मागवा:</div>
         <a id="rRegWaBtn" href="#" target="_blank" class="wa-btn" style="margin-bottom:8px;">📲 ॲडमिनला WhatsApp वर नोंदणी पाठवा</a>
         <input type="number" id="rRegOtpInput" placeholder="Admin ने दिलेला ६ अंकी OTP टाका">
         <button type="button" onclick="verifyRiderRegOtp()" style="background:#2ecc71; margin-top:8px;">OTP तपासा व डॅशबोर्ड उघडा</button>
@@ -95,9 +84,7 @@
       <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#262b36; color:#fff; font-size:12px;">Logout</button>
     </div>
     <div class="duty-bar">
-      <div>
-        <div id="dutyStatusTag" style="color:#e74c3c; font-size:14px; font-weight:800;">● OFFLINE</div>
-      </div>
+      <div><div id="dutyStatusTag" style="color:#e74c3c; font-size:14px; font-weight:800;">● OFFLINE</div></div>
       <button type="button" id="btnToggleDuty" onclick="toggleRiderDuty()" style="width:auto; padding:8px 16px; background:#2ecc71;">ONLINE या</button>
     </div>
   </div>
@@ -151,14 +138,18 @@
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const timeStr = new Date().toLocaleTimeString('en-IN');
 
-    await addDoc(collection(db, "otpRequests"), {
-      role: "Rider Login", name: "Existing Rider", phone, otp, createdAt: Date.now(), timeStr, status: "Pending"
-    });
+    try {
+      await addDoc(collection(db, "otpRequests"), {
+        role: "Rider Login", name: "Existing Rider", phone, otp, createdAt: Date.now(), timeStr, status: "Pending"
+      });
 
-    const waMsg = `👑 GoParcel Admin OTP Request:\nनमस्कार Admin, रायडर लॉगिनसाठी (${phone}) OTP मागवला आहे.\n🔐 OTP कोड: ${otp}`;
-    document.getElementById('rLoginWaBtn').href = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(waMsg)}`;
-    document.getElementById('rLoginOtpBox').classList.remove('hidden');
-    alert("✅ OTP तयार झाला! WhatsApp वर क्लिक करून ॲडमिनकडून OTP घ्या.");
+      const waMsg = `👑 GoParcel Admin OTP Request:\nनमस्कार Admin, रायडर लॉगिनसाठी (${phone}) OTP मागवला आहे.\n🔐 OTP कोड: ${otp}\nवेळ: ${timeStr}`;
+      document.getElementById('rLoginWaBtn').href = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(waMsg)}`;
+      document.getElementById('rLoginOtpBox').classList.remove('hidden');
+      alert("✅ OTP जनरेट झाला! आता खालील WhatsApp बटणावर क्लिक करा.");
+    } catch (err) {
+      alert("❌ एरर: " + err.message);
+    }
   };
 
   window.verifyRiderLoginOtp = () => {
@@ -172,27 +163,32 @@
     const name = document.getElementById('rName').value.trim();
     const phone = document.getElementById('rPhone').value.trim();
     const aadhaar = document.getElementById('rAadhaar').value.trim();
-    if(!name || !phone || !aadhaar) { alert("सर्व माहिती भरा!"); return; }
+    const vehicle = document.getElementById('rVehicle').value.trim();
+    if(!name || !phone || !aadhaar) { alert("कृपया सर्व माहिती भरा!"); return; }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const timeStr = new Date().toLocaleTimeString('en-IN');
 
-    await addDoc(collection(db, "pending_riders"), {
-      name, phone, aadhaarNo: aadhaar, aadhaarFront: window.capturedImg || "", createdAt: new Date(), status: "Pending"
-    });
-    await addDoc(collection(db, "otpRequests"), {
-      role: "Rider Register", name, phone, otp, createdAt: Date.now(), timeStr, status: "Pending"
-    });
+    try {
+      await addDoc(collection(db, "pending_riders"), {
+        name, phone, aadhaarNo: aadhaar, vehicleNo: vehicle, aadhaarFront: window.capturedImg || "", createdAt: new Date(), status: "Pending"
+      });
+      await addDoc(collection(db, "otpRequests"), {
+        role: "Rider Register", name, phone, otp, createdAt: Date.now(), timeStr, status: "Pending"
+      });
 
-    const waMsg = `👑 GoParcel New Registration:\nनाव: ${name}\nमोबाईल: ${phone}\n🔐 OTP: ${otp}`;
-    document.getElementById('rRegWaBtn').href = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(waMsg)}`;
-    document.getElementById('rRegWaBox').classList.remove('hidden');
-    alert("✅ नोंदणी सेव्ह झाली! WhatsApp द्वारे ॲडमिनला मेसेज पाठवा.");
+      const waMsg = `👑 GoParcel New Registration:\nनाव: ${name}\nमोबाईल: ${phone}\nआधार: ${aadhaar}\n🔐 OTP: ${otp}`;
+      document.getElementById('rRegWaBtn').href = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(waMsg)}`;
+      document.getElementById('rRegWaBox').classList.remove('hidden');
+      alert("✅ नोंदणी सेव्ह झाली आणि ॲडमिनकडे OTP विनंती गेली!");
+    } catch (err) {
+      alert("❌ एरर: " + err.message);
+    }
   };
 
   window.verifyRiderRegOtp = () => {
     if(!document.getElementById('rRegOtpInput').value.trim()) { alert("कृपया OTP टाका!"); return; }
-    alert("🎉 नोंदणी यशस्वी!");
+    alert("🎉 नोंदणी आणि OTP पडताळणी यशस्वी!");
     document.getElementById('authScreen').classList.add('hidden');
     document.getElementById('riderScreen').classList.remove('hidden');
   };
