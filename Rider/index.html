@@ -29,6 +29,8 @@
     .weekly-row:last-child { border-bottom: none; }
     .order-card { background: #222; padding: 12px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid #ff6600; }
     .timer-strip { background: #331400; border: 1px solid #ff6600; color: #ffaa66; padding: 6px; border-radius: 6px; text-align: center; font-weight: bold; font-size: 13px; margin-bottom: 8px; }
+    .ringing-banner { background: #e74c3c; color: #fff; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 10px; animation: pulseRing 1s infinite; }
+    @keyframes pulseRing { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
     .gps-lock-box { background: #1c1c1c; border: 1px solid #4db8ff; padding: 8px; border-radius: 6px; font-size: 12px; color: #4db8ff; margin: 6px 0; text-align: center; }
     .cam-box { background: #000; border: 2px dashed #ff6600; border-radius: 10px; padding: 10px; text-align: center; margin: 10px 0; }
     .doc-upload-box { background: #111; border: 1px solid #444; padding: 10px; border-radius: 8px; margin: 8px 0; }
@@ -133,7 +135,13 @@
   <div id="riderScreen" class="hidden">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <span id="riderLabel" style="font-size:13px; color:#aaa;"></span>
-      <button onclick="playAlertSound()" style="width:auto; padding:5px 10px; background:#222; color:#ff6600; border:1px solid #ff6600; font-size:11px; margin:0;">🔔 साऊंड टेस्ट</button>
+      <button onclick="enableAudioAndTest()" style="width:auto; padding:6px 10px; background:#222; color:#2ecc71; border:1px solid #2ecc71; font-size:11px; margin:0;">🔊 रिंगटोन व व्हायब्रेशन चालू</button>
+    </div>
+
+    <!-- Active Loud Ringing Alert Banner -->
+    <div id="ringingAlertBox" class="ringing-banner hidden">
+      🚨 नवीन ऑर्डर आली आहे! रिंगटोन वाजत आहे...
+      <button onclick="stopOrderRingtone()" style="background:#000; color:#fff; padding:6px; margin-top:6px; font-size:12px;">🔕 रिंगटोन थांबवा (Mute Ring)</button>
     </div>
 
     <div id="riderNoticeBanner" class="banner-strip hidden"></div>
@@ -182,7 +190,7 @@
       </div>
       <div class="card">
         <h3 style="color:#ff6600; margin-bottom:4px;">🔔 नवीन उपलब्ध ऑर्डर्स (<span id="radiusLabel">2</span> किमी परिसर)</h3>
-        <div id="availableOrders">जवळपासच्या ऑर्डर्स शोधत आहे...</div>
+        <div id="availableOrders">नवीन ऑर्डर्स शोधत आहे...</div>
       </div>
     </div>
 
@@ -190,8 +198,6 @@
     <div id="secWallet" class="hidden">
       <div class="card">
         <h3 style="color:#ff6600; margin-bottom:10px;">📊 साप्ताहिक कमाई व नफा (Weekly Profit Report)</h3>
-        
-        <!-- Weekly Profit Summary Card -->
         <div class="weekly-card">
           <div style="font-size:13px; color:#ff6600; font-weight:bold; margin-bottom:6px;">🗓️ मागील ७ दिवसांचा हिशोब (Weekly Summary):</div>
           <div class="weekly-row"><span>पूर्ण केलेल्या राईड्स (Weekly Rides):</span><strong id="wkRidesCount">0</strong></div>
@@ -203,7 +209,6 @@
           </div>
         </div>
 
-        <!-- Available Balance for Anytime Withdrawal -->
         <div class="wallet-grid">
           <div class="w-box">
             <div style="font-size:11px; color:#aaa;">विथड्रॉसाठी शिल्लक (Anytime Balance)</div>
@@ -216,28 +221,25 @@
         </div>
 
         <div class="tabs" style="margin-top:12px;">
-          <button id="wSubWithdraw" class="tab-btn active" onclick="switchWalletSub('withdraw')">🏦 बँक & विथड्रॉ (Anytime)</button>
+          <button id="wSubWithdraw" class="tab-btn active" onclick="switchWalletSub('withdraw')">🏦 बँक & विथड्रॉ</button>
           <button id="wSubDeposit" class="tab-btn" onclick="switchWalletSub('deposit')">➕ डिपॉझिट</button>
           <button id="wSubInstallment" class="tab-btn" onclick="switchWalletSub('installment')">📅 हप्ता पेमेंट</button>
         </div>
 
-        <!-- Sub-Tab 1: Bank Details & Anytime Withdraw -->
         <div id="wSecWithdraw">
           <div style="background:#111; padding:10px; border-radius:8px; border:1px solid #333; margin-top:6px;">
-            <strong style="color:#ff6600; font-size:13px;">🏦 तुमचे बँक खाते तपशील (Admin ला विथड्रॉ साठी दिसेल):</strong>
+            <strong style="color:#ff6600; font-size:13px;">🏦 तुमचे बँक खाते तपशील:</strong>
             <input type="text" id="bankHolderName" placeholder="खातेधारकाचे पूर्ण नाव">
-            <input type="text" id="bankName" placeholder="बँकेचे नाव (उदा. SBI / Bank of Maharashtra)">
-            <input type="text" id="bankAccNo" placeholder="बँक खाते नंबर (Account Number)">
-            <input type="text" id="bankIfsc" placeholder="IFSC कोड (उदा. SBIN0001234)">
-            <input type="text" id="bankUpiId" placeholder="तुमचा UPI ID (PhonePe / GPay)">
+            <input type="text" id="bankName" placeholder="बँकेचे नाव">
+            <input type="text" id="bankAccNo" placeholder="बँक खाते नंबर">
+            <input type="text" id="bankIfsc" placeholder="IFSC कोड">
+            <input type="text" id="bankUpiId" placeholder="तुमचा UPI ID">
             <button onclick="saveBankDetails()" style="background:#3498db; color:#fff; font-size:13px;">💾 बँक तपशील सेव्ह करा</button>
           </div>
-          <p style="font-size:11px; color:#aaa; margin-top:8px;">⚡ तुम्ही कधीही (Anytime) तुमच्या खात्यातील शिल्लक रक्कम काढू शकता:</p>
           <input type="number" id="withdrawAmtInput" placeholder="काढायची रक्कम टाका (किमान ₹100)">
           <button onclick="requestWithdrawal()" style="background:#2ecc71;">💳 विथड्रॉवल विनंती पाठवा (Anytime Withdraw)</button>
         </div>
 
-        <!-- Sub-Tab 2: Deposit Money -->
         <div id="wSecDeposit" class="hidden">
           <div class="upi-box" id="depositUpiDisplay">Admin UPI: Techesupp-2@okhdfcbank</div>
           <input type="number" id="depositAmtInput" placeholder="जमा केलेली रक्कम (₹)">
@@ -245,10 +247,9 @@
           <button onclick="submitDepositRequest()" style="background:#2ecc71;">➕ डिपॉझिट विनंती सबमिट करा</button>
         </div>
 
-        <!-- Sub-Tab 3: Installment Payment -->
         <div id="wSecInstallment" class="hidden">
           <div style="background:#111; padding:12px; border-radius:8px; border:1px solid #ff6600; margin-top:6px;">
-            <h4 style="color:#ff6600; margin-bottom:6px;">📅 नियमित हप्ता पेमेंट (Installment / Fee Plan)</h4>
+            <h4 style="color:#ff6600; margin-bottom:6px;">📅 नियमित हप्ता पेमेंट</h4>
             <p style="font-size:12px; color:#ccc;">तुमचा ठरलेला हप्ता: <strong style="color:#2ecc71; font-size:15px;">₹<span id="riderInstallmentAmt">500</span></strong></p>
             <div class="upi-box" id="instUpiDisplay">Admin UPI: Techesupp-2@okhdfcbank</div>
             <input type="number" id="instPayAmt" placeholder="भरलेली हप्ता रक्कम (₹)">
@@ -259,17 +260,14 @@
       </div>
     </div>
 
-    <!-- SECTION 3: ORDER HISTORY (WITHOUT CUSTOMER PERSONAL DETAILS) & PAYMENT HISTORY -->
+    <!-- SECTION 3: ORDER & PAYMENT HISTORY -->
     <div id="secHistory" class="hidden">
       <div class="card">
         <div class="tabs">
           <button id="hSubOrders" class="tab-btn active" onclick="switchHistSub('orders')">📦 ऑर्डर हिस्ट्री</button>
-          <button id="hSubPayments" class="tab-btn" onclick="switchHistSub('payments')">🧾 पेमेंट & विथड्रॉ हिस्ट्री</button>
+          <button id="hSubPayments" class="tab-btn" onclick="switchHistSub('payments')">🧾 पेमेंट हिस्ट्री</button>
         </div>
-        <div id="hSecOrders">
-          <p style="font-size:11px; color:#888; margin-bottom:8px;">🔒 गोपनीयतेच्या नियमांनुसार पूर्ण झालेल्या ऑर्डर्समध्ये कस्टमरचा मोबाईल/नाव लपवले आहे; फक्त पत्ता आणि कमाई दिसेल.</p>
-          <div id="orderHistoryList">लोड होत आहे...</div>
-        </div>
+        <div id="hSecOrders"><div id="orderHistoryList">लोड होत आहे...</div></div>
         <div id="hSecPayments" class="hidden"><div id="paymentHistoryList">लोड होत आहे...</div></div>
       </div>
     </div>
@@ -319,7 +317,7 @@
           <option value="en">English</option>
         </select>
         <label style="display:flex; align-items:center; justify-content:space-between; background:#111; padding:10px; border-radius:8px; margin:8px 0;">
-          <span>🔔 नवीन ऑर्डर साऊंड अलर्ट</span>
+          <span>🔔 नवीन ऑर्डर मोठ्या आवाजात रिंगटोन व व्हायब्रेशन</span>
           <input type="checkbox" id="soundAlertToggle" checked style="width:20px; height:20px; margin:0;">
         </label>
         <div style="background:#000; border:1px dashed #ff6600; padding:10px; border-radius:8px; text-align:center; margin:10px 0;">
@@ -360,15 +358,17 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   let riderLang = localStorage.getItem("gp_rider_lang") || "mr";
-  let adminWaNumber = "919999999999", adminUpiId = "Techesupp-2@okhdfcbank", currentOnboardingFee = 1000, currentCommPct = 20, maxRadiusKm = 2;
+  let adminWaNumber = "919999999999", adminUpiId = "Techesupp-2@okhdfcbank", currentOnboardingFee = 1000, currentCommPct = 20, maxRadiusKm = 10;
   let orderAlertTimerSec = 45, currentReferBonus = 100, deliveryRangeMeters = 150, defaultInstallmentAmt = 500;
   let consentTextGlobal = "मी GoParcel चे सर्व नियम व वाहतूक अटी पाळेन. प्रत्येक डिलिव्हरीवर प्लॅटफॉर्म कमिशन कपातीस माझी पूर्ण संमती आहे.";
   let reqDailySelfie = true, isDutyVerifiedToday = false;
   let isFeePaid = false, isApproved = false, existingRiderName = "", activeRiderId = null, activeRiderName = "";
   let rLoginReqId = null, rRegReqId = null, regSelfieData = "", docFrontData = "", docBackData = "", feeScreenshotData = "", activeStream = null;
-  let riderLat = 18.5204, riderLng = 73.8567, availableWalletBalance = 0, lastPendingOrderCount = 0;
+  let riderLat = null, riderLng = null, availableWalletBalance = 0, lastKnownOrderIds = new Set(), isFirstOrderLoad = true;
   let docRules = { docAadhaar: true, docLicense: true, docRcBook: false, docPanCard: false };
   let alertCountdownInterval = null;
+  let ringLoopInterval = null;
+  let audioCtx = null;
   let currentRiderProfile = null;
   let latestWeeklySummary = { rides: 0, gross: 0, comm: 0, netProfit: 0 };
 
@@ -388,21 +388,66 @@
     if (el) el.innerText = new Date().toLocaleTimeString('en-IN');
   }, 1000);
 
-  window.playAlertSound = () => {
+  // ब्राउझर नोटिफिकेशन परवानगी व ऑडिओ अनलॉक
+  window.enableAudioAndTest = () => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+    triggerSingleLoudRing();
+    setTimeout(() => stopOrderRingtone(), 1600);
+  };
+
+  function triggerSingleLoudRing() {
     if (!document.getElementById('soundAlertToggle').checked) return;
+    // मोबाईल व्हायब्रेशन (Loud Pattern)
+    if ("vibrate" in navigator) {
+      navigator.vibrate([700, 250, 700, 250, 900]);
+    }
+    // मोठ्या आवाजात रिंगटोन (High Gain Square/Triangle Siren Bell)
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      [520, 780, 1040].forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.18);
-        gain.gain.setValueAtTime(0.3, ctx.currentTime + idx * 0.18);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.18 + 0.16);
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.start(ctx.currentTime + idx * 0.18); osc.stop(ctx.currentTime + idx * 0.18 + 0.17);
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const notes = [880, 1174, 880, 1318, 1568];
+      notes.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.16);
+        gain.gain.setValueAtTime(0.95, audioCtx.currentTime + idx * 0.16);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.16 + 0.15);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + idx * 0.16);
+        osc.stop(audioCtx.currentTime + idx * 0.16 + 0.16);
       });
     } catch (e) {}
+  }
+
+  function startContinuousOrderRingtone(orderInfoText) {
+    stopOrderRingtone();
+    document.getElementById('ringingAlertBox').classList.remove('hidden');
+    triggerSingleLoudRing();
+    ringLoopInterval = setInterval(() => {
+      triggerSingleLoudRing();
+    }, 2200);
+
+    // Push Browser Notification
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("🚨 GoParcel - नवीन ऑर्डर आली आहे!", {
+        body: orderInfoText || "त्वरित ॲप उघडा आणि ऑर्डर स्वीकारा!",
+        vibrate: [800, 300, 800]
+      });
+    }
+  }
+
+  window.stopOrderRingtone = () => {
+    if (ringLoopInterval) {
+      clearInterval(ringLoopInterval);
+      ringLoopInterval = null;
+    }
+    if ("vibrate" in navigator) navigator.vibrate(0);
+    document.getElementById('ringingAlertBox').classList.add('hidden');
   };
 
   function isValidAadhaar(num) {
@@ -458,7 +503,7 @@
       adminUpiId = s.adminUpi || "Techesupp-2@okhdfcbank";
       currentOnboardingFee = s.onboardingFee ?? 1000;
       currentCommPct = s.commission ?? 20;
-      maxRadiusKm = s.pickupRadiusKm ?? 2;
+      maxRadiusKm = Number(s.pickupRadiusKm ?? 10);
       orderAlertTimerSec = s.orderTimerSec ?? 45;
       currentReferBonus = s.riderReferBonus ?? 100;
       deliveryRangeMeters = s.deliveryRangeMeters ?? 150;
@@ -612,7 +657,7 @@
     pdf.text(`Mobile: ${rec.phone}`, 15, 43);
     pdf.text(`Vehicle No: ${rec.summary}`, 15, 51);
     pdf.text(`Registration Timestamp: ${rec.timestampStr}`, 15, 59);
-    pdf.text(`GPS Location: Lat ${rec.lat}, Lng ${rec.lng}`, 15, 67);
+    pdf.text(`GPS Location: Lat ${rec.lat || 0}, Lng ${rec.lng || 0}`, 15, 67);
     pdf.text("Agreement Terms Accepted:", 15, 80);
     const lines = pdf.splitTextToSize(rec.agreementText, 180);
     pdf.text(lines, 15, 88);
@@ -664,8 +709,8 @@
       role: "Rider (Registration)",
       name, phone,
       timestampStr: fullTimestamp,
-      lat: riderLat,
-      lng: riderLng,
+      lat: riderLat || 18.5204,
+      lng: riderLng || 73.8567,
       summary: `Vehicle: ${vehicleNo}`,
       agreementText: consentTextGlobal,
       createdAt: Date.now()
@@ -714,7 +759,7 @@
     } else alert("संमती पत्र PDF उपलब्ध नाही.");
   };
 
-  window.logoutRider = () => { localStorage.removeItem("gp_verified_rider_id"); localStorage.removeItem("gp_verified_rider_name"); location.reload(); };
+  window.logoutRider = () => { stopOrderRingtone(); localStorage.removeItem("gp_verified_rider_id"); localStorage.removeItem("gp_verified_rider_name"); location.reload(); };
 
   window.submitOnboardingUtr = async () => {
     const utr = document.getElementById('feeUtrInput').value.trim();
@@ -726,6 +771,7 @@
   };
 
   window.acceptOrder = async (orderId) => {
+    stopOrderRingtone();
     if (reqDailySelfie && !isDutyVerifiedToday) return alert("आधी आजचा लाईव्ह ड्युटी सेल्फी काढून ONLINE या!");
     if (!isFeePaid && currentOnboardingFee > 0) return alert(`आधी ₹${currentOnboardingFee} ऑनबोर्डिंग शुल्क जमा करून Admin कडून व्हेरिफाय करून घ्या!`);
     if (!isApproved) return alert("तुमच्या खात्याला अजून Admin ची मंजुरी मिळालेली नाही!");
@@ -777,7 +823,6 @@
     alert("✅ बँक खाते तपशील सेव्ह झाले!");
   };
 
-  // Anytime Withdrawal Request (बँक डिटेल्स व वीकली नफा अहवालासह Admin कडे पाठवणे)
   window.requestWithdrawal = async () => {
     const amt = Number(document.getElementById('withdrawAmtInput').value);
     if (!amt || amt < 100) return alert("किमान ₹100 रक्कम टाका.");
@@ -838,6 +883,10 @@
     document.getElementById('bottomNav').classList.remove('hidden');
     document.getElementById('riderLabel').innerText = label;
 
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+
     const myCode = "GPR" + rid.slice(-4);
     document.getElementById('myRiderReferCode').innerText = myCode;
     document.getElementById('shareReferWa').href = `https://wa.me/?text=${encodeURIComponent(`GoParcel रायडर बना! रेफरल कोड: ${myCode}`)}`;
@@ -880,21 +929,34 @@
       }
     });
 
+    // नवीन ऑर्डर्स रिअल-टाइम लिसनर + रिंगटोन + व्हायब्रेशन + नोटिफिकेशन
     onSnapshot(query(collection(db, "orders"), where("status", "==", "Pending")), (snap) => {
       const div = document.getElementById('availableOrders');
       div.innerHTML = "";
       clearInterval(alertCountdownInterval);
-      let foundNearby = 0, secLeft = orderAlertTimerSec;
+      let foundOrders = 0, secLeft = orderAlertTimerSec;
+      let hasBrandNewOrder = false;
+      let newestOrderSummary = "";
+      const currentIds = new Set();
 
       snap.forEach(d => {
         const o = d.data();
-        const awayKm = getDistanceKm(riderLat, riderLng, o.pickupLat, o.pickupLng);
-        if (awayKm <= maxRadiusKm) {
-          foundNearby++;
-          const net = Math.round(o.fare * ((100 - currentCommPct) / 100));
+        const awayKm = (riderLat && riderLng && o.pickupLat && o.pickupLng) ? getDistanceKm(riderLat, riderLng, o.pickupLat, o.pickupLng) : 0;
+
+        // जर रायडरचा GPS ऑन नसेल तर सर्व Pending ऑर्डर्स दाखवा; GPS ऑन असल्यास रेंज तपासा
+        if (!riderLat || !riderLng || awayKm <= maxRadiusKm) {
+          foundOrders++;
+          currentIds.add(d.id);
+          if (!isFirstOrderLoad && !lastKnownOrderIds.has(d.id)) {
+            hasBrandNewOrder = true;
+            newestOrderSummary = `${o.vehicle}: ${o.pickup} ➔ ${o.drop} (₹${o.fare})`;
+          }
+
+          const net = Math.round(Number(o.fare || 0) * ((100 - currentCommPct) / 100));
+          const distLabel = (riderLat && riderLng && o.pickupLat) ? `📍 ${awayKm.toFixed(1)} km दूर` : `📍 नवीन ऑर्डर`;
           div.innerHTML += `<div class="order-card">
             <div class="timer-strip">⏱️ नवीन ऑर्डर अलर्ट: <span class="orderTimerVal">${secLeft}</span> सेकंद शिल्लक</div>
-            <div style="display:flex; justify-content:space-between;"><b>${o.vehicle} - ${o.parcel}</b><span style="color:#4db8ff; font-size:12px;">📍 ${awayKm.toFixed(1)} km दूर</span></div>
+            <div style="display:flex; justify-content:space-between;"><b>${o.vehicle} - ${o.parcel}</b><span style="color:#4db8ff; font-size:12px;">${distLabel}</span></div>
             <small>🟢 Pickup: ${o.pickup}<br>🔴 Drop: ${o.drop}</small><br>
             <div style="margin:6px 0; color:#2ecc71;">तुमची कमाई: <b>₹${net}</b> (भाडे: ₹${o.fare})</div>
             <button onclick="acceptOrder('${d.id}')">✅ ऑर्डर स्वीकारा (Accept)</button>
@@ -902,15 +964,25 @@
         }
       });
 
-      if (foundNearby > 0) {
-        if (foundNearby > lastPendingOrderCount) playAlertSound();
+      if (hasBrandNewOrder) {
+        startContinuousOrderRingtone(newestOrderSummary);
+      }
+      if (foundOrders === 0) {
+        stopOrderRingtone();
+        div.innerHTML = `तुमच्या ${maxRadiusKm} किमी परिसरात सध्या नवीन ऑर्डर नाही.`;
+      } else {
         alertCountdownInterval = setInterval(() => {
           secLeft--;
           document.querySelectorAll('.orderTimerVal').forEach(el => el.innerText = Math.max(0, secLeft));
-          if (secLeft <= 0) clearInterval(alertCountdownInterval);
+          if (secLeft <= 0) {
+            clearInterval(alertCountdownInterval);
+            stopOrderRingtone();
+          }
         }, 1000);
-      } else div.innerHTML = `तुमच्या ${maxRadiusKm} किमी परिसरात सध्या नवीन ऑर्डर नाही.`;
-      lastPendingOrderCount = foundNearby;
+      }
+
+      lastKnownOrderIds = currentIds;
+      isFirstOrderLoad = false;
     });
 
     let rideEarningsTotal = 0, completedRidesCount = 0;
@@ -931,29 +1003,16 @@
         if (o.status === "Delivered") {
           rideEarningsTotal += net;
           completedRidesCount++;
-
-          // Weekly Calculation (मागील ७ दिवस)
           const delivMs = o.deliveredTimestampMs || Date.now();
-          if (delivMs >= sevenDaysAgoMs) {
-            wkRides++;
-            wkGross += fareNum;
-            wkComm += comm;
-            wkNet += net;
-          }
+          if (delivMs >= sevenDaysAgoMs) { wkRides++; wkGross += fareNum; wkComm += comm; wkNet += net; }
 
-          // ऑर्डर हिस्ट्री: कस्टमरचे नाव किंवा मोबाईल नंबर पूर्णपणे लपवून फक्त पत्ता आणि कमाई दाखवणे
           histDiv.innerHTML += `<div class="hist-item">
             <div style="display:flex; justify-content:space-between;">
               <strong>📦 ${o.vehicle} • ${o.parcel}</strong>
               <span style="color:#2ecc71; font-weight:bold;">+₹${net}</span>
             </div>
-            <div style="font-size:12px; color:#ddd; margin-top:4px;">
-              🟢 पिकअप: ${o.pickup}<br>
-              🔴 डिलिव्हरी पत्ता: ${o.drop}
-            </div>
-            <div style="font-size:10px; color:#888; margin-top:4px;">
-              🕒 ${o.deliveredDateStr || 'Completed'} | एकण भाडे: ₹${fareNum} (कमिशन: ₹${comm})
-            </div>
+            <div style="font-size:12px; color:#ddd; margin-top:4px;">🟢 पिकअप: ${o.pickup}<br>🔴 डिलिव्हरी पत्ता: ${o.drop}</div>
+            <div style="font-size:10px; color:#888; margin-top:4px;">🕒 ${o.deliveredDateStr || 'Completed'} | एकूण भाडे: ₹${fareNum}</div>
           </div>`;
         } else {
           const gMapsUrl = o.pickupLat ? `https://www.google.com/maps/dir/?api=1&destination=${o.dropLat},${o.dropLng}&waypoints=${o.pickupLat},${o.pickupLng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.pickup)}`;
