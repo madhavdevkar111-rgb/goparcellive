@@ -27,12 +27,8 @@
     button { background: linear-gradient(135deg, #ff6600, #ff8533); color: #000; font-weight: 800; border: none; cursor: pointer; }
     a.wa-btn { background: #25D366; color: #000; font-weight: 800; border: none; }
     .otp-timer-strip { background: #1c2e3d; color: #4db8ff; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; text-align: center; margin: 6px 0; }
-    .action-row { display: flex; gap: 8px; margin-top: 8px; }
-    a.nav-map-btn { flex: 1; background: #162838; color: #4db8ff; border: 1px solid #3a8fd6; font-size: 13px; padding: 10px; font-weight: 700; margin: 0; }
-    a.call-btn { flex: 1; background: #153322; color: #2ecc71; border: 1px solid #2ecc71; font-size: 13px; padding: 10px; font-weight: 700; margin: 0; }
     .wallet-grid { display: flex; gap: 8px; text-align: center; }
     .w-box { flex: 1; background: #0d0f12; padding: 12px 6px; border-radius: 12px; border: 1px solid #ff6600; }
-    .order-card { background: #1e222b; padding: 14px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #ff6600; }
     .cam-box { background: #0d0f12; border: 2px dashed #ff6600; border-radius: 12px; padding: 12px; text-align: center; margin: 10px 0; }
     .doc-upload-box { background: #101318; border: 1px solid #333b48; padding: 12px; border-radius: 12px; margin: 8px 0; }
     .legal-box { background: #1b160d; border: 1px solid #ff6600; padding: 11px; border-radius: 10px; margin: 10px 0; font-size: 11.5px; color: #ffd9b3; line-height: 1.45; }
@@ -41,11 +37,8 @@
     .tc-link { color: #4db8ff; text-decoration: underline; cursor: pointer; }
     .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 16px; }
     .modal-box { background: #16191f; border: 1.5px solid #ff6600; border-radius: 14px; padding: 18px; max-width: 460px; width: 100%; max-height: 82vh; overflow-y: auto; font-size: 13px; line-height: 1.6; color: #ddd; }
-    .ref-share-card { background: linear-gradient(135deg, #102418, #1b160d); border: 1.5px solid #2ecc71; padding: 14px; border-radius: 14px; margin-bottom: 14px; }
-    .ref-code-pill { background: #000; border: 1px dashed #2ecc71; padding: 8px 12px; border-radius: 8px; text-align: center; font-size: 16px; font-weight: 800; color: #2ecc71; margin: 8px 0; letter-spacing: 1px; }
     video, img.preview-img { width: 100%; max-height: 220px; border-radius: 10px; object-fit: cover; margin-top: 8px; }
     .mirror-cam { transform: scaleX(-1); }
-    .banner-strip { background: #2b1a0e; border: 1px solid #ff6600; color: #ffd2b3; padding: 10px; border-radius: 10px; margin-bottom: 12px; font-size: 13px; text-align: center; font-weight: bold; }
     .perm-strip { background: #16191f; border: 1px solid #282d37; padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 12px; }
     .perm-alert-item { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; padding: 4px 0; border-bottom: 1px dashed #282d37; }
     .duty-bar { display: flex; justify-content: space-between; align-items: center; background: #0d0f12; padding: 10px 14px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #2c323d; }
@@ -54,7 +47,7 @@
 </head>
 <body>
 <header>
-  <div class="brand-title"><h1>GP Rider</h1></div>
+  <div class="brand-title"><h1 id="appTitle">GP Rider</h1></div>
   <select id="appLangSelect" class="lang-select" onchange="changeAppLang(this.value)">
     <option value="mr">🌐 मराठी</option>
     <option value="hi">🌐 हिंदी</option>
@@ -73,20 +66,33 @@
 </div>
 
 <div class="container">
-  <!-- स्मार्ट परमिशन स्ट्रिप -->
-  <div id="smartPermBox" class="perm-strip hidden">
-    <div style="color:#ff944d; font-weight:bold; margin-bottom:6px;">⚠️ कृपया रायडर ॲपसाठी खालील परवानग्या चालू करा:</div>
-    <div id="permItemGps" class="perm-alert-item hidden">
-      <span>📍 जीपीएस लोकेशन (Location) परवानगी बाकी आहे</span>
+  <!-- सर्व परवानग्यांची स्मार्ट स्ट्रिप (GPS, Overlay, Battery, Notification, Camera, Storage) -->
+  <div id="smartPermBox" class="perm-strip">
+    <div style="color:#ff944d; font-weight:bold; margin-bottom:6px;">⚠️ ॲपच्या परवानग्या व सेटिंग्ज तपासा:</div>
+    
+    <div id="permItemGps" class="perm-alert-item">
+      <span>📍 जीपीएस लोकेशन (GPS Location)</span>
       <button type="button" onclick="requestGpsPermission()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">चालू करा</button>
     </div>
-    <div id="permItemOverlay" class="perm-alert-item hidden">
+    
+    <div id="permItemOverlay" class="perm-alert-item">
       <span>📱 इतर ॲप्सवर वरती दाखवणे (Display over other apps)</span>
       <button type="button" onclick="openOverlaySettings()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">सेटिंग उघडा</button>
     </div>
-    <div id="permItemBattery" class="perm-alert-item hidden" style="border:none;">
-      <span>🔋 अनरिस्ट्रिक्टेड बॅटरी (Unrestricted Battery)</span>
+    
+    <div id="permItemBattery" class="perm-alert-item">
+      <span>🔋 अनरिस्ट्रिक्टेड बॅटरी (Battery Optimization)</span>
       <button type="button" onclick="openBatterySettings()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">बॅटरी सेटिंग</button>
+    </div>
+
+    <div id="permItemNotif" class="perm-alert-item">
+      <span>🔔 पुश नोटिफिकेशन (Notifications)</span>
+      <button type="button" onclick="requestNotificationPermission()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">परवानगी द्या</button>
+    </div>
+
+    <div id="permItemCam" class="perm-alert-item" style="border:none;">
+      <span>📷 कॅमेरा व स्टोरेज (Camera & Storage)</span>
+      <button type="button" onclick="requestCameraPermission()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#ff6600; color:#000;">तपासा</button>
     </div>
   </div>
 
@@ -130,10 +136,9 @@
 
       <input type="text" id="rVehicle" placeholder="गाडीचा नंबर (उदा. MH12AB1234)">
 
-      <!-- वाहन मालक तपशील बॉक्स (2-Wheeler साठी लपलेला असेल, इतरांसाठी दिसेल) -->
+      <!-- वाहन मालक तपशील बॉक्स -->
       <div id="ownerDetailsBox" class="doc-upload-box hidden" style="border: 1px dashed #ff6600; background: #16191f;">
         <label style="font-size:12px; color:#ff944d; display:block; margin-bottom:6px;">👤 वाहन मालक तपशील (Vehicle Owner Details):</label>
-        <p style="font-size: 11px; color: #aaa; margin-bottom: 6px;">ही व्यावसायिक गाडी असल्यामुळे मालक व ड्रायव्हर वेगळे असू शकतात.</p>
         <input type="text" id="rOwnerName" placeholder="गाडी मालकाचे पूर्ण नाव (Owner Name)" style="margin-bottom:6px;">
         <input type="tel" id="rOwnerPhone" maxlength="10" placeholder="मालकाचा १० अंकी मोबाईल नंबर" style="margin:0;">
       </div>
@@ -143,7 +148,6 @@
         <input type="tel" id="rReferredBy" maxlength="10" placeholder="रेफर करणाऱ्या रायडरचा १० अंकी नंबर" style="margin:0;">
       </div>
 
-      <!-- १. आधार कार्ड -->
       <div id="boxAadhaar" class="doc-upload-box">
         <label id="lblAadhaarBox" style="font-size:12px; color:#4db8ff;">🪪 आधार कार्ड नंबर व Live Camera फोटो:</label>
         <input type="tel" id="rAadhaar" maxlength="12" placeholder="१२ अंकी आधार कार्ड नंबर">
@@ -153,7 +157,6 @@
         <button type="button" id="snap_aadhaar" onclick="captureDocCam('aadhaar')" class="hidden" style="background:#2ecc71; font-size:13px;">✅ क्लिक करा</button>
       </div>
 
-      <!-- सेल्फी कॅमेरा -->
       <div class="cam-box">
         <p id="lblSelfieTitle" style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 नोंदणीसाठी तुमचा मूळ थेट सेल्फी काढा:</p>
         <video id="regVideo" autoplay playsinline class="hidden mirror-cam"></video>
@@ -259,8 +262,27 @@
 
   let currentRiderVehicleType = "2-Wheeler";
 
+  // भाषा बदलण्याची सोय (Language translation dictionary & function)
+  const translations = {
+    mr: { portalTitle: "GP Rider पार्टनर पोर्टल", loginTab: "🔑 जुना रायडर लॉगिन", regTab: "📝 नवीन रायडर नोंदणी" },
+    hi: { portalTitle: "GP Rider पार्टनर पोर्टल", loginTab: "🔑 पुराना राइडर लॉगिन", regTab: "📝 नया राइडर पंजीकरण" },
+    en: { portalTitle: "GP Rider Partner Portal", loginTab: "🔑 Existing Rider Login", regTab: "📝 New Rider Registration" }
+  };
+
+  window.changeAppLang = (lang) => {
+    localStorage.setItem("gp_rider_lang", lang);
+    const t = translations[lang] || translations["mr"];
+    const pt = document.getElementById('txtPortalTitle');
+    const lt = document.getElementById('rTabLogin');
+    const rt = document.getElementById('rTabReg');
+    if(pt) pt.innerText = t.portalTitle;
+    if(lt) lt.innerText = t.loginTab;
+    if(rt) rt.innerText = t.regTab;
+  };
+
   // वाहन मालक तपशील बॉक्स ऑन/ऑफ करणे
   window.toggleOwnerDetails = (vehType) => {
+    currentRiderVehicleType = vehType;
     const ownerBox = document.getElementById('ownerDetailsBox');
     if (vehType === '2-Wheeler') {
       ownerBox.classList.add('hidden');
@@ -271,7 +293,7 @@
     }
   };
 
-  // वाहननिहाय वेटिंग नियम (Free seconds & rate per minute)
+  // वाहननिहाय वेटिंग नियम
   function getVehicleWaitingRules(vehicleType) {
     if (vehicleType === "3-Wheeler") {
       return { freeSec: 360, ratePerMin: 2.00, desc: "३-व्हीलर: पहिली ६ मिनिटे मोफत, नंतर ₹२/मिनिट" };
@@ -324,27 +346,66 @@
     }, 1000);
   };
 
-  // सेटिंग्स ओपन करण्यासाठीचे फंक्शन्स
+  // 📱 सिस्टीम परवानग्या आणि सेटिंग्स उघडण्याचे हक्काचे फंक्शन्स (Permissions Handlers)
   window.openOverlaySettings = () => {
-    alert("कृपया फोनच्या Settings > Apps > GP Rider मध्ये जाऊन 'Display over other apps' परवानगी चालू करा.");
+    alert("कृपया फोनच्या Settings > Apps > GP Rider मध्ये जाऊन 'Display over other apps' परवानगी Allow करा.");
+    // WebView fallback intent
+    try { window.location.href = "intent://settings/application_details?package=" + window.location.hostname + "#Intent;scheme=package;end;"; } catch(e){}
   };
 
   window.openBatterySettings = () => {
-    alert("कृपया फोनच्या Settings > Apps > GP Rider > Battery मध्ये जाऊन 'Unrestricted' निवडा.");
+    alert("कृपया फोनच्या Settings > Apps > GP Rider > Battery मध्ये जाऊन 'Unrestricted' किंवा 'No restriction' निवडा.");
   };
 
   window.requestGpsPermission = () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(pos => {
         alert("✅ जीपीएस लोकेशन परवानगी सुरू झाली!");
-        document.getElementById('smartPermBox').classList.add('hidden');
+        document.getElementById('permItemGps').style.display = 'none';
       }, () => { alert("कृपया जीपीएस सेटिंगमध्ये जाऊन Location परवानगी Allow करा."); }, { enableHighAccuracy: true });
     }
   };
 
+  window.requestNotificationPermission = () => {
+    if ("Notification" in window) {
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          alert("✅ नोटिफिकेशन परवानगी यशस्वीपणे दिली!");
+          document.getElementById('permItemNotif').style.display = 'none';
+        } else {
+          alert("कृपया ब्राउझर किंवा ॲप सेटिंगमधून Notification परवानगी चालू करा.");
+        }
+      });
+    } else {
+      alert("तुमच्या डिव्हाइसवर नोटिफिकेशन समर्थित आहे.");
+    }
+  };
+
+  window.requestCameraPermission = () => {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        alert("✅ कॅमेरा आणि स्टोरेज परवानगी सक्रिय आहे!");
+        stream.getTracks().forEach(track => track.stop()); // बंद करणे
+        document.getElementById('permItemCam').style.display = 'none';
+      })
+      .catch(err => {
+        alert("❌ कॅमेरा परवानगी नाकारली आहे. कृपया ॲप सेटिंगमध्ये जाऊन कॅमेरा Allow करा.");
+      });
+  };
+
+  // टॅब स्विचिंग (Login / Reg)
+  window.switchRTab = (mode) => {
+    const isLogin = mode === 'login';
+    document.getElementById('rSecLogin').classList.toggle('hidden', !isLogin);
+    document.getElementById('rSecReg').classList.toggle('hidden', isLogin);
+    document.getElementById('rTabLogin').classList.toggle('active', isLogin);
+    document.getElementById('rTabReg').classList.toggle('active', !isLogin);
+  };
+
   window.addEventListener('load', () => {
-    const box = document.getElementById('smartPermBox');
-    if(box) box.classList.remove('hidden');
+    const savedLang = localStorage.getItem("gp_rider_lang") || "mr";
+    document.getElementById('appLangSelect').value = savedLang;
+    changeAppLang(savedLang);
   });
 </script>
 </body>
