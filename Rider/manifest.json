@@ -1,0 +1,22 @@
+{
+  "name": "GP Rider - GoParcel Partner",
+  "short_name": "GP Rider",
+  "start_url": "/goparcellive/Rider/",
+  "scope": "/goparcellive/Rider/",
+  "display": "standalone",
+  "background_color": "#0d0f12",
+  "theme_color": "#ff6600",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://madhavdevkar111-rgb.github.io/goparcellive/Rider/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://madhavdevkar111-rgb.github.io/goparcellive/Rider/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
