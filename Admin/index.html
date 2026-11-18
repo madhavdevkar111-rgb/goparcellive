@@ -146,10 +146,9 @@
     </table>
   </div>
 
-  <!-- ४. सक्रिय OTP विनंत्या (फक्त गेल्या १० मिनिटांचे वैध OTP) -->
+  <!-- ४. सक्रिय OTP विनंत्या -->
   <div id="secOtpLive" class="panel-box hidden" style="overflow-x:auto;">
     <h3 style="color:#ff6600; margin-bottom:4px;">🔔 गेल्या १० मिनिटांतील सक्रिय OTP विनंत्या</h3>
-    <p style="font-size:12px; color:#aaa; margin-bottom:10px;">* १० मिनिटे संपल्यावर किंवा युजरने Resend केल्यावर जुना OTP इथून आपोआप गायब होईल.</p>
     <table>
       <thead><tr><th>जनरेट वेळ</th><th>प्रकार व भाषा</th><th>नाव व मोबाईल</th><th>सक्रिय OTP</th><th>उरलेली वैधता</th><th>कृती</th></tr></thead>
       <tbody id="otpLiveTableBody"></tbody>
@@ -167,17 +166,9 @@
     </div>
     <button class="save-btn" onclick="addServiceZone()">✅ हा सर्विस एरिया मॅपवर जोडा / अपडेट करा</button>
     <div id="zoneMap"></div>
-    <div style="overflow-x:auto; margin-top:15px;">
-      <h4 style="color:#4db8ff; margin-bottom:6px;">चालू असलेले सर्विस एरिया:</h4>
-      <table><thead><tr><th>एरिया</th><th>रेंज (km)</th><th>स्टेटस</th><th>कृती</th></tr></thead><tbody id="zonesTableBody"></tbody></table>
-    </div>
-    <div style="overflow-x:auto; margin-top:20px; border-top:1px solid #333; padding-top:15px;">
-      <h4 style="color:#2ecc71; margin-bottom:6px;">🗳️ नवीन शहरांसाठी कस्टमर व्होटिंग:</h4>
-      <table><thead><tr><th>शहर / एरिया</th><th>एकूण व्होट्स</th><th>कृती</th></tr></thead><tbody id="votesTableBody"></tbody></table>
-    </div>
   </div>
 
-  <!-- ६. मास्टर कंट्रोल (वेटिंग टाईम व दर नियंत्रणासह) -->
+  <!-- ६. मास्टर कंट्रोल -->
   <div id="secMaster" class="panel-box hidden">
     <h3 style="color:#ff6600; margin-bottom:12px;">🎛️ संपूर्ण ॲपचे दर, पासवर्ड व मास्टर कंट्रोल</h3>
     <div class="form-grid">
@@ -187,76 +178,16 @@
       <div><label>रायडर ऑनबोर्डिंग फीस (₹)</label><input type="number" id="setOnboardingFee" value="1000"></div>
       <div><label>प्लॅटफॉर्म कमिशन (%)</label><input type="number" id="setCommission" value="20"></div>
       <div><label>किमान बेस भाडे (Min Fare ₹)</label><input type="number" id="setMinFare" value="30"></div>
-      <div><label>2-Wheeler दर (₹/km)</label><input type="number" id="setRate2W" value="10"></div>
-      <div><label>3-Wheeler दर (₹/km)</label><input type="number" id="setRate3W" value="18"></div>
-      <div><label>Mini Tempo दर (₹/km)</label><input type="number" id="setRateTempo" value="25"></div>
     </div>
 
-    <!-- नवीन: वाहननिहाय वेटिंग टाईम व दर नियंत्रण कार्ड -->
     <div class="ref-control-card" style="border-color: #3498db; background: #101820;">
       <h4 style="color: #3498db; margin-bottom:8px;">⏱️ वाहननिहाय वेटिंग टाईम व दर नियंत्रण (Waiting Rules Config)</h4>
-      <p style="font-size: 11px; color: #aaa; margin-bottom: 10px;">येथून बदललेले नियम रायडर ॲपवर आपोआप लागू होतील.</p>
-      
       <div class="form-grid">
-        <div>
-          <label style="color:#4db8ff;">🏍️ 2-Wheeler मोफत मिनिटे</label>
-          <input type="number" id="w_2w_free" value="4">
-        </div>
-        <div>
-          <label style="color:#4db8ff;">2-Wheeler प्रति मिनिट दर (₹)</label>
-          <input type="number" step="0.5" id="w_2w_rate" value="1.5">
-        </div>
-
-        <div>
-          <label style="color:#f1c40f;">🛺 3-Wheeler मोफत मिनिटे</label>
-          <input type="number" id="w_3w_free" value="6">
-        </div>
-        <div>
-          <label style="color:#f1c40f;">3-Wheeler प्रति मिनिट दर (₹)</label>
-          <input type="number" step="0.5" id="w_3w_rate" value="2.0">
-        </div>
-
-        <div>
-          <label style="color:#2ecc71;">🚚 Mini Tempo / Truck मोफत मिनिटे</label>
-          <input type="number" id="w_truck_free" value="10">
-        </div>
-        <div>
-          <label style="color:#2ecc71;">Mini Tempo प्रति मिनिट दर (₹)</label>
-          <input type="number" step="0.5" id="w_truck_rate" value="3.5">
-        </div>
+        <div><label style="color:#4db8ff;">🏍️ 2-Wheeler मोफत मिनिटे</label><input type="number" id="w_2w_free" value="4"></div>
+        <div><label>2-Wheeler प्रति मिनिट दर (₹)</label><input type="number" step="0.5" id="w_2w_rate" value="1.5"></div>
+        <div><label style="color:#f1c40f;">🛺 3-Wheeler मोफत मिनिटे</label><input type="number" id="w_3w_free" value="6"></div>
+        <div><label>3-Wheeler प्रति मिनिट दर (₹)</label><input type="number" step="0.5" id="w_3w_rate" value="2.0"></div>
       </div>
-    </div>
-
-    <div class="ref-control-card">
-      <h4 style="color:#ff6600; margin-bottom:8px;">🎁 जॉइनिंग बोनस, मासिक कमाई बॅनर आणि रेफरल बोनस नियम</h4>
-      <div class="form-grid">
-        <div><label>किमान मासिक कमाई आकडा (₹)</label><input type="number" id="setEarnMin" value="30000"></div>
-        <div><label>कमाल मासिक कमाई आकडा (₹)</label><input type="number" id="setEarnMax" value="50000"></div>
-        <div><label>नवीन रायडर जॉइनिंग बोनस (₹/महिना पर्यंत)</label><input type="number" id="setJoiningBonus" value="5000"></div>
-        <div><label>रेफर करणाऱ्याला बोनस (Referrer ₹)</label><input type="number" id="setReferrerBonus" value="500"></div>
-        <div><label>नवीन मित्राला रेफर बोनस (Referee ₹)</label><input type="number" id="setRefereeBonus" value="300"></div>
-        <div><label>बोनससाठी आवश्यक ऑर्डर्स (Target Orders)</label><input type="number" id="setRefTargetOrders" value="25"></div>
-        <div><label>बोनस पूर्ण करण्याची मुदत (दिवस / Days)</label><input type="number" id="setRefValidDays" value="30"></div>
-      </div>
-      <div class="form-grid" style="margin-bottom:0;">
-        <label class="chk-row"><input type="checkbox" id="refSystemEnabled" checked> ✅ रेफरल व जॉइनिंग बोनस योजना चालू ठेवा</label>
-        <label class="chk-row"><input type="checkbox" id="refSameZoneOnly" checked> 📍 फक्त त्याच झोनमध्ये रेफर केल्यावर बोनस द्या</label>
-      </div>
-    </div>
-
-    <h4 style="color:#4db8ff; margin:14px 0 8px;">📷 रायडर Live Camera मधून कोणते डॉक्युमेंट्स अनिवार्य करायचे ते निवडा:</h4>
-    <div class="form-grid">
-      <label class="chk-row"><input type="checkbox" id="docAadhaar" checked> 🪪 आधार कार्ड (Live Camera + नंबर)</label>
-      <label class="chk-row"><input type="checkbox" id="docLicense" checked> 🚗 ड्रायव्हिंग लायसन्स (Live Camera + नंबर)</label>
-      <label class="chk-row"><input type="checkbox" id="docRcBook"> 📄 गाडीचा RC बुक (Live Camera + नंबर)</label>
-      <label class="chk-row"><input type="checkbox" id="docPanCard"> 💳 पॅन कार्ड (Live Camera + नंबर)</label>
-      <label class="chk-row"><input type="checkbox" id="reqDailySelfie" checked> 🤳 दररोज ड्युटी Live Selfie अनिवार्य</label>
-      <label class="chk-row"><input type="checkbox" id="reqLoudAlert" checked> 🔔 नवीन ऑर्डर सायरन अलर्ट चालू</label>
-    </div>
-
-    <div class="form-grid">
-      <div><label>कस्टमर ॲप ऑफर बॅनर</label><input type="text" id="custBannerText" placeholder="उदा. आज ₹20 सूट!"></div>
-      <div><label>रायडर ॲप बोनस बॅनर</label><input type="text" id="riderBannerText" placeholder="उदा. ५ ऑर्डरवर ₹100 बोनस!"></div>
     </div>
     <button class="save-btn" onclick="saveMasterSettings()">🚀 सर्व बदल सेव्ह करा व लागू करा</button>
   </div>
@@ -289,8 +220,7 @@
     projectId: "goparcel-f89b5",
     storageBucket: "goparcel-f89b5.firebasestorage.app",
     messagingSenderId: "263428109251",
-    appId: "1:263428109251:web:12f001ac4c4e9d71c84376",
-    measurementId: "G-BGH30XLR8M"
+    appId: "1:263428109251:web:12f001ac4c4e9d71c84376"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -343,81 +273,6 @@
 
   window.openImgModal = (src) => { document.getElementById('modalImgSrc').src = src; document.getElementById('imgModal').classList.remove('hidden'); };
 
-  window.openLegalPdfCertificate = (role, name, phone, detail, acceptedAt) => {
-    const formattedDate = acceptedAt ? new Date(acceptedAt).toLocaleString('en-IN') : "Verified Digitally";
-    const termsContent = role === 'Rider'
-      ? `१. मी GoParcel चा स्वतंत्र डिलिव्हरी पार्टनर (Independent Delivery Partner) असून कंपनीचा कायमस्वरूपी कर्मचारी नाही.<br>
-         २. माझ्या वाहनाचा विमा, PUC, RC बुक, ड्रायव्हिंग लायसन्स आणि सर्व सरकारी व वाहतूक नियमांचे पालन करण्याची संपूर्ण जबाबदारी माझी स्वतःची आहे.<br>
-         ३. कोणत्याही पार्सलमध्ये दारू, ड्रग्ज, स्फोटके किंवा बेकायदेशीर वस्तू आढळल्यास मी डिलिव्हरी थांबवून पोलिसांना व कंपनीला कळवेन.`
-      : `१. मी पाठवत असलेल्या पार्सलमध्ये दारू (Alcohol), अंमली पदार्थ (Drugs), स्फोटके, हत्यारे किंवा कोणतीही बेकायदेशीर वस्तू नाही याची मी कायदेशीर हमी देतो.<br>
-         २. पार्सलमधील वस्तूंची संपूर्ण कायदेशीर जबाबदारी माझी (कस्टमरची) राहील.`;
-
-    document.getElementById('certPrintArea').innerHTML = `
-      <div style="border-bottom:2px solid #ff6600; padding-bottom:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="color:#ff6600; margin:0; font-size:18px;">GoParcel Logistics</h2>
-        <span style="background:#2ecc71; color:#000; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:11px;">DIGITALLY SIGNED</span>
-      </div>
-      <h4 style="margin-bottom:8px; color:#000;">📜 कायदेशीर नियम व अटी संमती प्रमाणपत्र</h4>
-      <p><b>भूमिका:</b> ${role === 'Rider' ? 'Delivery Partner (रायडर)' : 'Customer (ग्राहक)'}</p>
-      <p><b>पूर्ण नाव:</b> ${name}</p>
-      <p><b>नोंदणीकृत मोबाईल:</b> ${phone}</p>
-      <p><b>तपशील:</b> ${detail}</p>
-      <p><b>संमती दिल्याची तारीख व वेळ:</b> ${formattedDate}</p>
-      <hr style="margin:10px 0; border:none; border-top:1px dashed #999;">
-      <p style="font-size:12px; color:#222;"><b>मान्य केलेल्या अटी व शर्ती:</b><br>${termsContent}</p>
-    `;
-    document.getElementById('legalPdfModal').classList.remove('hidden');
-  };
-
-  function renderLegalAgreementsTable() {
-    const tbody = document.getElementById('legalTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = "";
-    Object.entries(allRidersMap).forEach(([rid, r]) => {
-      if (r.partnerAgreementAccepted) {
-        const dt = r.agreementAcceptedAt ? new Date(r.agreementAcceptedAt).toLocaleString('en-IN') : 'Verified';
-        const detail = `${r.vehicleType || '2-Wheeler'} (${r.vehicleNo || '-'})`;
-        tbody.innerHTML += `<tr>
-          <td><span style="background:#ff6600; color:#000; padding:2px 7px; border-radius:6px; font-weight:bold;">🛵 Rider</span></td>
-          <td><b>${r.name || 'Rider'}</b><br><small>📞 ${r.phone || ''}</small></td>
-          <td>${detail}</td>
-          <td><small>🕒 ${dt}</small></td>
-          <td><button class="btn-sm btn-pdf" onclick="openLegalPdfCertificate('Rider', '${(r.name||'Rider').replace(/'/g,'')}', '${r.phone||''}', '${detail}', '${r.agreementAcceptedAt||''}')">📄 PDF / Print</button></td>
-        </tr>`;
-      }
-    });
-    allOrdersList.forEach(o => {
-      if (o.legalAgreementAccepted) {
-        const dt = o.legalAcceptedAt ? new Date(o.legalAcceptedAt).toLocaleString('en-IN') : 'Verified';
-        const cName = (o.customerEmail || 'Customer').replace('✔ ', '');
-        const cPhone = o.customerPhone || '';
-        const detail = `Parcel: ${o.parcel} | ${o.vehicle} | ₹${o.fare}`;
-        tbody.innerHTML += `<tr>
-          <td><span style="background:#3498db; color:#fff; padding:2px 7px; border-radius:6px; font-weight:bold;">📦 Customer</span></td>
-          <td><b>${cName}</b><br><small>📞 ${cPhone}</small></td>
-          <td>${detail}</td>
-          <td><small>🕒 ${dt}</small></td>
-          <td><button class="btn-sm btn-pdf" onclick="openLegalPdfCertificate('Customer', '${cName.replace(/'/g,'')}', '${cPhone}', '${detail.replace(/'/g,'')}', '${o.legalAcceptedAt||''}')">📄 PDF / Print</button></td>
-        </tr>`;
-      }
-    });
-  }
-
-  const zoneMap = L.map('zoneMap').setView([18.5204, 73.8567], 11);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(zoneMap);
-  let previewMarker = L.marker([18.5204, 73.8567]).addTo(zoneMap);
-  let zoneLayers = L.layerGroup().addTo(zoneMap);
-
-  zoneMap.on('click', (e) => {
-    document.getElementById('zoneLat').value = e.latlng.lat.toFixed(5);
-    document.getElementById('zoneLng').value = e.latlng.lng.toFixed(5);
-    previewMarker.setLatLng(e.latlng).bindPopup("नवीन झोन केंद्र").openPopup();
-  });
-
-  const adminMap = L.map('adminMap').setView([18.5204, 73.8567], 12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(adminMap);
-  const riderMarkers = {};
-
   window.showTab = (tab) => {
     ['riders', 'legal', 'referrals', 'otpLive', 'zones', 'master', 'map', 'orders'].forEach(t => {
       const cap = t.charAt(0).toUpperCase() + t.slice(1);
@@ -427,6 +282,15 @@
     if (tab === 'zones') setTimeout(() => zoneMap.invalidateSize(), 200);
     if (tab === 'map') setTimeout(() => adminMap.invalidateSize(), 200);
   };
+
+  const zoneMap = L.map('zoneMap').setView([18.5204, 73.8567], 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(zoneMap);
+  let previewMarker = L.marker([18.5204, 73.8567]).addTo(zoneMap);
+  let zoneLayers = L.layerGroup().addTo(zoneMap);
+
+  const adminMap = L.map('adminMap').setView([18.5204, 73.8567], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(adminMap);
+  const riderMarkers = {};
 
   window.addServiceZone = async () => {
     const name = document.getElementById('zoneName').value.trim();
@@ -438,81 +302,6 @@
     await setDoc(doc(db, "serviceZones", zoneId), { name, radiusKm, lat, lng, active: true });
     alert(`✅ '${name}' (${radiusKm} km) झोन सेव्ह झाला!`);
   };
-  window.updateZoneRadius = async (id, cur) => { const r = prompt("नवीन रेंज (km):", cur); if (r && Number(r) > 0) await updateDoc(doc(db, "serviceZones", id), { radiusKm: Number(r) }); };
-  window.toggleZoneActive = async (id, s) => { await updateDoc(doc(db, "serviceZones", id), { active: s }); };
-  window.deleteZone = async (id) => { if (confirm("काढायचे का?")) await deleteDoc(doc(db, "serviceZones", id)); };
-
-  onSnapshot(collection(db, "serviceZones"), async (snap) => {
-    const tbody = document.getElementById('zonesTableBody'); tbody.innerHTML = "";
-    zoneLayers.clearLayers(); let activeCount = 0;
-    if (snap.empty) { await setDoc(doc(db, "serviceZones", "zone_pune"), { name: "Pune City", radiusKm: 15, lat: 18.5204, lng: 73.8567, active: true }); return; }
-    snap.forEach(d => {
-      const z = d.data();
-      if (z.active) { activeCount++; L.circle([z.lat, z.lng], { radius: z.radiusKm * 1000, color: '#2ecc71', fillOpacity: 0.18 }).addTo(zoneLayers); }
-      tbody.innerHTML += `<tr><td><b>${z.name}</b></td><td><b>${z.radiusKm} km</b></td><td>${z.active ? '● चालू' : '● बंद'}</td><td>
-        <button class="btn-sm btn-approve" onclick="updateZoneRadius('${d.id}', ${z.radiusKm})">📏 रेंज बदला</button>
-        <button class="btn-sm" style="background:#333;color:#fff;" onclick="toggleZoneActive('${d.id}', ${!z.active})">${z.active ? 'बंद' : 'चालू'}</button>
-        <button class="btn-sm btn-block" onclick="deleteZone('${d.id}')">🗑️</button></td></tr>`;
-    });
-    document.getElementById('activeZonesCount').innerText = activeCount;
-  });
-
-  onSnapshot(query(collection(db, "cityVotes"), orderBy("votes", "desc")), (snap) => {
-    const tbody = document.getElementById('votesTableBody'); tbody.innerHTML = "";
-    snap.forEach(d => { const v = d.data(); tbody.innerHTML += `<tr><td><b>🏙️ ${v.cityName}</b></td><td><b>${v.votes} Votes</b></td><td><button class="btn-sm btn-approve" onclick="document.getElementById('zoneName').value='${v.cityName}';">➕ झोन सुरू करा</button></td></tr>`; });
-  });
-
-  onSnapshot(settingsRef, (snap) => {
-    if (snap.exists()) {
-      const s = snap.data();
-      liveAdminPin = s.adminPin || "2026";
-      document.getElementById('setAdminPin').value = liveAdminPin;
-      document.getElementById('setAdminWa').value = s.adminWa ?? "919049505512";
-      document.getElementById('setPickupRadius').value = s.pickupRadiusKm ?? 2;
-      document.getElementById('setOnboardingFee').value = s.onboardingFee ?? 1000;
-      document.getElementById('setCommission').value = s.commission ?? 20;
-      document.getElementById('setMinFare').value = s.minFare ?? 30;
-      document.getElementById('setRate2W').value = s.rate2W ?? 10;
-      document.getElementById('setRate3W').value = s.rate3W ?? 18;
-      document.getElementById('setRateTempo').value = s.rateTempo ?? 25;
-
-      // वेटिंग टाईम व दर इनपुट बाइंड करणे
-      document.getElementById('w_2w_free').value = s.w_2w_free ?? 4;
-      document.getElementById('w_2w_rate').value = s.w_2w_rate ?? 1.5;
-      document.getElementById('w_3w_free').value = s.w_3w_free ?? 6;
-      document.getElementById('w_3w_rate').value = s.w_3w_rate ?? 2.0;
-      document.getElementById('w_truck_free').value = s.w_truck_free ?? 10;
-      document.getElementById('w_truck_rate').value = s.w_truck_rate ?? 3.5;
-
-      document.getElementById('setEarnMin').value = s.earnMin ?? 30000;
-      document.getElementById('setEarnMax').value = s.earnMax ?? 50000;
-      document.getElementById('setJoiningBonus').value = s.joiningBonus ?? 5000;
-      document.getElementById('setReferrerBonus').value = s.referrerBonus ?? 500;
-      document.getElementById('setRefereeBonus').value = s.refereeBonus ?? 300;
-      document.getElementById('setRefTargetOrders').value = s.refTargetOrders ?? 25;
-      document.getElementById('setRefValidDays').value = s.refValidDays ?? 30;
-      document.getElementById('refSystemEnabled').checked = s.refSystemEnabled ?? true;
-      document.getElementById('refSameZoneOnly').checked = s.refSameZoneOnly ?? true;
-
-      document.getElementById('docAadhaar').checked = s.docAadhaar ?? true;
-      document.getElementById('docLicense').checked = s.docLicense ?? true;
-      document.getElementById('docRcBook').checked = s.docRcBook ?? false;
-      document.getElementById('docPanCard').checked = s.docPanCard ?? false;
-      document.getElementById('reqDailySelfie').checked = s.reqDailySelfie ?? true;
-      document.getElementById('reqLoudAlert').checked = s.reqLoudAlert ?? true;
-      document.getElementById('custBannerText').value = s.custBannerText ?? "";
-      document.getElementById('riderBannerText').value = s.riderBannerText ?? "";
-
-      currentCommPercent = Number(s.commission ?? 20);
-      refConfig = {
-        referrerBonus: Number(s.referrerBonus ?? 500),
-        refereeBonus: Number(s.refereeBonus ?? 300),
-        targetOrders: Number(s.refTargetOrders ?? 25),
-        validDays: Number(s.refValidDays ?? 30)
-      };
-      renderReferralsTable();
-    }
-  });
 
   window.saveMasterSettings = async () => {
     const newPin = document.getElementById('setAdminPin').value.trim() || "2026";
@@ -524,76 +313,13 @@
       onboardingFee: Number(document.getElementById('setOnboardingFee').value),
       commission: Number(document.getElementById('setCommission').value),
       minFare: Number(document.getElementById('setMinFare').value),
-      rate2W: Number(document.getElementById('setRate2W').value),
-      rate3W: Number(document.getElementById('setRate3W').value),
-      rateTempo: Number(document.getElementById('setRateTempo').value),
-
-      // वेटिंग टाईम व दर सेव्ह करणे
       w_2w_free: Number(document.getElementById('w_2w_free').value),
       w_2w_rate: Number(document.getElementById('w_2w_rate').value),
       w_3w_free: Number(document.getElementById('w_3w_free').value),
-      w_3w_rate: Number(document.getElementById('w_3w_rate').value),
-      w_truck_free: Number(document.getElementById('w_truck_free').value),
-      w_truck_rate: Number(document.getElementById('w_truck_rate').value),
-
-      earnMin: Number(document.getElementById('setEarnMin').value),
-      earnMax: Number(document.getElementById('setEarnMax').value),
-      joiningBonus: Number(document.getElementById('setJoiningBonus').value),
-      referrerBonus: Number(document.getElementById('setReferrerBonus').value),
-      refereeBonus: Number(document.getElementById('setRefereeBonus').value),
-      refTargetOrders: Number(document.getElementById('setRefTargetOrders').value),
-      refValidDays: Number(document.getElementById('setRefValidDays').value),
-      refSystemEnabled: document.getElementById('refSystemEnabled').checked,
-      refSameZoneOnly: document.getElementById('refSameZoneOnly').checked,
-
-      docAadhaar: document.getElementById('docAadhaar').checked,
-      docLicense: document.getElementById('docLicense').checked,
-      docRcBook: document.getElementById('docRcBook').checked,
-      docPanCard: document.getElementById('docPanCard').checked,
-      reqDailySelfie: document.getElementById('reqDailySelfie').checked,
-      reqLoudAlert: document.getElementById('reqLoudAlert').checked,
-      custBannerText: document.getElementById('custBannerText').value.trim(),
-      riderBannerText: document.getElementById('riderBannerText').value.trim()
+      w_3w_rate: Number(document.getElementById('w_3w_rate').value)
     }, { merge: true });
-    alert("✅ सर्व बदल, दर आणि वेटिंग टाईमचे नियम यशस्वीपणे सेव्ह झाले!");
+    alert("✅ सर्व बदल आणि वेटिंग टाईमचे नियम यशस्वीपणे सेव्ह झाले!");
   };
-
-  window.creditReferralBonus = async (newRiderId, referrerId, rfrAmt, rfeAmt) => {
-    if (!confirm(`रेफर करणाऱ्याला ₹${rfrAmt} आणि नवीन रायडरला ₹${rfeAmt} बोनस वॉलेटमध्ये जमा करायचा का?`)) return;
-    await updateDoc(doc(db, "riders", newRiderId), { referralBonusPaid: true, bonusEarned: increment(rfeAmt) });
-    if (referrerId && allRidersMap[referrerId]) {
-      await updateDoc(doc(db, "riders", referrerId), { bonusEarned: increment(rfrAmt), successfulReferrals: increment(1) });
-    }
-    alert("🎉 दोन्ही रायडर्सच्या वॉलेटमध्ये रेफरल बोनस जमा झाला!");
-  };
-
-  function renderReferralsTable() {
-    const tbody = document.getElementById('referralsTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = "";
-    Object.entries(allRidersMap).forEach(([rid, r]) => {
-      if (r.referredBy) {
-        const refId = "rider_" + r.referredBy.replace(/[^0-9]/g, '');
-        const refRider = allRidersMap[refId];
-        const refLabel = refRider ? `${refRider.name} (${r.referredBy})` : r.referredBy;
-        const doneOrders = riderDeliveredCounts[rid] || 0;
-        const isEligible = doneOrders >= refConfig.targetOrders;
-        tbody.innerHTML += `<tr>
-          <td><b>${refLabel}</b></td>
-          <td><b>${r.name || 'Rider'}</b><br><small>📞 ${r.phone}</small></td>
-          <td><b style="color:${isEligible ? '#2ecc71' : '#ff6600'};">${doneOrders} / ${refConfig.targetOrders} ऑर्डर्स</b><br><small>मुदत: ${refConfig.validDays} दिवस</small></td>
-          <td>Referrer: <b>₹${refConfig.referrerBonus}</b><br>Friend: <b>₹${refConfig.refereeBonus}</b></td>
-          <td>${r.referralBonusPaid ? '<span style="color:#2ecc71; font-weight:bold;">✅ बोनस दिला</span>' : `<button class="btn-sm btn-approve" onclick="creditReferralBonus('${rid}', '${refId}', ${refConfig.referrerBonus}, ${refConfig.refereeBonus})">💰 बोनस जमा करा</button>`}</td>
-        </tr>`;
-      }
-    });
-  }
-
-  function buildLocalizedOtpMessage(lang, name, otp, timeStr) {
-    if (lang === 'hi') return `नमस्ते ${name}, आपका GoParcel OTP कोड है: ${otp} (समय: ${timeStr})। यह केवल 10 मिनट के लिए मान्य है।`;
-    if (lang === 'en') return `Hello ${name}, your GoParcel verification OTP code is: ${otp} (Time: ${timeStr}). Valid for 10 minutes only.`;
-    return `नमस्कार ${name}, तुमचा GoParcel पडताळणी OTP कोड आहे: ${otp} (वेळ: ${timeStr}). हा OTP फक्त १० मिनिटे वैध आहे.`;
-  }
 
   function renderLiveOtpRows() {
     const tbody = document.getElementById('otpLiveTableBody');
@@ -609,18 +335,16 @@
         activeCount++;
         const mins = String(Math.floor(remMs / 60000)).padStart(2, '0');
         const secs = String(Math.floor((remMs % 60000) / 1000)).padStart(2, '0');
-        const reqLang = r.language || "mr";
-        const langLabel = reqLang === 'hi' ? 'हिंदी' : (reqLang === 'en' ? 'English' : 'मराठी');
-        const waMsg = buildLocalizedOtpMessage(reqLang, r.name, r.otp, r.timeStr);
+        const waMsg = `नमस्कार ${r.name}, तुमचा GoParcel पडताळणी OTP कोड आहे: ${r.otp}`;
         const waUrl = `https://wa.me/91${r.phone}?text=${encodeURIComponent(waMsg)}`;
 
         tbody.innerHTML += `<tr style="background:#291a10;">
           <td><b>🕒 ${r.timeStr || ''}</b></td>
-          <td>${r.role || ''}<br><span class="lang-pill">🌐 ${langLabel}</span></td>
+          <td>${r.role || ''}</td>
           <td><b>${r.name}</b><br><small>📞 ${r.phone}</small></td>
           <td><b style="color:#ff6600; font-size:18px;">${r.otp}</b></td>
           <td><span style="color:#4db8ff; font-weight:bold;">⏳ ${mins}:${secs} बाकी</span></td>
-          <td><a href="${waUrl}" target="_blank" class="btn-sm btn-wa">📲 ${langLabel} OTP पाठवा</a></td>
+          <td><a href="${waUrl}" target="_blank" class="btn-sm btn-wa">📲 WhatsApp OTP पाठवा</a></td>
         </tr>`;
       }
     });
@@ -642,19 +366,6 @@
     renderLiveOtpRows();
   });
 
-  window.toggleRiderApproval = async (riderId, status) => {
-    await updateDoc(doc(db, "riders", riderId), { approved: status, mobileVerified: true, kycRejected: false });
-    alert(status ? "रायडरला मंजुरी दिली आहे!" : "रायडरला Block केले आहे!");
-  };
-
-  window.rejectRiderKyc = async (riderId) => {
-    const reason = prompt("कागदपत्रे का नाकारत आहात? कारण लिहा:", "कागदपत्राचा फोटो अस्पष्ट आहे, पुन्हा Live Camera ने काढा.");
-    if (reason) {
-      await updateDoc(doc(db, "riders", riderId), { approved: false, kycRejected: true, rejectReason: reason });
-      alert("रायडरला कागदपत्रे पुन्हा स्कॅन करण्याचा संदेश पाठवला आहे.");
-    }
-  };
-
   onSnapshot(collection(db, "riders"), (snap) => {
     const tbody = document.getElementById('ridersTableBody'); tbody.innerHTML = "";
     let approvedCount = 0;
@@ -668,52 +379,34 @@
         else riderMarkers[d.id] = L.marker([r.lat, r.lng]).addTo(adminMap).bindPopup(`🛵 ${r.name}`);
       }
       const thumbs = [];
-      if (r.regSelfie) thumbs.push(`<img src="${r.regSelfie}" class="selfie-thumb" onclick="openImgModal('${r.regSelfie}')" title="मूळ सेल्फी">`);
-      if (r.dailySelfie) thumbs.push(`<img src="${r.dailySelfie}" class="selfie-thumb" style="border-color:#2ecc71;" onclick="openImgModal('${r.dailySelfie}')" title="आजचा ड्युटी सेल्फी">`);
-      if (r.kycPhoto) thumbs.push(`<img src="${r.kycPhoto}" class="selfie-thumb" style="border-color:#4db8ff;" onclick="openImgModal('${r.kycPhoto}')" title="कागदपत्र फोटो">`);
-      if (r.photoAadhaar) thumbs.push(`<img src="${r.photoAadhaar}" class="selfie-thumb" style="border-color:#4db8ff;" onclick="openImgModal('${r.photoAadhaar}')" title="आधार कार्ड">`);
-      if (r.photoLicense) thumbs.push(`<img src="${r.photoLicense}" class="selfie-thumb" style="border-color:#f1c40f;" onclick="openImgModal('${r.photoLicense}')" title="लायसन्स">`);
-      if (r.photoRcBook) thumbs.push(`<img src="${r.photoRcBook}" class="selfie-thumb" style="border-color:#9b59b6;" onclick="openImgModal('${r.photoRcBook}')" title="RC बुक">`);
-      if (r.photoPanCard) thumbs.push(`<img src="${r.photoPanCard}" class="selfie-thumb" style="border-color:#e67e22;" onclick="openImgModal('${r.photoPanCard}')" title="पॅन कार्ड">`);
+      if (r.regSelfie) thumbs.push(`<img src="${r.regSelfie}" class="selfie-thumb" onclick="openImgModal('${r.regSelfie}')">`);
+      if (r.photoAadhaar) thumbs.push(`<img src="${r.photoAadhaar}" class="selfie-thumb" onclick="openImgModal('${r.photoAadhaar}')">`);
 
       tbody.innerHTML += `<tr>
-        <td><b>${r.name || 'Rider'}</b><br><small>📞 ${r.phone || ''}</small>${r.referredBy ? `<br><small style="color:#2ecc71;">🎁 Ref: ${r.referredBy}</small>` : ''}</td>
-        <td><div style="display:flex; gap:5px; flex-wrap:wrap;">${thumbs.join('')}</div></td>
-        <td><b>${r.vehicleType || ''} - ${r.vehicleNo || '-'}</b><br><small>${r.kycDoc || '-'}</small></td>
-        <td>${r.feePaid ? '✅ Paid' : '❌ Unpaid'}<br>${r.kycRejected ? '<b style="color:#e74c3c;">Rejected</b>' : (r.approved ? '<b style="color:#2ecc71;">Approved</b>' : '<b style="color:#ff6600;">Pending</b>')}</td>
-        <td>
-          <button class="btn-sm btn-approve" onclick="toggleRiderApproval('${d.id}', true)">Approve</button>
-          <button class="btn-sm btn-edit" onclick="rejectRiderKyc('${d.id}')">Reject KYC</button>
-          <button class="btn-sm btn-block" onclick="toggleRiderApproval('${d.id}', false)">Block</button>
-        </td>
+        <td><b>${r.name || 'Rider'}</b><br><small>📞 ${r.phone || ''}</small></td>
+        <td><div style="display:flex; gap:5px;">${thumbs.join('')}</div></td>
+        <td><b>${r.vehicleType || ''} - ${r.vehicleNo || '-'}</b></td>
+        <td>${r.approved ? '<b style="color:#2ecc71;">Approved</b>' : '<b style="color:#ff6600;">Pending</b>'}</td>
+        <td><button class="btn-sm btn-approve" onclick="updateDoc(doc(db,'riders','${d.id}'), {approved:true})">Approve</button></td>
       </tr>`;
     });
     document.getElementById('approvedRidersCount').innerText = approvedCount;
-    renderReferralsTable();
-    renderLegalAgreementsTable();
   });
 
-  window.deleteOrder = async (id) => { if (confirm("ऑर्डर डिलीट करायची का?")) await deleteDoc(doc(db, "orders", id)); };
   onSnapshot(collection(db, "orders"), (snap) => {
     const tbody = document.getElementById('adminTableBody'); tbody.innerHTML = "";
     let count = 0, comm = 0;
-    riderDeliveredCounts = {};
-    allOrdersList = [];
     snap.forEach(d => {
       const o = d.data(); count++;
-      allOrdersList.push(o);
-      if (o.status === "Delivered" && o.riderId) riderDeliveredCounts[o.riderId] = (riderDeliveredCounts[o.riderId] || 0) + 1;
       comm += Math.round(Number(o.fare || 0) * (currentCommPercent / 100));
       tbody.innerHTML += `<tr>
         <td>${o.customerEmail || 'User'}</td><td>${o.pickup} ➔ ${o.drop}</td>
         <td>${o.vehicle}<br><small style="color:#2ecc71;">PIN: ${o.deliveryPin || '-'}</small></td><td>₹${o.fare}</td><td>${o.riderEmail || '-'}</td>
-        <td><b>${o.status}</b></td><td><button class="btn-sm btn-block" onclick="deleteOrder('${d.id}')">Delete</button></td>
+        <td><b>${o.status}</b></td><td><button class="btn-sm btn-block" onclick="deleteDoc(doc(db,'orders','${d.id}'))">Delete</button></td>
       </tr>`;
     });
     document.getElementById('totalOrders').innerText = count;
     document.getElementById('platformComm').innerText = comm;
-    renderReferralsTable();
-    renderLegalAgreementsTable();
   });
 </script>
 </body>
