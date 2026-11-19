@@ -39,6 +39,15 @@
     table.order-tbl th, table.order-tbl td { border: 1px solid #333; padding: 8px; text-align: left; }
     table.order-tbl th { background: #222; color: #ff6600; }
 
+    /* New Customer Features Styling */
+    .extra-stop-item { background: #18140e; border: 1px dashed #ff9800; border-radius: 8px; padding: 8px; margin: 6px 0; display: flex; gap: 6px; align-items: center; }
+    .addon-card { background: #111; border: 1px solid #333; border-radius: 10px; padding: 10px; margin: 8px 0; }
+    .tip-pills { display: flex; gap: 6px; margin-top: 6px; }
+    .tip-pill { flex: 1; padding: 7px 4px; background: #1e1e1e; border: 1px solid #444; border-radius: 8px; text-align: center; font-size: 12px; font-weight: bold; cursor: pointer; color: #ccc; }
+    .tip-pill.active { background: #2ecc71; color: #000; border-color: #2ecc71; }
+    .offline-bar { background: #4a3500; border: 1px solid #f1c40f; color: #f1c40f; padding: 8px; border-radius: 8px; font-size: 12px; text-align: center; margin-bottom: 10px; font-weight: bold; }
+    .eta-pill { background: #0d2b18; border: 1px solid #2ecc71; color: #2ecc71; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; margin-top: 6px; display: flex; justify-content: space-between; }
+
     .chat-messages { max-height: 210px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 8px; background: #0a0a0a; border-radius: 8px; margin: 8px 0; }
     .msg-user { align-self: flex-end; background: #ff6600; color: #000; padding: 7px 11px; border-radius: 12px 12px 2px 12px; font-size: 13px; max-width: 80%; font-weight: 500; }
     .msg-admin { align-self: flex-start; background: #222; color: #2ecc71; border: 1px solid #2ecc71; padding: 7px 11px; border-radius: 12px 12px 12px 2px; font-size: 13px; max-width: 80%; }
@@ -82,6 +91,11 @@
 </header>
 
 <div class="container">
+  <!-- Offline / Low Network Alert Bar -->
+  <div id="custOfflineBar" class="offline-bar hidden">
+    📡 नेटवर्क कमी आहे (Offline Mode) — नेटवर्क येताच तुमची ऑर्डर माहिती आपोआप अपडेट होईल.
+  </div>
+
   <!-- Customer Login -->
   <div id="custAuthCard" class="card">
     <h3 id="txtLoginTitle" style="color:#ff6600; margin-bottom:8px;">कस्टमर लॉगिन</h3>
@@ -110,24 +124,44 @@
           <button type="button" id="txtBtnBigMap" class="btn-gps" style="width:auto; white-space:nowrap; border-color:#ff6600; color:#ff6600;" onclick="toggleMapSize()">🔍 मोठा नकाशा</button>
         </div>
 
-        <!-- Pickup Location + Contact Person Name & Phone -->
+        <!-- Pickup Location + Contact Person + Floor Selection -->
         <div class="contact-group" style="border-left: 3px solid #2ecc71;">
-          <label id="txtLblPickup" style="font-size:12px; color:#2ecc71; font-weight:bold;">🟢 पिकअप पत्ता व व्यक्तीची माहिती:</label>
+          <label id="txtLblPickup" style="font-size:12px; color:#2ecc71; font-weight:bold;">🟢 पिकअप पत्ता, मजला व व्यक्तीची माहिती:</label>
           <input type="text" id="pickupInput" placeholder="पिकअप पत्ता टाका">
           <div class="contact-row">
             <input type="text" id="pickupPersonName" placeholder="पिकअप व्यक्तीचे नाव">
             <input type="tel" id="pickupPersonPhone" maxlength="10" placeholder="पिकअप मोबाईल नंबर">
           </div>
+          <select id="pickupFloorSelect" onchange="recalcPrices()" style="margin-top:4px; border-color:#2ecc71; font-size:13px; padding:9px;">
+            <option value="Ground Floor|0">🏢 पिकअप मजला: Ground Floor (₹0)</option>
+            <option value="1st-2nd Floor (Lift Available)|0">🏢 1ला / 2रा मजला - लिफ्ट आहे (₹0)</option>
+            <option value="1st Floor (No Lift)|15">🪜 1ला मजला - लिफ्ट नाही (+₹15)</option>
+            <option value="2nd Floor (No Lift)|30">🪜 2रा मजला - लिफ्ट नाही (+₹30)</option>
+            <option value="3rd+ Floor (No Lift)|45">🪜 3रा किंवा वरचा मजला - लिफ्ट नाही (+₹45)</option>
+          </select>
         </div>
 
-        <!-- Drop Location + Contact Person Name & Phone -->
+        <!-- Multi-Stop Delivery (+ Add Stop) -->
+        <div id="extraStopsContainer"></div>
+        <button type="button" onclick="addExtraDeliveryStop()" style="background:#1f160a; color:#ff9800; border:1px dashed #ff9800; padding:8px; font-size:13px; margin:4px 0;">
+          ➕ मधला स्टॉप जोडा (Add Stop • +₹25/stop)
+        </button>
+
+        <!-- Drop Location + Contact Person + Floor Selection -->
         <div class="contact-group" style="border-left: 3px solid #e74c3c;">
-          <label id="txtLblDrop" style="font-size:12px; color:#e74c3c; font-weight:bold;">🔴 ड्रॉप पत्ता व व्यक्तीची माहिती:</label>
+          <label id="txtLblDrop" style="font-size:12px; color:#e74c3c; font-weight:bold;">🔴 ड्रॉप पत्ता, मजला व व्यक्तीची माहिती:</label>
           <input type="text" id="dropInput" placeholder="ड्रॉप पत्ता टाका">
           <div class="contact-row">
             <input type="text" id="dropPersonName" placeholder="ड्रॉप व्यक्तीचे नाव">
             <input type="tel" id="dropPersonPhone" maxlength="10" placeholder="ड्रॉप मोबाईल नंबर">
           </div>
+          <select id="dropFloorSelect" onchange="recalcPrices()" style="margin-top:4px; border-color:#e74c3c; font-size:13px; padding:9px;">
+            <option value="Ground Floor|0">🏢 ड्रॉप मजला: Ground Floor (₹0)</option>
+            <option value="1st-2nd Floor (Lift Available)|0">🏢 1ला / 2रा मजला - लिफ्ट आहे (₹0)</option>
+            <option value="1st Floor (No Lift)|15">🪜 1ला मजला - लिफ्ट नाही (+₹15)</option>
+            <option value="2nd Floor (No Lift)|30">🪜 2रा मजला - लिफ्ट नाही (+₹30)</option>
+            <option value="3rd+ Floor (No Lift)|45">🪜 3रा किंवा वरचा मजला - लिफ्ट नाही (+₹45)</option>
+          </select>
         </div>
 
         <div id="custMap"></div>
@@ -155,6 +189,47 @@
               <option value="15-50 kg">15 kg - 50 kg</option>
               <option value="50+ kg">50+ kg</option>
             </select>
+          </div>
+        </div>
+
+        <!-- Package Photo Upload & Schedule Later -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:6px;">
+          <div class="addon-card" style="margin:0;">
+            <label style="font-size:11px; color:#4db8ff; font-weight:bold;">📸 पार्सल फोटो (ऐच्छिक):</label>
+            <input type="file" id="pkgPhotoInput" accept="image/*" onchange="handlePackagePhotoUpload(this)" style="padding:6px; font-size:11px; margin:4px 0;">
+            <img id="pkgPhotoPreview" class="hidden" style="width:100%; max-height:70px; object-fit:cover; border-radius:6px; margin-top:4px;">
+          </div>
+          <div class="addon-card" style="margin:0;">
+            <label style="font-size:11px; color:#ffaa66; font-weight:bold;">⏰ बुकिंग वेळ (Schedule):</label>
+            <select id="scheduleModeSelect" onchange="toggleScheduleInput()" style="padding:7px; font-size:12px; margin:4px 0;">
+              <option value="now">⚡ आत्ताच (Book Now)</option>
+              <option value="later">📅 नंतरसाठी (Schedule Later)</option>
+            </select>
+            <input type="datetime-local" id="scheduleDateTimeInput" class="hidden" style="padding:6px; font-size:11px; margin:2px 0;">
+          </div>
+        </div>
+
+        <!-- Goods Insurance / Protection Option -->
+        <div class="addon-card" style="border-color:#2ecc71;">
+          <label style="font-size:12px; color:#2ecc71; font-weight:bold;">🛡️ वस्तूचा विमा (Goods Insurance / Protection):</label>
+          <select id="goodsInsuranceSelect" onchange="recalcPrices()" style="margin-top:4px; font-size:13px; padding:9px;">
+            <option value="0">विमा नको (No Insurance - ₹0)</option>
+            <option value="5">🛡️ ₹5 अतिरिक्त — ₹2,000 पर्यंत नुकसान विमा कव्हर</option>
+            <option value="10">🛡️ ₹10 अतिरिक्त — ₹5,000 पर्यंत संपूर्ण विमा कव्हर</option>
+          </select>
+        </div>
+
+        <!-- Optional Rider Tip (100% Goes to Rider) -->
+        <div class="addon-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label style="font-size:12px; color:#ffaa66; font-weight:bold;">🎁 रायडरसाठी टीप (100% थेट रायडरला मिळेल):</label>
+            <span id="selectedTipBadge" style="font-size:11px; color:#2ecc71; font-weight:bold;">₹0</span>
+          </div>
+          <div class="tip-pills">
+            <div class="tip-pill active" onclick="selectCustomerTip(0, this)">₹0</div>
+            <div class="tip-pill" onclick="selectCustomerTip(20, this)">+₹20</div>
+            <div class="tip-pill" onclick="selectCustomerTip(50, this)">+₹50</div>
+            <div class="tip-pill" onclick="selectCustomerTip(100, this)">+₹100</div>
           </div>
         </div>
 
@@ -242,7 +317,7 @@
       </div>
     </div>
 
-    <!-- TAB 2: MY ORDERS + LIVE TRACKING + ADMIN CHAT -->
+    <!-- TAB 2: MY ORDERS + LIVE TRACKING + CANCELLATION POLICY + ADMIN CHAT -->
     <div id="cTabOrders" class="hidden">
       <div id="liveRiderTrackingCard" class="card hidden" style="border: 2px solid #2ecc71;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -250,6 +325,10 @@
           <span id="liveRiderDistTag" style="font-size:11px; background:#1c2e3d; color:#4db8ff; padding:3px 8px; border-radius:6px;">GPS Active</span>
         </div>
         <p id="liveRiderStatusBanner" style="font-size:12px; color:#ddd; margin-top:4px;">...</p>
+        <div class="eta-pill">
+          <span>⏱️ पोहोचण्याची अंदाजे वेळ: <strong id="custDynamicEta">~5 मिनिटे</strong></span>
+          <span>🛣️ लाईव्ह मार्ग (Route)</span>
+        </div>
         <div id="liveTrackMap"></div>
       </div>
 
@@ -282,7 +361,7 @@
       <div id="custOrdersCards"></div>
     </div>
 
-    <!-- TAB 3: PROFILE & SETTINGS -->
+    <!-- TAB 3: PROFILE, REFER & EARN & SETTINGS -->
     <div id="cTabProfile" class="hidden">
       <div class="card">
         <h3 id="txtProfTitle" style="color:#ff6600; margin-bottom:10px;">👤 कस्टमर प्रोफाईल व सेटिंग्ज</h3>
@@ -298,6 +377,14 @@
           <option value="hi">हिंदी (Hindi)</option>
           <option value="en">English</option>
         </select>
+
+        <!-- Refer & Earn Card (Controlled by Admin) -->
+        <div id="custReferBox" style="background:#000; border:1px dashed #ff6600; padding:10px; border-radius:8px; text-align:center; margin:10px 0;">
+          <div style="font-size:12px; color:#ffaa66;">🎁 मित्राला जोडा आणि बोनस मिळवा!</div>
+          Refer Code: <strong style="color:#ff6600; font-size:17px;" id="myCustReferCode">GPC0000</strong><br>
+          <small style="color:#aaa;">प्रत्येक यशस्वी रेफरलवर ₹<span id="dynCustReferAmt">50</span> सूट</small>
+        </div>
+
         <button id="txtBtnSaveProf" onclick="saveCustProfile()" style="background:#2ecc71;">💾 प्रोफाईल सेव्ह करा</button>
         <button id="txtBtnDlPdf" onclick="downloadLastConsentPdf()" style="background:#3498db; color:#fff; margin-top:8px;">📄 संमती पत्र PDF डाउनलोड करा</button>
         <button id="txtBtnLogout" onclick="logoutCust()" style="background:#e74c3c; color:#fff; margin-top:8px;">🚪 लॉगआउट</button>
@@ -385,14 +472,19 @@
   let currentLang = localStorage.getItem("gp_cust_lang") || "mr";
   let custOtpReqId = null, custOtpExpiresAt = 0, custOtpTimerInterval = null;
   let custGpsLat = 18.5204, custGpsLng = 73.8567, lastConsentRecord = null;
-  let liveTrackMap = null, liveRiderMarker = null, livePickupMarker = null, liveDropMarker = null, trackedRiderUnsub = null, currentTrackedRiderId = null;
+  let liveTrackMap = null, liveRiderMarker = null, livePickupMarker = null, liveDropMarker = null, liveTrackPolyline = null, trackedRiderUnsub = null, currentTrackedRiderId = null;
+
+  // New Customer Add-on State
+  let extraStopsList = [];
+  let packagePhotoBase64 = "";
+  let selectedTipAmount = 0;
 
   const dict = {
     mr: {
       loginTitle: "कस्टमर लॉगिन", namePh: "तुमचे पूर्ण नाव", phonePh: "१० अंकी मोबाईल नंबर", reqOtp: "OTP मागवा", verifyOtp: "लॉगिन पूर्ण करा",
       currLoc: "📍 माझे सध्याचे लोकेशन घ्या", bigMap: "🔍 मोठा नकाशा",
-      lblPickup: "🟢 पिकअप पत्ता व व्यक्तीची माहिती:", phPickup: "पिकअप पत्ता टाका", phPickName: "पिकअप व्यक्तीचे नाव", phPickPhone: "पिकअप मोबाईल नंबर",
-      lblDrop: "🔴 ड्रॉप पत्ता व व्यक्तीची माहिती:", phDrop: "ड्रॉप पत्ता टाका", phDropName: "ड्रॉप व्यक्तीचे नाव", phDropPhone: "ड्रॉप मोबाईल नंबर",
+      lblPickup: "🟢 पिकअप पत्ता, मजला व व्यक्तीची माहिती:", phPickup: "पिकअप पत्ता टाका", phPickName: "पिकअप व्यक्तीचे नाव", phPickPhone: "पिकअप मोबाईल नंबर",
+      lblDrop: "🔴 ड्रॉप पत्ता, मजला व व्यक्तीची माहिती:", phDrop: "ड्रॉप पत्ता टाका", phDropName: "ड्रॉप व्यक्तीचे नाव", phDropPhone: "ड्रॉप मोबाईल नंबर",
       lblDist: "अंतर (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
       lblPay: "💳 पेमेंट पद्धत निवडा:", subCod: "रोख पेमेंट (COD)", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 QR स्कॅन करा किंवा थेट UPI ॲपने पेमेंट करा", qrAmt: "रक्कम:", qrNote: "✅ पेमेंट पूर्ण झाल्यावर खालील बटन दाबा",
@@ -411,8 +503,8 @@
     hi: {
       loginTitle: "कस्टमर लॉगिन", namePh: "आपका पूरा नाम", phonePh: "१० अंकों का मोबाइल नंबर", reqOtp: "OTP मंगवाएं", verifyOtp: "लॉगिन पूरा करें",
       currLoc: "📍 मेरी वर्तमान लोकेशन लें", bigMap: "🔍 बड़ा मैप",
-      lblPickup: "🟢 पिकअप पता और व्यक्ति की जानकारी:", phPickup: "पिकअप पता दर्ज करें", phPickName: "पिकअप व्यक्ति का नाम", phPickPhone: "पिकअप मोबाइल नंबर",
-      lblDrop: "🔴 ड्रॉप पता और व्यक्ति की जानकारी:", phDrop: "ड्रॉप पता दर्ज करें", phDropName: "ड्रॉप व्यक्ति का नाम", phDropPhone: "ड्रॉप मोबाइल नंबर",
+      lblPickup: "🟢 पिकअप पता, मंजिल और व्यक्ति की जानकारी:", phPickup: "पिकअप पता दर्ज करें", phPickName: "पिकअप व्यक्ति का नाम", phPickPhone: "पिकअप मोबाइल नंबर",
+      lblDrop: "🔴 ड्रॉप पता, मंजिल और व्यक्ति की जानकारी:", phDrop: "ड्रॉप पता दर्ज करें", phDropName: "ड्रॉप व्यक्ति का नाम", phDropPhone: "ड्रॉप मोबाइल नंबर",
       lblDist: "दूरी (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
       lblPay: "💳 पेमेंट का तरीका चुनें:", subCod: "नकद भुगतान (COD)", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 QR स्कैन करें या सीधे UPI ऐप से पेमेंट करें", qrAmt: "राशि:", qrNote: "✅ पेमेंट पूरा होने के बाद नीचे बटन दबाएं",
@@ -431,8 +523,8 @@
     en: {
       loginTitle: "Customer Login", namePh: "Enter Your Full Name", phonePh: "10-Digit Mobile Number", reqOtp: "Request OTP", verifyOtp: "Verify & Login",
       currLoc: "📍 Use My Current Location", bigMap: "🔍 Expand Map",
-      lblPickup: "🟢 Pickup Address & Contact Person:", phPickup: "Enter Pickup Address", phPickName: "Pickup Person Name", phPickPhone: "Pickup Mobile Number",
-      lblDrop: "🔴 Drop Address & Contact Person:", phDrop: "Enter Drop Address", phDropName: "Drop Person Name", phDropPhone: "Drop Mobile Number",
+      lblPickup: "🟢 Pickup Address, Floor & Contact Person:", phPickup: "Enter Pickup Address", phPickName: "Pickup Person Name", phPickPhone: "Pickup Mobile Number",
+      lblDrop: "🔴 Drop Address, Floor & Contact Person:", phDrop: "Enter Drop Address", phDropName: "Drop Person Name", phDropPhone: "Drop Mobile Number",
       lblDist: "Distance (KM):", lblParcel: "📦 Parcel Type:", lblWeight: "⚖️ Parcel Weight:",
       lblPay: "💳 Select Payment Method:", subCod: "Cash on Delivery", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 Scan QR or Pay Directly via UPI App", qrAmt: "Amount:", qrNote: "✅ Click Book button below after completing payment",
@@ -517,6 +609,15 @@
   };
   changeCustLang(currentLang);
 
+  // Offline / Low Network Monitor
+  function checkCustNetwork() {
+    const bar = document.getElementById('custOfflineBar');
+    if (bar) bar.classList.toggle('hidden', navigator.onLine);
+  }
+  window.addEventListener('online', checkCustNetwork);
+  window.addEventListener('offline', checkCustNetwork);
+  checkCustNetwork();
+
   window.toggleMapSize = () => {
     const m = document.getElementById('custMap');
     m.classList.toggle('expanded');
@@ -532,13 +633,108 @@
     minFare: 30, rate2W: 10, rate3W: 18, rateTempo: 25, rateBolero: 35, rateTruck: 50,
     surgeActive: false, surgeMultiplier: 1.2, timingAlertText: "",
     custBannerText: "", consentText: "मी GoParcel च्या सर्व अटी व नियमांशी सहमत आहे. पार्सलमध्ये कोणतीही बेकायदेशीर वस्तू नाही.",
-    adminWa: "919999999999", adminUpi: "Techesupp-2@okhdfcbank"
+    adminWa: "919999999999", adminUpi: "Techesupp-2@okhdfcbank",
+    referSchemeActive: true, custReferBonus: 50
   };
 
   let custUser = JSON.parse(localStorage.getItem("gp_cust_user") || "null");
   let chosenVehicle = "2-Wheeler", chosenPaymentMode = "COD";
   let map, pMarker, dMarker, routeLine;
   let pLat = 18.5204, pLng = 73.8567, dLat = 18.5314, dLng = 73.8446;
+
+  // Multi-Stop Delivery Functions
+  window.addExtraDeliveryStop = () => {
+    if (extraStopsList.length >= 3) return alert("जास्तीत जास्त ३ मधले स्टॉप्स जोडता येतात!");
+    const idx = extraStopsList.length;
+    extraStopsList.push({ address: "", lat: (pLat + dLat) / 2, lng: (pLng + dLng) / 2 });
+    renderExtraStopsUi();
+    recalcPrices();
+  };
+
+  window.removeExtraDeliveryStop = (idx) => {
+    extraStopsList.splice(idx, 1);
+    renderExtraStopsUi();
+    recalcPrices();
+  };
+
+  window.updateExtraStopText = (idx, val) => {
+    if (extraStopsList[idx]) extraStopsList[idx].address = val;
+  };
+
+  function renderExtraStopsUi() {
+    const box = document.getElementById('extraStopsContainer');
+    box.innerHTML = "";
+    extraStopsList.forEach((st, idx) => {
+      box.innerHTML += `<div class="extra-stop-item">
+        <span style="color:#ff9800; font-weight:bold; font-size:12px;">🛑 Stop ${idx + 1}:</span>
+        <input type="text" value="${st.address}" placeholder="मधल्या स्टॉपचा पत्ता टाका" oninput="updateExtraStopText(${idx}, this.value)" style="margin:0; padding:8px; font-size:13px;">
+        <button type="button" onclick="removeExtraDeliveryStop(${idx})" style="width:auto; padding:6px 10px; margin:0; background:#e74c3c; color:#fff; font-size:12px;">✕</button>
+      </div>`;
+    });
+  }
+
+  // Package Photo Upload Compression
+  window.handlePackagePhotoUpload = (input) => {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const scale = Math.min(360 / img.width, 360 / img.height, 1);
+          canvas.width = img.width * scale; canvas.height = img.height * scale;
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          packagePhotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+          const prev = document.getElementById('pkgPhotoPreview');
+          prev.src = packagePhotoBase64;
+          prev.classList.remove('hidden');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  };
+
+  // Schedule Later Toggle
+  window.toggleScheduleInput = () => {
+    const mode = document.getElementById('scheduleModeSelect').value;
+    document.getElementById('scheduleDateTimeInput').classList.toggle('hidden', mode !== 'later');
+  };
+
+  // Customer Tip Selection (100% to Rider)
+  window.selectCustomerTip = (amt, el) => {
+    selectedTipAmount = Number(amt);
+    document.querySelectorAll('.tip-pill').forEach(p => p.classList.remove('active'));
+    if (el) el.classList.add('active');
+    document.getElementById('selectedTipBadge').innerText = `+₹${selectedTipAmount}`;
+    recalcPrices();
+  };
+
+  // Cancellation Policy & Fee Handler
+  window.cancelCustomerOrder = async (orderId, currentStatus) => {
+    const reason = prompt(
+      "ऑर्डर कॅन्सल करण्याचे कारण निवडा:\n1. प्लॅन बदलला (Plan Changed)\n2. रायडरला उशीर होत आहे (Rider Delayed)\n3. पत्ता चुकला (Wrong Address)\n4. इतर कारण (Other)",
+      "प्लॅन बदलला (Plan Changed)"
+    );
+    if (!reason) return;
+
+    const hasCancellationFee = (currentStatus === "Accepted" || currentStatus === "ReachedPickup");
+    const feeAmt = hasCancellationFee ? 25 : 0;
+
+    if (hasCancellationFee) {
+      const ok = confirm(`⚠️ रायडरने ऑर्डर स्वीकारली असून तो पिकअपकडे निघाला आहे. नियमांनुसार ₹${feeAmt} कॅन्सलेशन चार्ज लागू होईल. तरीही कॅन्सल करायची का?`);
+      if (!ok) return;
+    }
+
+    await updateDoc(doc(db, "orders", orderId), {
+      status: "Cancelled",
+      cancelReason: reason,
+      cancellationFee: feeAmt,
+      cancelledBy: "Customer",
+      cancelledAt: serverTimestamp()
+    });
+    alert(feeAmt > 0 ? `❌ ऑर्डर कॅन्सल झाली (कॅन्सलेशन फी: ₹${feeAmt} लागू).` : "✅ ऑर्डर मोफत कॅन्सल झाली!");
+  };
 
   onSnapshot(collection(db, "serviceZones"), (snap) => {
     const sel = document.getElementById('activeCitySelect');
@@ -567,6 +763,11 @@
       if (s.consentText) appCfg.consentText = s.consentText;
       appCfg.adminWa = s.adminWa || "919999999999";
       appCfg.adminUpi = s.adminUpi || "Techesupp-2@okhdfcbank";
+      appCfg.referSchemeActive = s.referSchemeActive ?? true;
+      appCfg.custReferBonus = Number(s.custReferBonus ?? 50);
+
+      document.getElementById('custReferBox').classList.toggle('hidden', !appCfg.referSchemeActive);
+      document.getElementById('dynCustReferAmt').innerText = appCfg.custReferBonus;
 
       document.getElementById('qrUpiIdLabel').innerText = appCfg.adminUpi;
       document.getElementById('orderConsentText').innerText = appCfg.consentText;
@@ -682,6 +883,7 @@
     document.getElementById('profCustName').value = custUser.name || "";
     document.getElementById('profCustPhone').value = custUser.phone || "";
     document.getElementById('profCustAddr').value = custUser.address || "";
+    document.getElementById('myCustReferCode').innerText = "GPC" + String(custUser.phone || "0000").slice(-4);
     document.getElementById('pickupPersonName').value = custUser.name || "";
     document.getElementById('pickupPersonPhone').value = custUser.phone || "";
     initMap();
@@ -733,13 +935,26 @@
     } catch (e) {}
   }
 
-  function updateDistanceAndLine() {
+  async function updateDistanceAndLine() {
     if (!map) return;
     const km = Math.max(1, (map.distance([pLat, pLng], [dLat, dLng]) / 1000)).toFixed(1);
     document.getElementById('distKmInput').value = km;
+    recalcPrices();
+
+    // Draw Smooth Real Road Polyline via OSRM
+    try {
+      const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${pLng},${pLat};${dLng},${dLat}?overview=full&geometries=geojson`);
+      const data = await res.json();
+      if (data.routes && data.routes.length > 0) {
+        const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+        if (routeLine) map.removeLayer(routeLine);
+        routeLine = L.polyline(coords, { color: '#ff6600', weight: 5, opacity: 0.9 }).addTo(map);
+        return;
+      }
+    } catch (e) {}
+
     if (routeLine) map.removeLayer(routeLine);
     routeLine = L.polyline([[pLat, pLng], [dLat, dLng]], { color: '#ff6600', weight: 4, dashArray: '6, 6' }).addTo(map);
-    recalcPrices();
   }
 
   window.useCurrentGpsLocation = (target, silent = false) => {
@@ -809,11 +1024,19 @@
   window.recalcPrices = () => {
     const km = Math.max(1, Number(document.getElementById('distKmInput').value) || 1);
     const mult = appCfg.surgeActive ? appCfg.surgeMultiplier : 1;
-    const f2 = Math.max(appCfg.minFare, Math.round(km * appCfg.rate2W * mult));
-    const f3 = Math.max(appCfg.minFare, Math.round(km * appCfg.rate3W * mult));
-    const ft = Math.max(appCfg.minFare, Math.round(km * appCfg.rateTempo * mult));
-    const fb = Math.max(appCfg.minFare, Math.round(km * appCfg.rateBolero * mult));
-    const ftr = Math.max(appCfg.minFare, Math.round(km * appCfg.rateTruck * mult));
+
+    // Extra Add-ons: Multi-stops (₹25/stop), Floor Lift Charges, Goods Insurance & Rider Tip
+    const stopsFee = extraStopsList.length * 25;
+    const pickFloorFee = Number((document.getElementById('pickupFloorSelect')?.value || "Ground|0").split('|')[1] || 0);
+    const dropFloorFee = Number((document.getElementById('dropFloorSelect')?.value || "Ground|0").split('|')[1] || 0);
+    const insuranceFee = Number(document.getElementById('goodsInsuranceSelect')?.value || 0);
+    const addOnsTotal = stopsFee + pickFloorFee + dropFloorFee + insuranceFee + selectedTipAmount;
+
+    const f2 = Math.max(appCfg.minFare, Math.round(km * appCfg.rate2W * mult)) + addOnsTotal;
+    const f3 = Math.max(appCfg.minFare, Math.round(km * appCfg.rate3W * mult)) + addOnsTotal;
+    const ft = Math.max(appCfg.minFare, Math.round(km * appCfg.rateTempo * mult)) + addOnsTotal;
+    const fb = Math.max(appCfg.minFare, Math.round(km * appCfg.rateBolero * mult)) + addOnsTotal;
+    const ftr = Math.max(appCfg.minFare, Math.round(km * appCfg.rateTruck * mult)) + addOnsTotal;
 
     document.getElementById('fare2W').innerText = "₹" + f2;
     document.getElementById('fare3W').innerText = "₹" + f3;
@@ -870,6 +1093,14 @@
     if (!pickup || !drop) return alert("Please enter Pickup & Drop address!");
     if (!dropContactName || dropContactPhone.length < 10) return alert("कृपया ड्रॉप लोकेशनवरील व्यक्तीचे नाव आणि १० अंकी मोबाईल नंबर टाका!");
 
+    const scheduleMode = document.getElementById('scheduleModeSelect').value;
+    const scheduledTime = scheduleMode === 'later' ? document.getElementById('scheduleDateTimeInput').value : "";
+    if (scheduleMode === 'later' && !scheduledTime) return alert("कृपया शेड्युल बुकिंगची तारीख व वेळ निवडा!");
+
+    const pickupFloor = document.getElementById('pickupFloorSelect').value.split('|')[0];
+    const dropFloor = document.getElementById('dropFloorSelect').value.split('|')[0];
+    const insuranceFee = Number(document.getElementById('goodsInsuranceSelect').value || 0);
+
     const fare = recalcPrices();
     const weight = document.getElementById('weightSelect').value;
     const pin = Math.floor(1000 + Math.random() * 9000).toString();
@@ -889,6 +1120,12 @@
       customerPhone: custUser.phone,
       city: document.getElementById('activeCitySelect').value,
       pickup, drop,
+      extraStops: extraStopsList,
+      pickupFloor, dropFloor,
+      insuranceFee,
+      tipAmount: selectedTipAmount,
+      packagePhoto: packagePhotoBase64,
+      scheduledTime,
       pickupContactName, pickupContactPhone,
       dropContactName, dropContactPhone,
       pickupLat: Number(pLat), pickupLng: Number(pLng),
@@ -941,9 +1178,16 @@
             liveRiderMarker.setLatLng(rPos);
             liveTrackMap.panTo(rPos);
             const targetCoords = (order.status === "PickedUp" || order.status === "ReachedDrop") ? [oDropLat, oDropLng] : [oPickLat, oPickLng];
-            const distKm = (liveTrackMap.distance(rPos, targetCoords) / 1000).toFixed(2);
+            const distKmNum = liveTrackMap.distance(rPos, targetCoords) / 1000;
+            const distKm = distKmNum.toFixed(2);
+            const etaMins = Math.max(1, Math.round(distKmNum * 2.5));
+
             document.getElementById('liveRiderDistTag').innerText = `📍 ${distKm} km`;
+            document.getElementById('custDynamicEta').innerText = `~${etaMins} मिनिटे (${distKm} km)`;
             document.getElementById('liveRiderStatusBanner').innerText = `🛵 ${rData.name} (${distKm} km away)`;
+
+            if (liveTrackPolyline) liveTrackPolyline.setLatLngs([rPos, targetCoords]);
+            else liveTrackPolyline = L.polyline([rPos, targetCoords], { color: '#ff6600', weight: 5, opacity: 0.9 }).addTo(liveTrackMap);
           }
         }
       });
@@ -969,6 +1213,17 @@
           activeTrackOrder = o;
         }
 
+        const canCancel = (o.status === "Pending" || o.status === "Accepted" || o.status === "ReachedPickup");
+        const cancelBtnHtml = canCancel
+          ? `<button onclick="cancelCustomerOrder('${d.id}', '${o.status}')" style="background:#3b0d0d; color:#ff6b6b; border:1px solid #e74c3c; padding:6px 10px; font-size:12px; margin-top:8px;">❌ ऑर्डर कॅन्सल करा</button>`
+          : '';
+
+        const addonsInfo = [
+          o.insuranceFee > 0 ? `🛡️ विमा ₹${o.insuranceFee}` : '',
+          o.tipAmount > 0 ? `🎁 टीप ₹${o.tipAmount}` : '',
+          o.scheduledTime ? `⏰ ${o.scheduledTime}` : ''
+        ].filter(Boolean).join(' • ');
+
         tbody.innerHTML += `<tr>
           <td>🟢 ${o.pickup} <br><small style="color:#4db8ff;">(${o.pickupContactName || ''}: ${o.pickupContactPhone || ''})</small><br>
               🔴 ${o.drop} <br><small style="color:#ffaa66;">(${o.dropContactName || ''}: ${o.dropContactPhone || ''})</small></td>
@@ -983,6 +1238,7 @@
             <strong>${o.vehicle} • ${o.parcel} (${o.parcelWeight || '1-5 kg'})</strong>
             <span style="color:#2ecc71; font-weight:bold;">${o.status}</span>
           </div>
+          ${addonsInfo ? `<div style="font-size:11px; color:#4db8ff; margin-top:3px;">${addonsInfo}</div>` : ''}
           <p style="font-size:12px; color:#ccc; margin:6px 0;">
             🟢 ${o.pickup} (${o.pickupContactName || ''} - ${o.pickupContactPhone || ''})<br>
             🔴 ${o.drop} (${o.dropContactName || ''} - ${o.dropContactPhone || ''})
@@ -991,6 +1247,7 @@
             <span style="font-size:12px; color:#aaa;">Rider: <b>${riderCleanName}</b> | <b>${o.paymentMode || 'COD'}</b></span>
             <span>PIN: <span class="pin-badge">${o.deliveryPin}</span></span>
           </div>
+          ${cancelBtnHtml}
         </div>`;
       });
 
