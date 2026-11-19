@@ -39,6 +39,15 @@
     table.order-tbl th, table.order-tbl td { border: 1px solid #333; padding: 8px; text-align: left; }
     table.order-tbl th { background: #222; color: #ff6600; }
 
+    /* Saved Places (Home / Office) & Search Bar */
+    .saved-places-bar { display: flex; gap: 5px; flex-wrap: wrap; margin: 4px 0 6px; }
+    .place-chip { background: #1e1e1e; border: 1px solid #444; color: #ddd; padding: 5px 9px; border-radius: 14px; font-size: 11px; font-weight: bold; cursor: pointer; width: auto; margin: 0; }
+    .place-chip:hover { border-color: #ff6600; color: #ff6600; }
+    .place-chip.save-btn-chip { background: #16291d; border-color: #2ecc71; color: #2ecc71; }
+    .addr-input-row { display: flex; gap: 5px; align-items: center; }
+    .addr-search-btn { width: auto; padding: 11px 12px; margin: 6px 0; background: #262626; color: #ffaa66; border: 1px solid #444; font-size: 13px; white-space: nowrap; }
+    .fare-breakdown-box { background: #0c0c0c; border: 1px dashed #333; border-radius: 8px; padding: 8px 10px; margin-top: 8px; font-size: 11px; color: #bbb; line-height: 1.6; }
+
     /* New Customer Features Styling */
     .extra-stop-item { background: #18140e; border: 1px dashed #ff9800; border-radius: 8px; padding: 8px; margin: 6px 0; display: flex; gap: 6px; align-items: center; }
     .addon-card { background: #111; border: 1px solid #333; border-radius: 10px; padding: 10px; margin: 8px 0; }
@@ -120,14 +129,22 @@
     <div id="cTabBook">
       <div class="card">
         <div style="display:flex; gap:6px;">
-          <button type="button" id="txtBtnCurrLoc" class="btn-gps" onclick="useCurrentGpsLocation('pickup')">📍 माझे सध्याचे लोकेशन घ्या</button>
+          <button type="button" id="txtBtnCurrLoc" class="btn-gps" onclick="useCurrentGpsLocation('pickup')">📍 Use My Current Location (ऑटो पत्ता)</button>
           <button type="button" id="txtBtnBigMap" class="btn-gps" style="width:auto; white-space:nowrap; border-color:#ff6600; color:#ff6600;" onclick="toggleMapSize()">🔍 मोठा नकाशा</button>
         </div>
 
-        <!-- Pickup Location + Contact Person + Floor Selection -->
+        <!-- Pickup Location + Saved Home/Office + Contact Person + Floor Selection -->
         <div class="contact-group" style="border-left: 3px solid #2ecc71;">
           <label id="txtLblPickup" style="font-size:12px; color:#2ecc71; font-weight:bold;">🟢 पिकअप पत्ता, मजला व व्यक्तीची माहिती:</label>
-          <input type="text" id="pickupInput" placeholder="पिकअप पत्ता टाका">
+          <div class="saved-places-bar">
+            <button type="button" class="place-chip" onclick="applySavedPlace('pickup', 'home')">🏠 Home</button>
+            <button type="button" class="place-chip" onclick="applySavedPlace('pickup', 'office')">🏢 Office</button>
+            <button type="button" class="place-chip save-btn-chip" onclick="promptSaveCurrentPlace('pickup')">💾 हा पत्ता Save करा</button>
+          </div>
+          <div class="addr-input-row">
+            <input type="text" id="pickupInput" placeholder="पिकअप पत्ता टाका किंवा GPS दाबा" onchange="geocodeTypedAddress('pickup')">
+            <button type="button" class="addr-search-btn" onclick="geocodeTypedAddress('pickup')" title="मॅपवर पत्ता शोधा">🔍 शोधा</button>
+          </div>
           <div class="contact-row">
             <input type="text" id="pickupPersonName" placeholder="पिकअप व्यक्तीचे नाव">
             <input type="tel" id="pickupPersonPhone" maxlength="10" placeholder="पिकअप मोबाईल नंबर">
@@ -147,10 +164,18 @@
           ➕ मधला स्टॉप जोडा (Add Stop • +₹25/stop)
         </button>
 
-        <!-- Drop Location + Contact Person + Floor Selection -->
+        <!-- Drop Location + Saved Home/Office + Contact Person + Floor Selection -->
         <div class="contact-group" style="border-left: 3px solid #e74c3c;">
           <label id="txtLblDrop" style="font-size:12px; color:#e74c3c; font-weight:bold;">🔴 ड्रॉप पत्ता, मजला व व्यक्तीची माहिती:</label>
-          <input type="text" id="dropInput" placeholder="ड्रॉप पत्ता टाका">
+          <div class="saved-places-bar">
+            <button type="button" class="place-chip" onclick="applySavedPlace('drop', 'home')">🏠 Home</button>
+            <button type="button" class="place-chip" onclick="applySavedPlace('drop', 'office')">🏢 Office</button>
+            <button type="button" class="place-chip save-btn-chip" onclick="promptSaveCurrentPlace('drop')">💾 हा पत्ता Save करा</button>
+          </div>
+          <div class="addr-input-row">
+            <input type="text" id="dropInput" placeholder="ड्रॉप पत्ता टाका (उदा. स्वारगेट, पुणे)" onchange="geocodeTypedAddress('drop')">
+            <button type="button" class="addr-search-btn" onclick="geocodeTypedAddress('drop')" title="मॅपवर पत्ता शोधा">🔍 शोधा</button>
+          </div>
           <div class="contact-row">
             <input type="text" id="dropPersonName" placeholder="ड्रॉप व्यक्तीचे नाव">
             <input type="tel" id="dropPersonPhone" maxlength="10" placeholder="ड्रॉप मोबाईल नंबर">
@@ -165,9 +190,12 @@
         </div>
 
         <div id="custMap"></div>
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#aaa;">
-          <span id="txtLblDist">अंतर (KM):</span>
-          <input type="number" id="distKmInput" value="3" min="1" step="0.5" style="width:90px; padding:4px 8px; margin:0;" oninput="recalcPrices()">
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#aaa; background:#111; padding:8px 10px; border-radius:8px; border:1px solid #2b2b2b;">
+          <div>
+            <span id="txtLblDist" style="color:#ffaa66; font-weight:bold;">🛣️ रोड अंतर (KM):</span>
+            <div id="routeTimeEstTag" style="font-size:10px; color:#2ecc71;">OSRM Road Distance Auto-Calculated</div>
+          </div>
+          <input type="number" id="distKmInput" value="3" min="0.5" step="0.1" style="width:95px; padding:6px 8px; margin:0; text-align:center; font-weight:bold; color:#2ecc71; border-color:#2ecc71;" oninput="recalcPrices()">
         </div>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:6px;">
@@ -308,6 +336,11 @@
           </label>
         </div>
 
+        <!-- Live KM & Add-ons Fare Breakdown -->
+        <div id="fareBreakdownBox" class="fare-breakdown-box">
+          भाडे तपशील लोड होत आहे...
+        </div>
+
         <div style="background:#111; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
           <span><span id="txtTotalFareLbl">एकूण भाडे</span> (<span id="selectedPayBadge" style="color:#ff6600;">COD</span>):</span>
           <strong id="finalFareDisplay" style="font-size:20px; color:#2ecc71;">₹30</strong>
@@ -361,16 +394,29 @@
       <div id="custOrdersCards"></div>
     </div>
 
-    <!-- TAB 3: PROFILE, REFER & EARN & SETTINGS -->
+    <!-- TAB 3: PROFILE, SAVED HOME/OFFICE ADDRESSES & SETTINGS -->
     <div id="cTabProfile" class="hidden">
       <div class="card">
-        <h3 id="txtProfTitle" style="color:#ff6600; margin-bottom:10px;">👤 कस्टमर प्रोफाईल व सेटिंग्ज</h3>
+        <h3 id="txtProfTitle" style="color:#ff6600; margin-bottom:10px;">👤 कस्टमर प्रोफाईल व सेव्ह केलेले पत्ते</h3>
         <label id="txtLblProfName" style="font-size:12px; color:#aaa;">तुमचे नाव:</label>
         <input type="text" id="profCustName">
         <label id="txtLblProfPhone" style="font-size:12px; color:#aaa;">मोबाईल नंबर:</label>
         <input type="text" id="profCustPhone" disabled style="opacity:0.7;">
-        <label id="txtLblProfAddr" style="font-size:12px; color:#aaa;">कायमचा पत्ता:</label>
-        <input type="text" id="profCustAddr" placeholder="तुमचा पत्ता सेव्ह करा">
+
+        <!-- Saved Home Address -->
+        <div style="background:#111; border:1px solid #2ecc71; border-radius:8px; padding:8px; margin:8px 0;">
+          <label style="font-size:12px; color:#2ecc71; font-weight:bold;">🏠 घरचा पत्ता (Saved Home Address):</label>
+          <input type="text" id="profHomeAddr" placeholder="घरचा पूर्ण पत्ता टाका">
+          <button type="button" onclick="useCurrentGpsForProfilePlace('home')" style="background:#1c2e3d; color:#4db8ff; border:1px solid #4db8ff; padding:7px; font-size:12px;">📍 सध्याचे GPS लोकेशन Home म्हणून सेव्ह करा</button>
+        </div>
+
+        <!-- Saved Office Address -->
+        <div style="background:#111; border:1px solid #4db8ff; border-radius:8px; padding:8px; margin:8px 0;">
+          <label style="font-size:12px; color:#4db8ff; font-weight:bold;">🏢 ऑफिसचा पत्ता (Saved Office Address):</label>
+          <input type="text" id="profOfficeAddr" placeholder="ऑफिस / दुकानाचा पत्ता टाका">
+          <button type="button" onclick="useCurrentGpsForProfilePlace('office')" style="background:#1c2e3d; color:#4db8ff; border:1px solid #4db8ff; padding:7px; font-size:12px;">📍 सध्याचे GPS लोकेशन Office म्हणून सेव्ह करा</button>
+        </div>
+
         <label id="txtLblProfLang" style="font-size:12px; color:#aaa;">ॲप भाषा (Language):</label>
         <select id="profLangSelect" onchange="changeCustLang(this.value)">
           <option value="mr">मराठी (Marathi)</option>
@@ -385,7 +431,7 @@
           <small style="color:#aaa;">प्रत्येक यशस्वी रेफरलवर ₹<span id="dynCustReferAmt">50</span> सूट</small>
         </div>
 
-        <button id="txtBtnSaveProf" onclick="saveCustProfile()" style="background:#2ecc71;">💾 प्रोफाईल सेव्ह करा</button>
+        <button id="txtBtnSaveProf" onclick="saveCustProfile()" style="background:#2ecc71;">💾 प्रोफाईल व पत्ते सेव्ह करा</button>
         <button id="txtBtnDlPdf" onclick="downloadLastConsentPdf()" style="background:#3498db; color:#fff; margin-top:8px;">📄 संमती पत्र PDF डाउनलोड करा</button>
         <button id="txtBtnLogout" onclick="logoutCust()" style="background:#e74c3c; color:#fff; margin-top:8px;">🚪 लॉगआउट</button>
       </div>
@@ -474,7 +520,6 @@
   let custGpsLat = 18.5204, custGpsLng = 73.8567, lastConsentRecord = null;
   let liveTrackMap = null, liveRiderMarker = null, livePickupMarker = null, liveDropMarker = null, liveTrackPolyline = null, trackedRiderUnsub = null, currentTrackedRiderId = null;
 
-  // New Customer Add-on State
   let extraStopsList = [];
   let packagePhotoBase64 = "";
   let selectedTipAmount = 0;
@@ -482,10 +527,10 @@
   const dict = {
     mr: {
       loginTitle: "कस्टमर लॉगिन", namePh: "तुमचे पूर्ण नाव", phonePh: "१० अंकी मोबाईल नंबर", reqOtp: "OTP मागवा", verifyOtp: "लॉगिन पूर्ण करा",
-      currLoc: "📍 माझे सध्याचे लोकेशन घ्या", bigMap: "🔍 मोठा नकाशा",
-      lblPickup: "🟢 पिकअप पत्ता, मजला व व्यक्तीची माहिती:", phPickup: "पिकअप पत्ता टाका", phPickName: "पिकअप व्यक्तीचे नाव", phPickPhone: "पिकअप मोबाईल नंबर",
-      lblDrop: "🔴 ड्रॉप पत्ता, मजला व व्यक्तीची माहिती:", phDrop: "ड्रॉप पत्ता टाका", phDropName: "ड्रॉप व्यक्तीचे नाव", phDropPhone: "ड्रॉप मोबाईल नंबर",
-      lblDist: "अंतर (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
+      currLoc: "📍 Use My Current Location (ऑटो पत्ता)", bigMap: "🔍 मोठा नकाशा",
+      lblPickup: "🟢 पिकअप पत्ता, मजला व व्यक्तीची माहिती:", phPickup: "पिकअप पत्ता टाका किंवा GPS दाबा", phPickName: "पिकअप व्यक्तीचे नाव", phPickPhone: "पिकअप मोबाईल नंबर",
+      lblDrop: "🔴 ड्रॉप पत्ता, मजला व व्यक्तीची माहिती:", phDrop: "ड्रॉप पत्ता टाका (उदा. स्वारगेट, पुणे)", phDropName: "ड्रॉप व्यक्तीचे नाव", phDropPhone: "ड्रॉप मोबाईल नंबर",
+      lblDist: "🛣️ रोड अंतर (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
       lblPay: "💳 पेमेंट पद्धत निवडा:", subCod: "रोख पेमेंट (COD)", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 QR स्कॅन करा किंवा थेट UPI ॲपने पेमेंट करा", qrAmt: "रक्कम:", qrNote: "✅ पेमेंट पूर्ण झाल्यावर खालील बटन दाबा",
       conHead: "📜 ऑर्डर संमती पत्र:", conAgree: "मला वरील अटी मान्य आहेत (I Agree)",
@@ -493,8 +538,8 @@
       trackTitle: "रायडर लाईव्ह लोकेशन ट्रॅकिंग", chatTitle: "💬 लाईव्ह ऑर्डर हेल्प चॅट (Company Customer Care)",
       chatSub: "ऑर्डर संबंधित मदतीसाठी थेट कंपनी ॲडमिनशी बोला:", chatPh: "तुमचा मेसेज इथे लिहा...", btnSend: "पाठवा",
       myOrders: "🚚 माझ्या ऑर्डर्स व स्थिती", thAddr: "पत्ता व व्यक्ती", thVeh: "वाहन & भाडे", thStat: "स्थिती",
-      profTitle: "👤 कस्टमर प्रोफाईल व सेटिंग्ज", pName: "तुमचे नाव:", pPhone: "मोबाईल नंबर:", pAddr: "कायमचा पत्ता:", pLang: "ॲप भाषा:",
-      btnSave: "💾 प्रोफाईल सेव्ह करा", btnPdf: "📄 संमती पत्र PDF डाउनलोड करा", btnOut: "🚪 लॉगआउट",
+      profTitle: "👤 कस्टमर प्रोफाईल व सेव्ह केलेले पत्ते", pName: "तुमचे नाव:", pPhone: "मोबाईल नंबर:", pLang: "ॲप भाषा:",
+      btnSave: "💾 प्रोफाईल व पत्ते सेव्ह करा", btnPdf: "📄 संमती पत्र PDF डाउनलोड करा", btnOut: "🚪 लॉगआउट",
       sosTitle: "🆘 हेल्प आणि इमर्जन्सी सपोर्ट", polHead: "👮 पोलीस हेल्पलाईन (Police)", polSub: "आपत्कालीन पोलीस मदत - 112",
       ambHead: "🚑 रुग्णवाहिका (Ambulance)", ambSub: "आपत्कालीन वैद्यकीय मदत - 108",
       fireHead: "🚒 फायर ब्रिगेड (Fire Brigade)", fireSub: "अग्निशमन दल आपत्कालीन सेवा - 101", admHead: "👑 GoParcel Admin सपोर्ट",
@@ -502,10 +547,10 @@
     },
     hi: {
       loginTitle: "कस्टमर लॉगिन", namePh: "आपका पूरा नाम", phonePh: "१० अंकों का मोबाइल नंबर", reqOtp: "OTP मंगवाएं", verifyOtp: "लॉगिन पूरा करें",
-      currLoc: "📍 मेरी वर्तमान लोकेशन लें", bigMap: "🔍 बड़ा मैप",
+      currLoc: "📍 Use My Current Location (ऑटो पता)", bigMap: "🔍 बड़ा मैप",
       lblPickup: "🟢 पिकअप पता, मंजिल और व्यक्ति की जानकारी:", phPickup: "पिकअप पता दर्ज करें", phPickName: "पिकअप व्यक्ति का नाम", phPickPhone: "पिकअप मोबाइल नंबर",
       lblDrop: "🔴 ड्रॉप पता, मंजिल और व्यक्ति की जानकारी:", phDrop: "ड्रॉप पता दर्ज करें", phDropName: "ड्रॉप व्यक्ति का नाम", phDropPhone: "ड्रॉप मोबाइल नंबर",
-      lblDist: "दूरी (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
+      lblDist: "🛣️ रोड दूरी (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
       lblPay: "💳 पेमेंट का तरीका चुनें:", subCod: "नकद भुगतान (COD)", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 QR स्कैन करें या सीधे UPI ऐप से पेमेंट करें", qrAmt: "राशि:", qrNote: "✅ पेमेंट पूरा होने के बाद नीचे बटन दबाएं",
       conHead: "📜 ऑर्डर सहमति पत्र:", conAgree: "मुझे उपरोक्त सभी शर्तें मान्य हैं (I Agree)",
@@ -513,8 +558,8 @@
       trackTitle: "राइडर लाइव लोकेशन ट्रैकिंग", chatTitle: "💬 लाइव ऑर्डर हेल्प चैट (Company Customer Care)",
       chatSub: "ऑर्डर संबंधित मदद के लिए सीधे कंपनी एडमिन से बात करें:", chatPh: "अपना संदेश यहाँ लिखें...", btnSend: "भेजें",
       myOrders: "🚚 मेरे ऑर्डर्स और स्थिति", thAddr: "पता व व्यक्ति", thVeh: "वाहन & किराया", thStat: "स्थिति",
-      profTitle: "👤 कस्टमर प्रोफाइल और सेटिंग्स", pName: "आपका नाम:", pPhone: "मोबाइल नंबर:", pAddr: "स्थायी पता:", pLang: "ऐप भाषा:",
-      btnSave: "💾 प्रोफाइल सेव करें", btnPdf: "📄 सहमति पत्र PDF डाउनलोड करें", btnOut: "🚪 लॉगआउट",
+      profTitle: "👤 कस्टमर प्रोफाइल और सेव किए गए पते", pName: "आपका नाम:", pPhone: "मोबाइल नंबर:", pLang: "ऐप भाषा:",
+      btnSave: "💾 प्रोफाइल और पते सेव करें", btnPdf: "📄 सहमति पत्र PDF डाउनलोड करें", btnOut: "🚪 लॉगआउट",
       sosTitle: "🆘 हेल्प और इमरजेंसी सपोर्ट", polHead: "👮 पुलिस हेल्पलाइन (Police)", polSub: "आपातकालीन पुलिस मदद - 112",
       ambHead: "🚑 एम्बुलेंस (Ambulance)", ambSub: "आपातकालीन चिकित्सा सेवा - 108",
       fireHead: "🚒 फायर ब्रिगेड (Fire Brigade)", fireSub: "अग्निशमन दल आपातकालीन सेवा - 101", admHead: "👑 GoParcel Admin सपोर्ट",
@@ -522,10 +567,10 @@
     },
     en: {
       loginTitle: "Customer Login", namePh: "Enter Your Full Name", phonePh: "10-Digit Mobile Number", reqOtp: "Request OTP", verifyOtp: "Verify & Login",
-      currLoc: "📍 Use My Current Location", bigMap: "🔍 Expand Map",
-      lblPickup: "🟢 Pickup Address, Floor & Contact Person:", phPickup: "Enter Pickup Address", phPickName: "Pickup Person Name", phPickPhone: "Pickup Mobile Number",
+      currLoc: "📍 Use My Current Location (Auto Address)", bigMap: "🔍 Expand Map",
+      lblPickup: "🟢 Pickup Address, Floor & Contact Person:", phPickup: "Enter Pickup Address or Tap GPS", phPickName: "Pickup Person Name", phPickPhone: "Pickup Mobile Number",
       lblDrop: "🔴 Drop Address, Floor & Contact Person:", phDrop: "Enter Drop Address", phDropName: "Drop Person Name", phDropPhone: "Drop Mobile Number",
-      lblDist: "Distance (KM):", lblParcel: "📦 Parcel Type:", lblWeight: "⚖️ Parcel Weight:",
+      lblDist: "🛣️ Road Distance (KM):", lblParcel: "📦 Parcel Type:", lblWeight: "⚖️ Parcel Weight:",
       lblPay: "💳 Select Payment Method:", subCod: "Cash on Delivery", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 Scan QR or Pay Directly via UPI App", qrAmt: "Amount:", qrNote: "✅ Click Book button below after completing payment",
       conHead: "📜 Order Consent Agreement:", conAgree: "I agree to all Terms & Conditions",
@@ -533,8 +578,8 @@
       trackTitle: "Live Rider GPS Tracking", chatTitle: "💬 Live Order Support Chat (Company Customer Care)",
       chatSub: "Chat directly with Company Admin for order support:", chatPh: "Type your message here...", btnSend: "Send",
       myOrders: "🚚 My Orders & Live Status", thAddr: "Address & Contact", thVeh: "Vehicle & Fare", thStat: "Status",
-      profTitle: "👤 Customer Profile & Settings", pName: "Full Name:", pPhone: "Mobile Number:", pAddr: "Default Address:", pLang: "App Language:",
-      btnSave: "💾 Save Profile & Settings", btnPdf: "📄 Download Consent PDF", btnOut: "🚪 Logout",
+      profTitle: "👤 Customer Profile & Saved Addresses", pName: "Full Name:", pPhone: "Mobile Number:", pLang: "App Language:",
+      btnSave: "💾 Save Profile & Addresses", btnPdf: "📄 Download Consent PDF", btnOut: "🚪 Logout",
       sosTitle: "🆘 Help & Emergency Support", polHead: "👮 Police Helpline", polSub: "Emergency Police Support - 112",
       ambHead: "🚑 Ambulance Emergency", ambSub: "Emergency Medical Service - 108",
       fireHead: "🚒 Fire Brigade", fireSub: "Emergency Fire Service - 101", admHead: "👑 GoParcel Admin Support",
@@ -589,7 +634,6 @@
     document.getElementById('txtProfTitle').innerText = t.profTitle;
     document.getElementById('txtLblProfName').innerText = t.pName;
     document.getElementById('txtLblProfPhone').innerText = t.pPhone;
-    document.getElementById('txtLblProfAddr').innerText = t.pAddr;
     document.getElementById('txtLblProfLang').innerText = t.pLang;
     document.getElementById('txtBtnSaveProf').innerText = t.btnSave;
     document.getElementById('txtBtnDlPdf').innerText = t.btnPdf;
@@ -609,7 +653,6 @@
   };
   changeCustLang(currentLang);
 
-  // Offline / Low Network Monitor
   function checkCustNetwork() {
     const bar = document.getElementById('custOfflineBar');
     if (bar) bar.classList.toggle('hidden', navigator.onLine);
@@ -642,19 +685,156 @@
   let map, pMarker, dMarker, routeLine;
   let pLat = 18.5204, pLng = 73.8567, dLat = 18.5314, dLng = 73.8446;
 
+  // ==========================================
+  // 1. SAVED HOME / OFFICE ADDRESSES (PORTER-STYLE)
+  // ==========================================
+  window.promptSaveCurrentPlace = async (side) => {
+    if (!custUser) return;
+    const addr = document.getElementById(side === 'pickup' ? 'pickupInput' : 'dropInput').value.trim();
+    if (!addr) return alert("कृपया आधी पत्ता टाका किंवा GPS लोकेशन घ्या!");
+
+    const choice = prompt("हा पत्ता कशासाठी सेव्ह करायचा आहे?\n1 टाका = 🏠 Home (घर)\n2 टाका = 🏢 Office (ऑफिस)", "1");
+    if (!choice) return;
+    const type = (choice.trim() === "2" || choice.toLowerCase().includes("off")) ? "office" : "home";
+    const lat = side === 'pickup' ? pLat : dLat;
+    const lng = side === 'pickup' ? pLng : dLng;
+
+    if (!custUser.savedPlaces) custUser.savedPlaces = {};
+    custUser.savedPlaces[type] = { address: addr, lat, lng };
+    localStorage.setItem("gp_cust_user", JSON.stringify(custUser));
+    await setDoc(doc(db, "customers", "cust_" + custUser.phone), { savedPlaces: custUser.savedPlaces }, { merge: true });
+
+    if (type === 'home') document.getElementById('profHomeAddr').value = addr;
+    else document.getElementById('profOfficeAddr').value = addr;
+
+    alert(`✅ ${type === 'home' ? '🏠 Home' : '🏢 Office'} पत्ता यशस्वीरित्या सेव्ह झाला!`);
+  };
+
+  window.applySavedPlace = async (side, type) => {
+    const saved = custUser?.savedPlaces?.[type];
+    const fallbackText = type === 'home' ? document.getElementById('profHomeAddr').value.trim() : document.getElementById('profOfficeAddr').value.trim();
+
+    if (!saved && !fallbackText) {
+      return alert(`तुमचा ${type === 'home' ? '🏠 Home' : '🏢 Office'} पत्ता अजून सेव्ह केलेला नाही. पत्ता टाकून '💾 हा पत्ता Save करा' वर क्लिक करा किंवा प्रोफाईलमध्ये सेव्ह करा.`);
+    }
+
+    const targetAddr = saved?.address || fallbackText;
+    const inputId = side === 'pickup' ? 'pickupInput' : 'dropInput';
+    document.getElementById(inputId).value = targetAddr;
+
+    if (side === 'pickup') {
+      document.getElementById('pickupPersonName').value = custUser.name || "";
+      document.getElementById('pickupPersonPhone').value = custUser.phone || "";
+    } else {
+      document.getElementById('dropPersonName').value = custUser.name || "";
+      document.getElementById('dropPersonPhone').value = custUser.phone || "";
+    }
+
+    if (saved && saved.lat && saved.lng) {
+      if (side === 'pickup') {
+        pLat = Number(saved.lat); pLng = Number(saved.lng);
+        if (pMarker) pMarker.setLatLng([pLat, pLng]);
+      } else {
+        dLat = Number(saved.lat); dLng = Number(saved.lng);
+        if (dMarker) dMarker.setLatLng([dLat, dLng]);
+      }
+      if (map) map.fitBounds([[pLat, pLng], [dLat, dLng]], { padding: [45, 45] });
+      await updateDistanceAndLine();
+    } else {
+      await geocodeTypedAddress(side);
+    }
+  };
+
+  window.useCurrentGpsForProfilePlace = (type) => {
+    if (!("geolocation" in navigator)) return alert("GPS उपलब्ध नाही!");
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const lat = pos.coords.latitude, lng = pos.coords.longitude;
+      const addr = await reverseGeocodeFast(lat, lng);
+      const finalAddr = addr || `Lat ${lat.toFixed(4)}, Lng ${lng.toFixed(4)}`;
+      if (type === 'home') document.getElementById('profHomeAddr').value = finalAddr;
+      else document.getElementById('profOfficeAddr').value = finalAddr;
+
+      if (!custUser.savedPlaces) custUser.savedPlaces = {};
+      custUser.savedPlaces[type] = { address: finalAddr, lat, lng };
+      localStorage.setItem("gp_cust_user", JSON.stringify(custUser));
+      await setDoc(doc(db, "customers", "cust_" + custUser.phone), { savedPlaces: custUser.savedPlaces }, { merge: true });
+      alert(`✅ ${type === 'home' ? '🏠 Home' : '🏢 Office'} लोकेशन व पत्ता सेव्ह झाला!`);
+    }, () => alert("कृपया GPS परवानगी (Allow Location) द्या!"), { enableHighAccuracy: true });
+  };
+
+  // ==========================================
+  // 2. DUAL FAST REVERSE & FORWARD GEOCODING
+  // ==========================================
+  async function reverseGeocodeFast(lat, lng) {
+    // Primary: Photon Komoot API (Fast, CORS-friendly, no rate-limit block)
+    try {
+      const res1 = await fetch(`https://photon.komoot.io/reverse?lat=${lat}&lon=${lng}`);
+      const data1 = await res1.json();
+      if (data1 && data1.features && data1.features.length > 0) {
+        const p = data1.features[0].properties;
+        const parts = [p.name, p.street, p.district || p.suburb, p.city || p.state].filter(Boolean);
+        if (parts.length > 0) return [...new Set(parts)].join(', ');
+      }
+    } catch (e) {}
+
+    // Fallback: OpenStreetMap Nominatim
+    try {
+      const res2 = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=en`);
+      const data2 = await res2.json();
+      if (data2 && data2.display_name) {
+        return data2.display_name.split(',').slice(0, 4).join(', ');
+      }
+    } catch (e) {}
+    return "";
+  }
+
+  async function fetchAddressFromCoords(lat, lng, inputId) {
+    const inp = document.getElementById(inputId);
+    if (!inp) return;
+    inp.value = "⏳ पत्ता शोधत आहे...";
+    const addr = await reverseGeocodeFast(lat, lng);
+    inp.value = addr || `GPS Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+  }
+
+  // Forward Geocoding: Typed address -> Map Pin + Actual Road KM
+  window.geocodeTypedAddress = async (side) => {
+    const inp = document.getElementById(side === 'pickup' ? 'pickupInput' : 'dropInput');
+    const queryText = inp.value.trim();
+    if (!queryText || queryText.startsWith("⏳")) return;
+
+    const cityContext = document.getElementById('activeCitySelect')?.value || "Pune";
+    const fullQuery = queryText.toLowerCase().includes(cityContext.toLowerCase()) ? queryText : `${queryText}, ${cityContext}, Maharashtra`;
+
+    try {
+      const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(fullQuery)}&limit=1`);
+      const data = await res.json();
+      if (data && data.features && data.features.length > 0) {
+        const [lng, lat] = data.features[0].geometry.coordinates;
+        if (side === 'pickup') {
+          pLat = lat; pLng = lng;
+          if (pMarker) pMarker.setLatLng([pLat, pLng]).openPopup();
+        } else {
+          dLat = lat; dLng = lng;
+          if (dMarker) dMarker.setLatLng([dLat, dLng]).openPopup();
+        }
+        if (map) map.fitBounds([[pLat, pLng], [dLat, dLng]], { padding: [45, 45] });
+        await updateDistanceAndLine();
+      }
+    } catch (e) {}
+  };
+
   // Multi-Stop Delivery Functions
   window.addExtraDeliveryStop = () => {
     if (extraStopsList.length >= 3) return alert("जास्तीत जास्त ३ मधले स्टॉप्स जोडता येतात!");
-    const idx = extraStopsList.length;
     extraStopsList.push({ address: "", lat: (pLat + dLat) / 2, lng: (pLng + dLng) / 2 });
     renderExtraStopsUi();
-    recalcPrices();
+    updateDistanceAndLine();
   };
 
   window.removeExtraDeliveryStop = (idx) => {
     extraStopsList.splice(idx, 1);
     renderExtraStopsUi();
-    recalcPrices();
+    updateDistanceAndLine();
   };
 
   window.updateExtraStopText = (idx, val) => {
@@ -695,13 +875,11 @@
     }
   };
 
-  // Schedule Later Toggle
   window.toggleScheduleInput = () => {
     const mode = document.getElementById('scheduleModeSelect').value;
     document.getElementById('scheduleDateTimeInput').classList.toggle('hidden', mode !== 'later');
   };
 
-  // Customer Tip Selection (100% to Rider)
   window.selectCustomerTip = (amt, el) => {
     selectedTipAmount = Number(amt);
     document.querySelectorAll('.tip-pill').forEach(p => p.classList.remove('active'));
@@ -710,7 +888,6 @@
     recalcPrices();
   };
 
-  // Cancellation Policy & Fee Handler
   window.cancelCustomerOrder = async (orderId, currentStatus) => {
     const reason = prompt(
       "ऑर्डर कॅन्सल करण्याचे कारण निवडा:\n1. प्लॅन बदलला (Plan Changed)\n2. रायडरला उशीर होत आहे (Rider Delayed)\n3. पत्ता चुकला (Wrong Address)\n4. इतर कारण (Other)",
@@ -850,7 +1027,9 @@
     clearInterval(custOtpTimerInterval);
     await updateDoc(doc(db, "otpRequests", custOtpReqId), { status: "Verified" });
 
-    custUser = { name, phone, lang: currentLang, address: "" };
+    const existingDoc = await getDoc(doc(db, "customers", "cust_" + phone));
+    const existingSaved = existingDoc.exists() ? (existingDoc.data().savedPlaces || {}) : {};
+    custUser = { name, phone, lang: currentLang, savedPlaces: existingSaved };
     await setDoc(doc(db, "customers", "cust_" + phone), custUser, { merge: true });
     localStorage.setItem("gp_cust_user", JSON.stringify(custUser));
     startCustApp();
@@ -858,11 +1037,16 @@
 
   window.saveCustProfile = async () => {
     custUser.name = document.getElementById('profCustName').value.trim();
-    custUser.address = document.getElementById('profCustAddr').value.trim();
     custUser.lang = currentLang;
+    const homeTxt = document.getElementById('profHomeAddr').value.trim();
+    const officeTxt = document.getElementById('profOfficeAddr').value.trim();
+    if (!custUser.savedPlaces) custUser.savedPlaces = {};
+    if (homeTxt) custUser.savedPlaces.home = { ...(custUser.savedPlaces.home || {}), address: homeTxt };
+    if (officeTxt) custUser.savedPlaces.office = { ...(custUser.savedPlaces.office || {}), address: officeTxt };
+
     localStorage.setItem("gp_cust_user", JSON.stringify(custUser));
     await setDoc(doc(db, "customers", "cust_" + custUser.phone), custUser, { merge: true });
-    alert("✅ Saved!");
+    alert("✅ प्रोफाईल व Home/Office पत्ते सेव्ह झाले!");
   };
 
   window.logoutCust = () => { localStorage.removeItem("gp_cust_user"); location.reload(); };
@@ -882,7 +1066,8 @@
     document.getElementById('custBottomNav').classList.remove('hidden');
     document.getElementById('profCustName').value = custUser.name || "";
     document.getElementById('profCustPhone').value = custUser.phone || "";
-    document.getElementById('profCustAddr').value = custUser.address || "";
+    document.getElementById('profHomeAddr').value = custUser.savedPlaces?.home?.address || "";
+    document.getElementById('profOfficeAddr').value = custUser.savedPlaces?.office?.address || "";
     document.getElementById('myCustReferCode').innerText = "GPC" + String(custUser.phone || "0000").slice(-4);
     document.getElementById('pickupPersonName').value = custUser.name || "";
     document.getElementById('pickupPersonPhone').value = custUser.phone || "";
@@ -925,30 +1110,33 @@
     });
   }
 
-  async function fetchAddressFromCoords(lat, lng, inputId) {
-    try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-      const data = await res.json();
-      if (data && data.display_name) {
-        document.getElementById(inputId).value = data.display_name.split(',').slice(0, 3).join(', ');
-      }
-    } catch (e) {}
-  }
-
+  // ==========================================
+  // 3. ACTUAL ROAD KM CALCULATION VIA OSRM
+  // ==========================================
   async function updateDistanceAndLine() {
     if (!map) return;
-    const km = Math.max(1, (map.distance([pLat, pLng], [dLat, dLng]) / 1000)).toFixed(1);
-    document.getElementById('distKmInput').value = km;
+
+    // Fallback straight-line * 1.25 road factor
+    const straightKm = map.distance([pLat, pLng], [dLat, dLng]) / 1000;
+    const estRoadKm = Math.max(1, (straightKm * 1.25)).toFixed(1);
+    document.getElementById('distKmInput').value = estRoadKm;
     recalcPrices();
 
-    // Draw Smooth Real Road Polyline via OSRM
     try {
       const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${pLng},${pLat};${dLng},${dLat}?overview=full&geometries=geojson`);
       const data = await res.json();
       if (data.routes && data.routes.length > 0) {
-        const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+        const route = data.routes[0];
+        const actualRoadKm = Math.max(1, (route.distance / 1000)).toFixed(1);
+        const estMinutes = Math.max(3, Math.round(route.duration / 60));
+
+        document.getElementById('distKmInput').value = actualRoadKm;
+        document.getElementById('routeTimeEstTag').innerText = `✅ अस्सल रोड अंतर: ${actualRoadKm} km (~${estMinutes} मिनिटे)`;
+
+        const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
         if (routeLine) map.removeLayer(routeLine);
         routeLine = L.polyline(coords, { color: '#ff6600', weight: 5, opacity: 0.9 }).addTo(map);
+        recalcPrices();
         return;
       }
     } catch (e) {}
@@ -959,21 +1147,33 @@
 
   window.useCurrentGpsLocation = (target, silent = false) => {
     if (!("geolocation" in navigator)) { if (!silent) alert("GPS not available"); return; }
-    navigator.geolocation.getCurrentPosition((pos) => {
+    if (!silent) document.getElementById('pickupInput').value = "⏳ तुमचे GPS लोकेशन आणि पत्ता शोधत आहे...";
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
       custGpsLat = pos.coords.latitude; custGpsLng = pos.coords.longitude;
       if (target === 'pickup') {
         pLat = custGpsLat; pLng = custGpsLng;
-        dLat = pLat + 0.012; dLng = pLng + 0.012;
+        // Set drop offset only if drop address is still empty
+        if (!document.getElementById('dropInput').value.trim()) {
+          dLat = pLat + 0.015; dLng = pLng + 0.015;
+        }
         if (map && pMarker && dMarker) {
           pMarker.setLatLng([pLat, pLng]).openPopup();
           dMarker.setLatLng([dLat, dLng]);
-          map.setView([pLat, pLng], 14);
-          updateDistanceAndLine();
+          map.fitBounds([[pLat, pLng], [dLat, dLng]], { padding: [45, 45] });
+          await updateDistanceAndLine();
         }
-        fetchAddressFromCoords(pLat, pLng, 'pickupInput');
-        fetchAddressFromCoords(dLat, dLng, 'dropInput');
+        await fetchAddressFromCoords(pLat, pLng, 'pickupInput');
+        if (!document.getElementById('dropInput').value.trim()) {
+          await fetchAddressFromCoords(dLat, dLng, 'dropInput');
+        }
       }
-    }, () => { if (!silent) alert("Please Allow GPS Location!"); }, { enableHighAccuracy: true });
+    }, () => {
+      if (!silent) {
+        document.getElementById('pickupInput').value = "";
+        alert("⚠️ कृपया मोबाईलचे GPS (Location) चालू करा आणि ब्राउझरला परवानगी द्या!");
+      }
+    }, { enableHighAccuracy: true, timeout: 10000 });
   };
 
   function initMap() {
@@ -983,8 +1183,8 @@
     const greenPin = L.divIcon({ html: '<div style="font-size:28px; line-height:1;">🟢</div>', className: '', iconSize: [30, 30], iconAnchor: [15, 15] });
     const redPin = L.divIcon({ html: '<div style="font-size:28px; line-height:1;">🔴</div>', className: '', iconSize: [30, 30], iconAnchor: [15, 15] });
 
-    pMarker = L.marker([pLat, pLng], { icon: greenPin, draggable: true }).addTo(map).bindPopup("🟢 Pickup");
-    dMarker = L.marker([dLat, dLng], { icon: redPin, draggable: true }).addTo(map).bindPopup("🔴 Drop");
+    pMarker = L.marker([pLat, pLng], { icon: greenPin, draggable: true }).addTo(map).bindPopup("🟢 Pickup (ओढा किंवा क्लिक करा)");
+    dMarker = L.marker([dLat, dLng], { icon: redPin, draggable: true }).addTo(map).bindPopup("🔴 Drop (ओढा किंवा क्लिक करा)");
 
     pMarker.on('dragend', () => { const pos = pMarker.getLatLng(); pLat = pos.lat; pLng = pos.lng; updateDistanceAndLine(); fetchAddressFromCoords(pLat, pLng, 'pickupInput'); });
     dMarker.on('dragend', () => { const pos = dMarker.getLatLng(); dLat = pos.lat; dLng = pos.lng; updateDistanceAndLine(); fetchAddressFromCoords(dLat, dLng, 'dropInput'); });
@@ -1022,21 +1222,26 @@
   }
 
   window.recalcPrices = () => {
-    const km = Math.max(1, Number(document.getElementById('distKmInput').value) || 1);
+    const km = Math.max(0.5, Number(document.getElementById('distKmInput').value) || 1);
     const mult = appCfg.surgeActive ? appCfg.surgeMultiplier : 1;
 
-    // Extra Add-ons: Multi-stops (₹25/stop), Floor Lift Charges, Goods Insurance & Rider Tip
     const stopsFee = extraStopsList.length * 25;
     const pickFloorFee = Number((document.getElementById('pickupFloorSelect')?.value || "Ground|0").split('|')[1] || 0);
     const dropFloorFee = Number((document.getElementById('dropFloorSelect')?.value || "Ground|0").split('|')[1] || 0);
     const insuranceFee = Number(document.getElementById('goodsInsuranceSelect')?.value || 0);
     const addOnsTotal = stopsFee + pickFloorFee + dropFloorFee + insuranceFee + selectedTipAmount;
 
-    const f2 = Math.max(appCfg.minFare, Math.round(km * appCfg.rate2W * mult)) + addOnsTotal;
-    const f3 = Math.max(appCfg.minFare, Math.round(km * appCfg.rate3W * mult)) + addOnsTotal;
-    const ft = Math.max(appCfg.minFare, Math.round(km * appCfg.rateTempo * mult)) + addOnsTotal;
-    const fb = Math.max(appCfg.minFare, Math.round(km * appCfg.rateBolero * mult)) + addOnsTotal;
-    const ftr = Math.max(appCfg.minFare, Math.round(km * appCfg.rateTruck * mult)) + addOnsTotal;
+    const base2 = Math.max(appCfg.minFare, Math.round(km * appCfg.rate2W * mult));
+    const base3 = Math.max(appCfg.minFare, Math.round(km * appCfg.rate3W * mult));
+    const baset = Math.max(appCfg.minFare, Math.round(km * appCfg.rateTempo * mult));
+    const baseb = Math.max(appCfg.minFare, Math.round(km * appCfg.rateBolero * mult));
+    const basetr = Math.max(appCfg.minFare, Math.round(km * appCfg.rateTruck * mult));
+
+    const f2 = base2 + addOnsTotal;
+    const f3 = base3 + addOnsTotal;
+    const ft = baset + addOnsTotal;
+    const fb = baseb + addOnsTotal;
+    const ftr = basetr + addOnsTotal;
 
     document.getElementById('fare2W').innerText = "₹" + f2;
     document.getElementById('fare3W').innerText = "₹" + f3;
@@ -1044,11 +1249,23 @@
     document.getElementById('fareBolero').innerText = "₹" + fb;
     document.getElementById('fareTruck').innerText = "₹" + ftr;
 
-    let final = f2;
-    if (chosenVehicle === "3-Wheeler") final = f3;
-    if (chosenVehicle === "Mini Tempo") final = ft;
-    if (chosenVehicle === "Bolero Pickup") final = fb;
-    if (chosenVehicle === "Truck") final = ftr;
+    let final = f2, activeBase = base2, activeRate = appCfg.rate2W;
+    if (chosenVehicle === "3-Wheeler") { final = f3; activeBase = base3; activeRate = appCfg.rate3W; }
+    if (chosenVehicle === "Mini Tempo") { final = ft; activeBase = baset; activeRate = appCfg.rateTempo; }
+    if (chosenVehicle === "Bolero Pickup") { final = fb; activeBase = baseb; activeRate = appCfg.rateBolero; }
+    if (chosenVehicle === "Truck") { final = ftr; activeBase = basetr; activeRate = appCfg.rateTruck; }
+
+    // Transparent KM & Add-ons Fare Tally Breakdown
+    const bdBox = document.getElementById('fareBreakdownBox');
+    if (bdBox) {
+      bdBox.innerHTML = `
+        <div style="display:flex; justify-content:space-between;"><span>📏 ${chosenVehicle} (${km} km × ₹${activeRate}/km, Min ₹${appCfg.minFare}):</span><strong>₹${activeBase}</strong></div>
+        ${stopsFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#ff9800;"><span>🛑 एक्स्ट्रा स्टॉप्स (${extraStopsList.length} × ₹25):</span><strong>+₹${stopsFee}</strong></div>` : ''}
+        ${(pickFloorFee + dropFloorFee) > 0 ? `<div style="display:flex; justify-content:space-between; color:#ffaa66;"><span>🪜 मजला लिफ्ट नसल्याचा चार्ज:</span><strong>+₹${pickFloorFee + dropFloorFee}</strong></div>` : ''}
+        ${insuranceFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🛡️ वस्तू विमा संरक्षण:</span><strong>+₹${insuranceFee}</strong></div>` : ''}
+        ${selectedTipAmount > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🎁 रायडर टीप (100% रायडरला):</span><strong>+₹${selectedTipAmount}</strong></div>` : ''}
+      `;
+    }
 
     document.getElementById('finalFareDisplay').innerText = "₹" + final;
     if (chosenPaymentMode === 'ONLINE') generateDynamicUpiQrAndApps(final);
