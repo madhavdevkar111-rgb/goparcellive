@@ -67,7 +67,7 @@
 <body>
 <header>
   <h1>👑 GoParcel Master Panel</h1>
-  <span style="color:#2ecc71; font-size:13px;">● Porter Fare & Pickup Payout Engine</span>
+  <span style="color:#2ecc71; font-size:13px;">● Porter / Rapido Fare Engine</span>
 </header>
 
 <div id="imgModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
@@ -87,7 +87,7 @@
   </div>
 
   <div class="nav-tabs">
-    <button id="tMaster" class="nav-btn active" onclick="showTab('master')">🎛️ दर तक्ता (Rate Card) व लांब पिकअप भत्ता</button>
+    <button id="tMaster" class="nav-btn active" onclick="showTab('master')">🎛️ दर तक्ता (Porter / Rapido Rate Card)</button>
     <button id="tRiders" class="nav-btn" onclick="showTab('riders')">🛵 रायडर्स KYC, Selfie & Direct Add</button>
     <button id="tOrders" class="nav-btn" onclick="showTab('orders')">📦 ऑर्डर्स, फोन बुकिंग & GST रिपोर्ट</button>
     <button id="tChat" class="nav-btn" onclick="showTab('chat')">💬 Live Support Chat <span id="chatBadge" class="badge-req hidden">0</span></button>
@@ -98,53 +98,68 @@
     <button id="tMap" class="nav-btn" onclick="showTab('map')">🔥 हीट मॅप & लाईव्ह GPS</button>
   </div>
 
-  <!-- 8. MASTER SETTINGS (PORTER-STYLE VEHICLE-WISE BASE FARE + PER KM RATE + LONG PICKUP PAYOUT) -->
+  <!-- 8. MASTER SETTINGS (PORTER / RAPIDO FARE ENGINE) -->
   <div id="secMaster" class="panel-box">
     <div class="sub-box-green">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-        <h3 style="color:#2ecc71;">🚛 Porter-Style वाहन दर तक्ता (कस्टमरचे बेस भाडे व प्रति KM दर)</h3>
-        <span style="font-size:11px; color:#aaa;">येथे दर सेव्ह करताच कस्टमर व रायडर पॅनेलवर लगेच लागू होतील!</span>
+        <h3 style="color:#2ecc71;">🚛 Porter / Rapido वाहन दर तक्ता (Base Fare + Per KM Rate)</h3>
+        <span style="font-size:11px; color:#aaa;">सूत्र: Base Fare + (बिलिंग KM × प्रति KM दर)</span>
       </div>
+
+      <div style="background:#0a180f; border:1px solid #2ecc71; border-radius:8px; padding:10px; margin-bottom:10px;">
+        <label style="color:#4db8ff;">⚙️ बेस फेअरमध्ये समाविष्ट मोफत किलोमीटर (Included Free Base KM):</label>
+        <select id="setIncludedBaseKm" onchange="previewRateSamples()">
+          <option value="0">0 km मोफत — उदा. Base ₹15 + (1.2 km × ₹15 = ₹18) = एकूण ₹33</option>
+          <option value="1">1 km मोफत — उदा. Base ₹20 (पहिला 1 km फ्री) + (0.2 km × ₹15 = ₹3) = एकूण ₹23</option>
+        </select>
+      </div>
+
       <div style="overflow-x:auto;">
         <table class="rate-card-table">
           <thead>
             <tr>
               <th>वाहन प्रकार (Vehicle)</th>
-              <th>किमान बेस भाडे (Base / Min Fare ₹)</th>
-              <th>प्रति किलोमीटर दर (Per KM Rate ₹/km)</th>
+              <th>Base Fare (बेस भाडे ₹)</th>
+              <th>प्रति KM दर (₹/km)</th>
+              <th>उदा. 1.2 KM चे भाडे</th>
               <th>उदा. 5 KM चे भाडे</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td><b>🏍️ 2-Wheeler (बाईक)</b></td>
-              <td><input type="number" id="setBase2W" value="30" oninput="previewRateSamples()"></td>
-              <td><input type="number" id="setRate2W" value="10" oninput="previewRateSamples()"></td>
-              <td id="sample5Km2W" style="color:#2ecc71; font-weight:bold;">₹50</td>
+              <td><input type="number" id="setBase2W" value="15" oninput="previewRateSamples()"></td>
+              <td><input type="number" id="setRate2W" value="15" oninput="previewRateSamples()"></td>
+              <td id="sample1Km2W" style="color:#ffaa66; font-weight:bold;">₹33</td>
+              <td id="sample5Km2W" style="color:#2ecc71; font-weight:bold;">₹90</td>
             </tr>
             <tr>
               <td><b>🛺 3-Wheeler (रिक्षा/अपे)</b></td>
-              <td><input type="number" id="setBase3W" value="70" oninput="previewRateSamples()"></td>
-              <td><input type="number" id="setRate3W" value="18" oninput="previewRateSamples()"></td>
-              <td id="sample5Km3W" style="color:#2ecc71; font-weight:bold;">₹90</td>
+              <td><input type="number" id="setBase3W" value="50" oninput="previewRateSamples()"></td>
+              <td><input type="number" id="setRate3W" value="20" oninput="previewRateSamples()"></td>
+              <td id="sample1Km3W" style="color:#ffaa66; font-weight:bold;">₹74</td>
+              <td id="sample5Km3W" style="color:#2ecc71; font-weight:bold;">₹150</td>
             </tr>
             <tr>
               <td><b>🚐 Mini Tempo (टाटा एस/छोटा हत्ती)</b></td>
-              <td><input type="number" id="setBaseTempo" value="150" oninput="previewRateSamples()"></td>
-              <td><input type="number" id="setRateTempo" value="25" oninput="previewRateSamples()"></td>
-              <td id="sample5KmTempo" style="color:#2ecc71; font-weight:bold;">₹150</td>
+              <td><input type="number" id="setBaseTempo" value="120" oninput="previewRateSamples()"></td>
+              <td><input type="number" id="setRateTempo" value="28" oninput="previewRateSamples()"></td>
+              <td id="sample1KmTempo" style="color:#ffaa66; font-weight:bold;">₹154</td>
+              <td id="sample5KmTempo" style="color:#2ecc71; font-weight:bold;">₹260</td>
             </tr>
             <tr>
               <td><b>🛻 Bolero Pickup</b></td>
-              <td><input type="number" id="setBaseBolero" value="250" oninput="previewRateSamples()"></td>
-              <td><input type="number" id="setRateBolero" value="35" oninput="previewRateSamples()"></td>
-              <td id="sample5KmBolero" style="color:#2ecc71; font-weight:bold;">₹250</td>
+              <td><input type="number" id="setBaseBolero" value="200" oninput="previewRateSamples()"></td>
+              <td><input type="number" id="setRateBolero" value="38" oninput="previewRateSamples()"></td>
+              <td id="sample1KmBolero" style="color:#ffaa66; font-weight:bold;">₹246</td>
+              <td id="sample5KmBolero" style="color:#2ecc71; font-weight:bold;">₹390</td>
             </tr>
             <tr>
               <td><b>🚛 Truck (मोठा ट्रक)</b></td>
-              <td><input type="number" id="setBaseTruck" value="500" oninput="previewRateSamples()"></td>
-              <td><input type="number" id="setRateTruck" value="50" oninput="previewRateSamples()"></td>
-              <td id="sample5KmTruck" style="color:#2ecc71; font-weight:bold;">₹500</td>
+              <td><input type="number" id="setBaseTruck" value="450" oninput="previewRateSamples()"></td>
+              <td><input type="number" id="setRateTruck" value="55" oninput="previewRateSamples()"></td>
+              <td id="sample1KmTruck" style="color:#ffaa66; font-weight:bold;">₹516</td>
+              <td id="sample5KmTruck" style="color:#2ecc71; font-weight:bold;">₹725</td>
             </tr>
           </tbody>
         </table>
@@ -383,7 +398,7 @@
   <!-- 4. ALL ORDERS, MANUAL PHONE BOOKING & GST/INVOICE REPORTS -->
   <div id="secOrders" class="panel-box hidden" style="overflow-x:auto;">
     <div class="sub-box-orange">
-      <h4 style="color:#ff6600; margin-bottom:8px;">📞 मॅन्युअल फोन बुकिंग एन्ट्री (Auto KM Fare Calculator -> Direct to Riders)</h4>
+      <h4 style="color:#ff6600; margin-bottom:8px;">📞 मॅन्युअल फोन बुकिंग एन्ट्री (Porter Auto KM Fare Calculator -> Direct to Riders)</h4>
       <div class="form-grid" style="margin-bottom:8px;">
         <div><label>कस्टमर नाव</label><input type="text" id="manCustName" placeholder="ग्राहकाचे नाव"></div>
         <div><label>कस्टमर मोबाईल (१० अंकी)</label><input type="tel" id="manCustPhone" maxlength="10" placeholder="9876543210"></div>
@@ -399,12 +414,12 @@
             <option value="Truck">Truck</option>
           </select>
         </div>
-        <div><label>अंतर (KM)</label><input type="number" id="manDistKm" value="5" min="0.5" step="0.5" oninput="recalcManualOrderFare()"></div>
+        <div><label>अंतर (KM)</label><input type="number" id="manDistKm" value="1.2" min="0.1" step="0.1" oninput="recalcManualOrderFare()"></div>
         <div><label>पार्सल प्रकार & वजन</label><input type="text" id="manParcel" value="Box / Goods (5 kg)"></div>
-        <div><label>ऑटो कॅल्क्युलेट भाडे (₹)</label><input type="number" id="manFare" placeholder="उदा. 50"></div>
+        <div><label>ऑटो कॅल्क्युलेट भाडे (₹)</label><input type="number" id="manFare" placeholder="उदा. 33"></div>
         <div><label>पेमेंट पद्धत</label><select id="manPayMode"><option value="COD">💵 Cash on Delivery (COD)</option><option value="ONLINE">📱 Online Paid</option></select></div>
       </div>
-      <div id="manFareTallyHint" style="font-size:12px; color:#2ecc71; margin-bottom:8px;">📏 5 km × ₹10/km = ₹50</div>
+      <div id="manFareTallyHint" style="font-size:12px; color:#2ecc71; margin-bottom:8px;">📏 Base ₹15 + (1.2 km × ₹15/km) = ₹33</div>
       <button class="save-btn" onclick="createManualPhoneOrder()">🚀 मॅन्युअल ऑर्डर तयार करा आणि सर्व रायडर्सना पाठवा</button>
     </div>
 
@@ -417,7 +432,7 @@
     </div>
 
     <table>
-      <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता व व्यक्ती</th><th>वाहन, Trip KM & PIN</th><th>कस्टमर बिल vs रायडर कमाई (Pickup Bonus सह)</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
+      <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता व व्यक्ती</th><th>वाहन, Trip KM & PIN</th><th>कस्टमर बिल vs रायडर कमाई</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
       <tbody id="adminTableBody"></tbody>
     </table>
   </div>
@@ -490,15 +505,23 @@
   const db = getFirestore(app);
   let currentCommPercent = 20;
   let adminRates = {
-    base2W: 30, rate2W: 10,
-    base3W: 70, rate3W: 18,
-    baseTempo: 150, rateTempo: 25,
-    baseBolero: 250, rateBolero: 35,
-    baseTruck: 500, rateTruck: 50,
+    includedBaseKm: 0,
+    base2W: 15, rate2W: 15,
+    base3W: 50, rate3W: 20,
+    baseTempo: 120, rateTempo: 28,
+    baseBolero: 200, rateBolero: 38,
+    baseTruck: 450, rateTruck: 55,
     surgeActive: false, surgeMultiplier: 1.2
   };
   let allChatMsgs = [], selectedChatRoomId = null;
   let allOrdersCache = [];
+
+  // Exact Porter / Rapido Fare Formula: Base Fare + (Billable KM * Rate)
+  function computePorterFare(km, baseFare, perKmRate, includedFreeKm, surgeMult) {
+    const billableKm = Math.max(0, km - includedFreeKm);
+    const raw = baseFare + (billableKm * perKmRate);
+    return Math.round(raw * surgeMult);
+  }
 
   window.openImgModal = (src, caption) => {
     document.getElementById('modalCaption').innerText = caption || '';
@@ -533,16 +556,22 @@
   };
 
   window.previewRateSamples = () => {
-    const calc5 = (bId, rId) => {
+    const incKm = Number(document.getElementById('setIncludedBaseKm')?.value || 0);
+    const calcSample = (km, bId, rId) => {
       const b = Number(document.getElementById(bId).value || 0);
       const r = Number(document.getElementById(rId).value || 0);
-      return Math.max(b, Math.round(5 * r));
+      return computePorterFare(km, b, r, incKm, 1);
     };
-    document.getElementById('sample5Km2W').innerText = "₹" + calc5('setBase2W', 'setRate2W');
-    document.getElementById('sample5Km3W').innerText = "₹" + calc5('setBase3W', 'setRate3W');
-    document.getElementById('sample5KmTempo').innerText = "₹" + calc5('setBaseTempo', 'setRateTempo');
-    document.getElementById('sample5KmBolero').innerText = "₹" + calc5('setBaseBolero', 'setRateBolero');
-    document.getElementById('sample5KmTruck').innerText = "₹" + calc5('setBaseTruck', 'setRateTruck');
+    document.getElementById('sample1Km2W').innerText = "₹" + calcSample(1.2, 'setBase2W', 'setRate2W');
+    document.getElementById('sample5Km2W').innerText = "₹" + calcSample(5, 'setBase2W', 'setRate2W');
+    document.getElementById('sample1Km3W').innerText = "₹" + calcSample(1.2, 'setBase3W', 'setRate3W');
+    document.getElementById('sample5Km3W').innerText = "₹" + calcSample(5, 'setBase3W', 'setRate3W');
+    document.getElementById('sample1KmTempo').innerText = "₹" + calcSample(1.2, 'setBaseTempo', 'setRateTempo');
+    document.getElementById('sample5KmTempo').innerText = "₹" + calcSample(5, 'setBaseTempo', 'setRateTempo');
+    document.getElementById('sample1KmBolero').innerText = "₹" + calcSample(1.2, 'setBaseBolero', 'setRateBolero');
+    document.getElementById('sample5KmBolero').innerText = "₹" + calcSample(5, 'setBaseBolero', 'setRateBolero');
+    document.getElementById('sample1KmTruck').innerText = "₹" + calcSample(1.2, 'setBaseTruck', 'setRateTruck');
+    document.getElementById('sample5KmTruck').innerText = "₹" + calcSample(5, 'setBaseTruck', 'setRateTruck');
   };
 
   window.adminDirectAddRider = async () => {
@@ -570,7 +599,7 @@
 
   window.recalcManualOrderFare = () => {
     const veh = document.getElementById('manVehicle').value;
-    const km = Math.max(0.5, Number(document.getElementById('manDistKm').value) || 1);
+    const km = Math.max(0.1, Number(document.getElementById('manDistKm').value) || 1);
     let base = adminRates.base2W, rate = adminRates.rate2W;
     if (veh === "3-Wheeler") { base = adminRates.base3W; rate = adminRates.rate3W; }
     if (veh === "Mini Tempo") { base = adminRates.baseTempo; rate = adminRates.rateTempo; }
@@ -578,9 +607,10 @@
     if (veh === "Truck") { base = adminRates.baseTruck; rate = adminRates.rateTruck; }
 
     const mult = adminRates.surgeActive ? adminRates.surgeMultiplier : 1;
-    const calcFare = Math.max(base, Math.round(km * rate * mult));
+    const calcFare = computePorterFare(km, base, rate, adminRates.includedBaseKm, mult);
+    const billKm = Math.max(0, (km - adminRates.includedBaseKm)).toFixed(1);
     document.getElementById('manFare').value = calcFare;
-    document.getElementById('manFareTallyHint').innerText = `📏 ${veh}: ${km} km × ₹${rate}/km (Base ₹${base}) = ₹${calcFare}`;
+    document.getElementById('manFareTallyHint').innerText = `📏 ${veh}: Base ₹${base} + (${billKm} km × ₹${rate}/km) = ₹${calcFare}`;
   };
 
   window.createManualPhoneOrder = async () => {
@@ -589,7 +619,7 @@
     const pickup = document.getElementById('manPickup').value.trim();
     const drop = document.getElementById('manDrop').value.trim();
     const vehicle = document.getElementById('manVehicle').value;
-    const distanceKm = Math.max(0.5, Number(document.getElementById('manDistKm').value) || 1);
+    const distanceKm = Math.max(0.1, Number(document.getElementById('manDistKm').value) || 1);
     const parcel = document.getElementById('manParcel').value.trim() || "Parcel";
     const fare = Number(document.getElementById('manFare').value);
     const paymentMode = document.getElementById('manPayMode').value;
@@ -850,19 +880,21 @@
   onSnapshot(settingsRef, (snap) => {
     if (snap.exists()) {
       const s = snap.data();
-      adminRates.base2W = Number(s.base2W ?? s.minFare ?? 30);
-      adminRates.rate2W = Number(s.rate2W ?? 10);
-      adminRates.base3W = Number(s.base3W ?? 70);
-      adminRates.rate3W = Number(s.rate3W ?? 18);
-      adminRates.baseTempo = Number(s.baseTempo ?? 150);
-      adminRates.rateTempo = Number(s.rateTempo ?? 25);
-      adminRates.baseBolero = Number(s.baseBolero ?? 250);
-      adminRates.rateBolero = Number(s.rateBolero ?? 35);
-      adminRates.baseTruck = Number(s.baseTruck ?? 500);
-      adminRates.rateTruck = Number(s.rateTruck ?? 50);
+      adminRates.includedBaseKm = Number(s.includedBaseKm ?? 0);
+      adminRates.base2W = Number(s.base2W ?? 15);
+      adminRates.rate2W = Number(s.rate2W ?? 15);
+      adminRates.base3W = Number(s.base3W ?? 50);
+      adminRates.rate3W = Number(s.rate3W ?? 20);
+      adminRates.baseTempo = Number(s.baseTempo ?? 120);
+      adminRates.rateTempo = Number(s.rateTempo ?? 28);
+      adminRates.baseBolero = Number(s.baseBolero ?? 200);
+      adminRates.rateBolero = Number(s.rateBolero ?? 38);
+      adminRates.baseTruck = Number(s.baseTruck ?? 450);
+      adminRates.rateTruck = Number(s.rateTruck ?? 55);
       adminRates.surgeActive = !!s.surgeActive;
       adminRates.surgeMultiplier = Number(s.surgeMultiplier ?? 1.2);
 
+      document.getElementById('setIncludedBaseKm').value = String(adminRates.includedBaseKm);
       document.getElementById('setBase2W').value = adminRates.base2W;
       document.getElementById('setRate2W').value = adminRates.rate2W;
       document.getElementById('setBase3W').value = adminRates.base3W;
@@ -924,7 +956,7 @@
   });
 
   window.saveMasterSettings = async () => {
-    const b2 = Number(document.getElementById('setBase2W').value) || 30;
+    const b2 = Number(document.getElementById('setBase2W').value) || 15;
     await setDoc(settingsRef, {
       adminWa: document.getElementById('setAdminWa').value.trim(),
       adminUpi: document.getElementById('setAdminUpi').value.trim(),
@@ -932,6 +964,7 @@
       deliveryRangeMeters: Number(document.getElementById('setDeliveryRangeMeters').value),
       onboardingFee: Number(document.getElementById('setOnboardingFee').value),
       commission: Number(document.getElementById('setCommission').value),
+      includedBaseKm: Number(document.getElementById('setIncludedBaseKm').value),
       minFare: b2,
       base2W: b2,
       rate2W: Number(document.getElementById('setRate2W').value),
