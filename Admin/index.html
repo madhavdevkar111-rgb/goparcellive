@@ -139,7 +139,6 @@
 
   <!-- 3. BANK WITHDRAWALS, DEPOSITS & REFUND / SETTLEMENT MANAGER -->
   <div id="secPayouts" class="panel-box hidden" style="overflow-x:auto;">
-    <!-- Refund & Settlement Manager -->
     <div class="sub-box-blue">
       <h4 style="color:#4db8ff; margin-bottom:8px;">⚖️ रिफंड आणि सेटलमेंट मॅनेजर (Customer Refund / Rider Penalty Waiver)</h4>
       <div class="form-grid" style="margin-bottom:8px;">
@@ -164,27 +163,36 @@
     </table>
   </div>
 
-  <!-- 4. ALL ORDERS, MANUAL PHONE BOOKING & GST/INVOICE REPORTS -->
+  <!-- 4. ALL ORDERS, MANUAL PHONE BOOKING (AUTO KM FARE) & GST/INVOICE REPORTS -->
   <div id="secOrders" class="panel-box hidden" style="overflow-x:auto;">
-    <!-- Manual Phone Order Booking -->
     <div class="sub-box-orange">
-      <h4 style="color:#ff6600; margin-bottom:8px;">📞 मॅन्युअल फोन बुकिंग एन्ट्री (Phone Order Entry -> Direct to Riders)</h4>
+      <h4 style="color:#ff6600; margin-bottom:8px;">📞 मॅन्युअल फोन बुकिंग एन्ट्री (Auto KM Fare Calculator -> Direct to Riders)</h4>
       <div class="form-grid" style="margin-bottom:8px;">
         <div><label>कस्टमर नाव</label><input type="text" id="manCustName" placeholder="ग्राहकाचे नाव"></div>
         <div><label>कस्टमर मोबाईल (१० अंकी)</label><input type="tel" id="manCustPhone" maxlength="10" placeholder="9876543210"></div>
         <div><label>पिकअप पत्ता (पुणे/शहर)</label><input type="text" id="manPickup" placeholder="उदा. स्वारगेट, पुणे"></div>
         <div><label>ड्रॉप पत्ता</label><input type="text" id="manDrop" placeholder="उदा. हिंजवडी फेज १, पुणे"></div>
-        <div><label>वाहन प्रकार</label><select id="manVehicle"><option value="2-Wheeler">2-Wheeler</option><option value="3-Wheeler">3-Wheeler</option><option value="Mini Tempo">Mini Tempo</option><option value="Bolero Pickup">Bolero Pickup</option><option value="Truck">Truck</option></select></div>
+        <div>
+          <label>वाहन प्रकार</label>
+          <select id="manVehicle" onchange="recalcManualOrderFare()">
+            <option value="2-Wheeler">2-Wheeler</option>
+            <option value="3-Wheeler">3-Wheeler</option>
+            <option value="Mini Tempo">Mini Tempo</option>
+            <option value="Bolero Pickup">Bolero Pickup</option>
+            <option value="Truck">Truck</option>
+          </select>
+        </div>
+        <div><label>अंतर (KM)</label><input type="number" id="manDistKm" value="5" min="0.5" step="0.5" oninput="recalcManualOrderFare()"></div>
         <div><label>पार्सल प्रकार & वजन</label><input type="text" id="manParcel" value="Box / Goods (5 kg)"></div>
-        <div><label>एकूण भाडे (₹)</label><input type="number" id="manFare" placeholder="उदा. 150"></div>
+        <div><label>ऑटो कॅल्क्युलेट भाडे (₹)</label><input type="number" id="manFare" placeholder="उदा. 50"></div>
         <div><label>पेमेंट पद्धत</label><select id="manPayMode"><option value="COD">💵 Cash on Delivery (COD)</option><option value="ONLINE">📱 Online Paid</option></select></div>
       </div>
+      <div id="manFareTallyHint" style="font-size:12px; color:#2ecc71; margin-bottom:8px;">📏 5 km × ₹10/km = ₹50</div>
       <button class="save-btn" onclick="createManualPhoneOrder()">🚀 मॅन्युअल ऑर्डर तयार करा आणि सर्व रायडर्सना पाठवा</button>
     </div>
 
-    <!-- One-Click Automatic Invoice & GST Report Download -->
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-      <h3 style="color:#ff6600;">📦 सर्व ऑर्डर्स (पिकअप व ड्रॉप संपर्क व्यक्तींसह)</h3>
+      <h3 style="color:#ff6600;">📦 सर्व ऑर्डर्स (KM, भाडे टॅली व संपर्क व्यक्तींसह)</h3>
       <div style="display:flex; gap:8px;">
         <button class="btn-sm btn-approve" style="padding:9px 14px; font-size:12px;" onclick="downloadGstExcelCsv()">📊 Excel (CSV) GST रिपोर्ट</button>
         <button class="btn-sm btn-edit" style="padding:9px 14px; font-size:12px;" onclick="downloadGstPdfReport()">📄 PDF इन्व्हॉइस / GST रिपोर्ट</button>
@@ -192,7 +200,7 @@
     </div>
 
     <table>
-      <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता व व्यक्ती</th><th>वाहन, वजन & PIN</th><th>भाडे, पेमेंट & इन्सेंटिव्ह</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
+      <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता व व्यक्ती</th><th>वाहन, KM & PIN</th><th>भाडे टॅली (KM × Rate + Add-ons)</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
       <tbody id="adminTableBody"></tbody>
     </table>
   </div>
@@ -235,9 +243,8 @@
     </div>
   </div>
 
-  <!-- 8. MASTER SETTINGS (WITH PEAK HOUR, REFER & EARN TOGGLE & BROADCAST PUSH ALERTS) -->
+  <!-- 8. MASTER SETTINGS -->
   <div id="secMaster" class="panel-box hidden">
-    <!-- Broadcast Notification Push Alert Box -->
     <div class="sub-box-orange">
       <h4 style="color:#ff6600; margin-bottom:8px;">📣 ब्रॉडकास्ट नोटिफिकेशन (Instant Push Alert to Riders / Customers)</h4>
       <div class="form-grid" style="margin-bottom:8px;">
@@ -269,7 +276,6 @@
       <div><label>Truck दर (₹/km)</label><input type="number" id="setRateTruck" value="50"></div>
     </div>
 
-    <!-- Peak Hour Incentive Chart Control -->
     <div class="section-divider">
       <h4 style="color:#2ecc71; margin-bottom:8px;">🎁 रायडर पीक अवर्स इन्सेंटिव्ह चार्ट (Peak Hour Incentive Control):</h4>
       <div class="form-grid">
@@ -303,7 +309,6 @@
       </div>
     </div>
 
-    <!-- Refer & Earn ON/OFF & Bonus Control -->
     <div class="section-divider">
       <h4 style="color:#2ecc71; margin-bottom:8px;">🎁 जॉइनिंग फी आणि रिफर अँड अर्न कंट्रोल (Refer & Earn Settings):</h4>
       <div class="form-grid">
@@ -418,6 +423,7 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   let currentCommPercent = 20;
+  let adminRates = { minFare: 30, rate2W: 10, rate3W: 18, rateTempo: 25, rateBolero: 35, rateTruck: 50, surgeActive: false, surgeMultiplier: 1.2 };
   let allChatMsgs = [], selectedChatRoomId = null;
   let allOrdersCache = [];
 
@@ -476,13 +482,29 @@
     alert(`✅ नवीन रायडर '${name}' थेट जोडला गेला आणि Selfie + Account मंजूर झाले!`);
   };
 
-  // Manual Phone Order Entry
+  // Auto KM-Based Fare Calculator for Manual Phone Orders
+  window.recalcManualOrderFare = () => {
+    const veh = document.getElementById('manVehicle').value;
+    const km = Math.max(0.5, Number(document.getElementById('manDistKm').value) || 1);
+    let rate = adminRates.rate2W;
+    if (veh === "3-Wheeler") rate = adminRates.rate3W;
+    if (veh === "Mini Tempo") rate = adminRates.rateTempo;
+    if (veh === "Bolero Pickup") rate = adminRates.rateBolero;
+    if (veh === "Truck") rate = adminRates.rateTruck;
+
+    const mult = adminRates.surgeActive ? adminRates.surgeMultiplier : 1;
+    const calcFare = Math.max(adminRates.minFare, Math.round(km * rate * mult));
+    document.getElementById('manFare').value = calcFare;
+    document.getElementById('manFareTallyHint').innerText = `📏 ${veh}: ${km} km × ₹${rate}/km (Min ₹${adminRates.minFare}) = ₹${calcFare}`;
+  };
+
   window.createManualPhoneOrder = async () => {
     const cName = document.getElementById('manCustName').value.trim() || "Phone Customer";
     const cPhone = document.getElementById('manCustPhone').value.trim();
     const pickup = document.getElementById('manPickup').value.trim();
     const drop = document.getElementById('manDrop').value.trim();
     const vehicle = document.getElementById('manVehicle').value;
+    const distanceKm = Math.max(0.5, Number(document.getElementById('manDistKm').value) || 1);
     const parcel = document.getElementById('manParcel').value.trim() || "Parcel";
     const fare = Number(document.getElementById('manFare').value);
     const paymentMode = document.getElementById('manPayMode').value;
@@ -505,6 +527,9 @@
       pickupLng: 73.8567,
       dropLat: 18.5314,
       dropLng: 73.8446,
+      distanceKm,
+      baseFare: fare,
+      addOnsTotal: 0,
       vehicle,
       parcel,
       parcelWeight: parcel,
@@ -520,11 +545,9 @@
     document.getElementById('manCustPhone').value = "";
     document.getElementById('manPickup').value = "";
     document.getElementById('manDrop').value = "";
-    document.getElementById('manFare').value = "";
-    alert(`✅ फोन बुकिंग ऑर्डर तयार झाली! (Delivery PIN: ${deliveryPin}) — सर्व जवळच्या रायडर्सना पाठवली आहे.`);
+    alert(`✅ फोन बुकिंग ऑर्डर तयार झाली! (${distanceKm} km • ₹${fare} • PIN: ${deliveryPin})`);
   };
 
-  // Refund & Settlement Manager
   window.processRefundOrSettlement = async () => {
     const type = document.getElementById('settleType').value;
     const phone = document.getElementById('settlePhone').value.trim();
@@ -553,7 +576,6 @@
     alert(`✅ ${type} (₹${amount}) यशस्वीरित्या नोंदवले गेले!`);
   };
 
-  // Broadcast Push Notification Alert
   window.sendBroadcastPushAlert = async () => {
     const target = document.getElementById('broadcastTarget').value;
     const msg = document.getElementById('broadcastMessage').value.trim();
@@ -574,17 +596,16 @@
     alert("📣 ब्रॉडकास्ट अलर्ट तात्काळ सर्व युजर्सच्या स्क्रीनवर पाठवला गेला!");
   };
 
-  // Automatic GST & Invoice Excel (CSV) Download
   window.downloadGstExcelCsv = () => {
     if (allOrdersCache.length === 0) return alert("डाऊनलोड करण्यासाठी ऑर्डर्स उपलब्ध नाहीत.");
-    let csv = "Order ID,Date,Customer,Phone,Pickup,Drop,Vehicle,Status,Payment Mode,Gross Fare (INR),GST 18% Included (INR),Platform Commission (INR),Rider Payout (INR)\n";
+    let csv = "Order ID,Date,Customer,Phone,Pickup,Drop,Distance (KM),Vehicle,Status,Payment Mode,Gross Fare (INR),GST 18% Included (INR),Platform Commission (INR),Rider Payout (INR)\n";
     allOrdersCache.forEach(o => {
       const fare = Number(o.fare || 0);
       const gst = (fare * 0.18).toFixed(2);
       const comm = Math.round(fare * (currentCommPercent / 100));
       const riderNet = fare - comm;
       const clean = (s) => `"${String(s || '').replace(/"/g, '""')}"`;
-      csv += `${clean(o.id)},${clean(o.deliveredDateStr || 'Recent')},${clean(o.customerEmail)},${clean(o.customerPhone)},${clean(o.pickup)},${clean(o.drop)},${clean(o.vehicle)},${clean(o.status)},${clean(o.paymentMode || 'COD')},${fare},${gst},${comm},${riderNet}\n`;
+      csv += `${clean(o.id)},${clean(o.deliveredDateStr || 'Recent')},${clean(o.customerEmail)},${clean(o.customerPhone)},${clean(o.pickup)},${clean(o.drop)},${o.distanceKm || '-'},${clean(o.vehicle)},${clean(o.status)},${clean(o.paymentMode || 'COD')},${fare},${gst},${comm},${riderNet}\n`;
     });
     const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
@@ -593,7 +614,6 @@
     a.click();
   };
 
-  // Automatic GST & Invoice PDF Report Download
   window.downloadGstPdfReport = () => {
     if (allOrdersCache.length === 0) return alert("डाऊनलोड करण्यासाठी ऑर्डर्स उपलब्ध नाहीत.");
     const { jsPDF } = window.jspdf;
@@ -618,7 +638,7 @@
     let y = 78;
     pdf.setFontSize(9);
     allOrdersCache.slice(0, 28).forEach((o, idx) => {
-      pdf.text(`${idx + 1}. [${o.status}] ${o.vehicle} | INR ${o.fare} | ${String(o.pickup).slice(0, 22)} -> ${String(o.drop).slice(0, 22)}`, 15, y);
+      pdf.text(`${idx + 1}. [${o.status}] ${o.vehicle} (${o.distanceKm || '-'} km) | INR ${o.fare} | ${String(o.pickup).slice(0, 20)} -> ${String(o.drop).slice(0, 20)}`, 15, y);
       y += 6;
     });
     pdf.save(`GoParcel_GST_Invoice_${new Date().toISOString().slice(0,10)}.pdf`);
@@ -744,18 +764,27 @@
   onSnapshot(settingsRef, (snap) => {
     if (snap.exists()) {
       const s = snap.data();
+      adminRates.minFare = Number(s.minFare ?? 30);
+      adminRates.rate2W = Number(s.rate2W ?? 10);
+      adminRates.rate3W = Number(s.rate3W ?? 18);
+      adminRates.rateTempo = Number(s.rateTempo ?? 25);
+      adminRates.rateBolero = Number(s.rateBolero ?? 35);
+      adminRates.rateTruck = Number(s.rateTruck ?? 50);
+      adminRates.surgeActive = !!s.surgeActive;
+      adminRates.surgeMultiplier = Number(s.surgeMultiplier ?? 1.2);
+
       document.getElementById('setAdminWa').value = s.adminWa ?? "919999999999";
       document.getElementById('setAdminUpi').value = s.adminUpi ?? "Techesupp-2@okhdfcbank";
       document.getElementById('setPickupRadius').value = s.pickupRadiusKm ?? 10;
       document.getElementById('setDeliveryRangeMeters').value = s.deliveryRangeMeters ?? 150;
       document.getElementById('setOnboardingFee').value = s.onboardingFee ?? 1000;
       document.getElementById('setCommission').value = s.commission ?? 20;
-      document.getElementById('setMinFare').value = s.minFare ?? 30;
-      document.getElementById('setRate2W').value = s.rate2W ?? 10;
-      document.getElementById('setRate3W').value = s.rate3W ?? 18;
-      document.getElementById('setRateTempo').value = s.rateTempo ?? 25;
-      document.getElementById('setRateBolero').value = s.rateBolero ?? 35;
-      document.getElementById('setRateTruck').value = s.rateTruck ?? 50;
+      document.getElementById('setMinFare').value = adminRates.minFare;
+      document.getElementById('setRate2W').value = adminRates.rate2W;
+      document.getElementById('setRate3W').value = adminRates.rate3W;
+      document.getElementById('setRateTempo').value = adminRates.rateTempo;
+      document.getElementById('setRateBolero').value = adminRates.rateBolero;
+      document.getElementById('setRateTruck').value = adminRates.rateTruck;
 
       document.getElementById('setPeakIncentiveActive').value = String(s.peakIncentiveActive ?? true);
       document.getElementById('setPeakStartHour').value = s.peakStartHour ?? 18;
@@ -764,8 +793,8 @@
 
       document.getElementById('setSelfieIntervalHours').value = s.selfieIntervalHours ?? 2;
       document.getElementById('setTempBlockMinutes').value = s.tempBlockMinutes ?? 60;
-      document.getElementById('setSurgeActive').value = String(s.surgeActive ?? false);
-      document.getElementById('setSurgeMultiplier').value = s.surgeMultiplier ?? 1.2;
+      document.getElementById('setSurgeActive').value = String(adminRates.surgeActive);
+      document.getElementById('setSurgeMultiplier').value = adminRates.surgeMultiplier;
       document.getElementById('setTimingAlertText').value = s.timingAlertText ?? "";
       document.getElementById('setReferSchemeActive').value = String(s.referSchemeActive ?? true);
       document.getElementById('setRiderReferBonus').value = s.riderReferBonus ?? 100;
@@ -791,6 +820,7 @@
       document.getElementById('custBannerText').value = s.custBannerText ?? "";
       document.getElementById('riderBannerText').value = s.riderBannerText ?? "";
       currentCommPercent = Number(s.commission ?? 20);
+      recalcManualOrderFare();
     }
   });
 
@@ -1003,7 +1033,6 @@
     else pBadge.classList.add('hidden');
   });
 
-  // Render Pune Demand Heat Map Circles from Live & Historical Orders
   function renderDemandHeatMap(ordersList) {
     heatLayerGroup.clearLayers();
     const clusters = {};
@@ -1015,7 +1044,6 @@
       }
     });
 
-    // Add default Pune hotspot markers if orders are sparse so Admin always sees demand zones
     const hotspots = Object.values(clusters);
     if (hotspots.length === 0) {
       hotspots.push(
@@ -1045,11 +1073,20 @@
     snap.forEach(d => {
       const o = d.data(); count++;
       allOrdersCache.push({ id: d.id, ...o });
-      const orderComm = Math.round(Number(o.fare || 0) * (currentCommPercent / 100));
+      const fareNum = Number(o.fare || 0);
+      const tipNum = Number(o.tipAmount || 0);
+      const commissionableFare = Math.max(0, fareNum - tipNum);
+      const orderComm = Math.round(commissionableFare * (currentCommPercent / 100));
+      const riderNet = fareNum - orderComm;
       comm += orderComm;
+
       const payTag = o.paymentMode === "ONLINE"
         ? `<span style="color:#2ecc71; font-weight:bold;">📱 ONLINE</span>`
         : `<span style="color:#ff6600; font-weight:bold;">💵 COD</span>`;
+      const kmInfo = o.distanceKm ? `<span style="color:#4db8ff; font-weight:bold;">${o.distanceKm} km</span>` : '-';
+      const breakdownLine = (o.baseFare !== undefined)
+        ? `<div style="font-size:10px; color:#aaa;">Base: ₹${o.baseFare} + Add-ons: ₹${o.addOnsTotal || 0}</div>`
+        : '';
       const incTag = o.incentiveBonus ? `<br><small style="color:#4db8ff;">+₹${o.incentiveBonus} Bonus</small>` : '';
       const viaTag = o.bookedVia ? `<br><span style="font-size:10px; color:#ffaa66;">📞 ${o.bookedVia}</span>` : '';
 
@@ -1057,8 +1094,8 @@
         <td><b>${o.customerEmail || 'Customer'}</b><br><small style="color:#4db8ff;">📞 ${o.customerPhone || '-'}</small>${viaTag}</td>
         <td><small>🟢 <b>पिकअप:</b> ${o.pickup} (${o.pickupContactName || ''}: ${o.pickupContactPhone || ''})<br>
                    🔴 <b>ड्रॉप:</b> ${o.drop} (${o.dropContactName || ''}: ${o.dropContactPhone || ''})</small></td>
-        <td><b>${o.vehicle}</b> (${o.parcelWeight || '1-5 kg'})<br><small style="color:#2ecc71;">PIN: ${o.deliveryPin || '-'}</small></td>
-        <td><b>₹${o.fare}</b> (${payTag})<br><small style="color:#ff6600;">कमिशन: ₹${orderComm}</small>${incTag}</td>
+        <td><b>${o.vehicle}</b> (${kmInfo})<br><small style="color:#2ecc71;">PIN: ${o.deliveryPin || '-'}</small></td>
+        <td><b>₹${fareNum}</b> (${payTag})${breakdownLine}<small style="color:#ff6600;">कमिशन (${currentCommPercent}%): ₹${orderComm} | रायडर: ₹${riderNet}</small>${incTag}</td>
         <td><b>${o.riderEmail || 'प्रलंबित'}</b><br><small style="color:#888;">${o.deliveredDateStr || ''}</small></td>
         <td><b style="color:${o.status === 'Delivered' ? '#2ecc71' : '#ff6600'};">${o.status}</b></td>
         <td><button class="btn-sm btn-block" onclick="deleteOrder('${d.id}')">Delete</button></td>
