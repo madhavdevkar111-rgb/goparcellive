@@ -121,6 +121,7 @@
   <div id="custMain" class="hidden">
     <div id="custBanner" class="banner-strip hidden"></div>
     <div id="custSurgeBanner" class="banner-strip hidden" style="background:#331100; color:#ffaa66;"></div>
+    <a id="custCustomShortcutBtn" href="#" target="_blank" class="btn-link hidden" style="background:#1c2e3d; color:#4db8ff; border:1px solid #4db8ff; margin-bottom:10px;">🔗 Quick Shortcut</a>
 
     <!-- TAB 1: BOOK PARCEL -->
     <div id="cTabBook">
@@ -156,10 +157,12 @@
         </div>
 
         <!-- Multi-Stop Delivery (+ Add Stop) -->
-        <div id="extraStopsContainer"></div>
-        <button type="button" onclick="addExtraDeliveryStop()" style="background:#1f160a; color:#ff9800; border:1px dashed #ff9800; padding:8px; font-size:13px; margin:4px 0;">
-          ➕ मधला स्टॉप जोडा (Add Stop • +₹25/stop)
-        </button>
+        <div id="multiStopWrapper">
+          <div id="extraStopsContainer"></div>
+          <button type="button" onclick="addExtraDeliveryStop()" style="background:#1f160a; color:#ff9800; border:1px dashed #ff9800; padding:8px; font-size:13px; margin:4px 0;">
+            ➕ मधला स्टॉप जोडा (Add Stop • +₹25/stop)
+          </button>
+        </div>
 
         <!-- Drop Location + Saved Home/Office + Contact Person + Floor Selection -->
         <div class="contact-group" style="border-left: 3px solid #e74c3c;">
@@ -224,7 +227,7 @@
             <input type="file" id="pkgPhotoInput" accept="image/*" onchange="handlePackagePhotoUpload(this)" style="padding:6px; font-size:11px; margin:4px 0;">
             <img id="pkgPhotoPreview" class="hidden" style="width:100%; max-height:70px; object-fit:cover; border-radius:6px; margin-top:4px;">
           </div>
-          <div class="addon-card" style="margin:0;">
+          <div id="scheduleWrapper" class="addon-card" style="margin:0;">
             <label style="font-size:11px; color:#ffaa66; font-weight:bold;">⏰ बुकिंग वेळ (Schedule):</label>
             <select id="scheduleModeSelect" onchange="toggleScheduleInput()" style="padding:7px; font-size:12px; margin:4px 0;">
               <option value="now">⚡ आत्ताच (Book Now)</option>
@@ -234,8 +237,17 @@
           </div>
         </div>
 
+        <!-- Helper / Loader Add-on (Controlled by Admin) -->
+        <div id="helperWrapper" class="addon-card" style="border-color:#ff9800;">
+          <label style="font-size:12px; color:#ff9800; font-weight:bold;">👷 लोडिंग/अनलोडिंग मदतनीस (Helper / Loader):</label>
+          <select id="helperSelect" onchange="recalcPrices()" style="margin-top:4px; font-size:13px; padding:9px;">
+            <option value="0">मदतनीस नको (Driver Only - ₹0)</option>
+            <option value="1">👷 १ मदतनीस हवा (+₹<span id="dynHelperChargeLbl">150</span>)</option>
+          </select>
+        </div>
+
         <!-- Goods Insurance / Protection Option -->
-        <div class="addon-card" style="border-color:#2ecc71;">
+        <div id="insuranceWrapper" class="addon-card" style="border-color:#2ecc71;">
           <label style="font-size:12px; color:#2ecc71; font-weight:bold;">🛡️ वस्तूचा विमा (Goods Insurance / Protection):</label>
           <select id="goodsInsuranceSelect" onchange="recalcPrices()" style="margin-top:4px; font-size:13px; padding:9px;">
             <option value="0">विमा नको (No Insurance - ₹0)</option>
@@ -245,7 +257,7 @@
         </div>
 
         <!-- Optional Rider Tip (100% Goes to Rider) -->
-        <div class="addon-card">
+        <div id="tipWrapper" class="addon-card">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <label style="font-size:12px; color:#ffaa66; font-weight:bold;">🎁 रायडरसाठी टीप (100% थेट रायडरला मिळेल):</label>
             <span id="selectedTipBadge" style="font-size:11px; color:#2ecc71; font-weight:bold;">₹0</span>
@@ -258,48 +270,54 @@
           </div>
         </div>
 
-        <!-- Clean Customer-Facing Vehicle Cards (No Base/Per-KM Formula Exposed) -->
-        <div class="veh-grid">
-          <div class="veh-box active" onclick="pickVeh('2-Wheeler', this)">
+        <!-- Clean Customer-Facing Vehicle Cards (Synced with Admin Master Controls) -->
+        <div class="veh-grid" id="vehicleGridContainer">
+          <div id="vehCard2W" class="veh-box active" onclick="pickVeh('2-Wheeler', this)">
             <div style="font-size:22px;">🏍️</div>
             <div style="font-size:12px; font-weight:bold; margin-top:2px;">2-Wheeler</div>
             <div id="fare2W" style="color:#ff6600; font-weight:bold; font-size:16px; margin-top:2px;">₹20</div>
             <div style="font-size:9px; color:#888; margin-top:2px;">Up to 20 kg</div>
           </div>
-          <div class="veh-box" onclick="pickVeh('3-Wheeler', this)">
+          <div id="vehCard3W" class="veh-box" onclick="pickVeh('3-Wheeler', this)">
             <div style="font-size:22px;">🛺</div>
             <div style="font-size:12px; font-weight:bold; margin-top:2px;">3-Wheeler</div>
             <div id="fare3W" style="color:#ff6600; font-weight:bold; font-size:16px; margin-top:2px;">₹92</div>
             <div style="font-size:9px; color:#888; margin-top:2px;">Up to 500 kg</div>
           </div>
-          <div class="veh-box" onclick="pickVeh('Mini Tempo', this)">
+          <div id="vehCardTempo" class="veh-box" onclick="pickVeh('Mini Tempo', this)">
             <div style="font-size:22px;">🚐</div>
             <div style="font-size:12px; font-weight:bold; margin-top:2px;">Mini Tempo</div>
             <div id="fareTempo" style="color:#ff6600; font-weight:bold; font-size:16px; margin-top:2px;">₹178</div>
             <div style="font-size:9px; color:#888; margin-top:2px;">Up to 750 kg</div>
           </div>
-          <div class="veh-box" onclick="pickVeh('Bolero Pickup', this)">
+          <div id="vehCardBolero" class="veh-box" onclick="pickVeh('Bolero Pickup', this)">
             <div style="font-size:22px;">🛻</div>
             <div style="font-size:12px; font-weight:bold; margin-top:2px;">Bolero</div>
             <div id="fareBolero" style="color:#ff6600; font-weight:bold; font-size:16px; margin-top:2px;">₹238</div>
             <div style="font-size:9px; color:#888; margin-top:2px;">Up to 1.2 Ton</div>
           </div>
-          <div class="veh-box" onclick="pickVeh('Truck', this)">
+          <div id="vehCardTruck" class="veh-box" onclick="pickVeh('Truck', this)">
             <div style="font-size:22px;">🚛</div>
             <div style="font-size:12px; font-weight:bold; margin-top:2px;">Truck</div>
             <div id="fareTruck" style="color:#ff6600; font-weight:bold; font-size:16px; margin-top:2px;">₹505</div>
             <div style="font-size:9px; color:#888; margin-top:2px;">Heavy Load</div>
           </div>
+          <div id="vehCardCustom" class="veh-box hidden" onclick="pickVeh(appCfg.customVehName, this)">
+            <div id="customVehIconDisplay" style="font-size:22px;">🛺</div>
+            <div id="customVehNameDisplay" style="font-size:12px; font-weight:bold; margin-top:2px;">Custom</div>
+            <div id="fareCustomVeh" style="color:#ff6600; font-weight:bold; font-size:16px; margin-top:2px;">₹50</div>
+            <div style="font-size:9px; color:#2ecc71; margin-top:2px;">Special Fleet</div>
+          </div>
         </div>
 
         <label id="txtLblPayMethod" style="font-size:12px; color:#ff6600; font-weight:bold; margin-top:6px; display:block;">💳 पेमेंट पद्धत निवडा:</label>
         <div class="pay-grid">
-          <div class="pay-box active" onclick="selectPayMode('COD', this)">
+          <div id="payBoxCod" class="pay-box active" onclick="selectPayMode('COD', this)">
             <div style="font-size:20px;">💵</div>
             <div style="font-size:13px; font-weight:bold;">Cash on Delivery</div>
             <div id="txtSubCod" style="font-size:10px; color:#aaa;">रोख पेमेंट (COD)</div>
           </div>
-          <div class="pay-box" onclick="selectPayMode('ONLINE', this)">
+          <div id="payBoxOnline" class="pay-box" onclick="selectPayMode('ONLINE', this)">
             <div style="font-size:20px;">📱</div>
             <div style="font-size:13px; font-weight:bold;">Online Payment</div>
             <div id="txtSubOnl" style="font-size:10px; color:#2ecc71;">QR / GPay / PhonePe</div>
@@ -672,6 +690,8 @@
     baseTempo: 120, rateTempo: 28,
     baseBolero: 200, rateBolero: 38,
     baseTruck: 450, rateTruck: 55,
+    helperCharge: 150,
+    customVehName: "", customVehIcon: "🛺", customVehBase: 0, customVehRate: 0,
     surgeActive: false, surgeMultiplier: 1.2, timingAlertText: "",
     custBannerText: "", consentText: "मी GoParcel च्या सर्व अटी व नियमांशी सहमत आहे. पार्सलमध्ये कोणतीही बेकायदेशीर वस्तू नाही.",
     adminWa: "919999999999", adminUpi: "Techesupp-2@okhdfcbank",
@@ -949,6 +969,50 @@
       appCfg.rateBolero = Number(s.rateBolero ?? 38);
       appCfg.baseTruck = Number(s.baseTruck ?? 450);
       appCfg.rateTruck = Number(s.rateTruck ?? 55);
+      appCfg.helperCharge = Number(s.helperCharge ?? 150);
+
+      // Dynamic Fleet Visibility & Custom Fleet Sync
+      document.getElementById('vehCard2W').classList.toggle('hidden', s.vehActive2W === false);
+      document.getElementById('vehCard3W').classList.toggle('hidden', s.vehActive3W === false);
+      document.getElementById('vehCardTempo').classList.toggle('hidden', s.vehActiveTempo === false);
+      document.getElementById('vehCardBolero').classList.toggle('hidden', s.vehActiveBolero === false);
+      document.getElementById('vehCardTruck').classList.toggle('hidden', s.vehActiveTruck === false);
+
+      appCfg.customVehName = s.customVehName || "";
+      appCfg.customVehIcon = s.customVehIcon || "🛺";
+      appCfg.customVehBase = Number(s.customVehBase || 0);
+      appCfg.customVehRate = Number(s.customVehRate || 0);
+      const customVehCard = document.getElementById('vehCardCustom');
+      if (appCfg.customVehName && appCfg.customVehBase > 0) {
+        customVehCard.classList.remove('hidden');
+        document.getElementById('customVehIconDisplay').innerText = appCfg.customVehIcon;
+        document.getElementById('customVehNameDisplay').innerText = appCfg.customVehName;
+      } else {
+        customVehCard.classList.add('hidden');
+      }
+
+      // Dynamic Feature Flags Sync from Admin
+      document.getElementById('multiStopWrapper').classList.toggle('hidden', s.featCustMultiStop === false);
+      document.getElementById('insuranceWrapper').classList.toggle('hidden', s.featCustInsurance === false);
+      document.getElementById('helperWrapper').classList.toggle('hidden', s.featCustHelper === false);
+      document.getElementById('tipWrapper').classList.toggle('hidden', s.featCustTip === false);
+      document.getElementById('scheduleWrapper').classList.toggle('hidden', s.featCustSchedule === false);
+      document.getElementById('payBoxCod').classList.toggle('hidden', s.featCustCod === false);
+      document.getElementById('payBoxOnline').classList.toggle('hidden', s.featCustOnline === false);
+      if (s.featCustCod === false && chosenPaymentMode === 'COD') {
+        selectPayMode('ONLINE', document.getElementById('payBoxOnline'));
+      }
+
+      const shortcutBtn = document.getElementById('custCustomShortcutBtn');
+      if (s.customShortcutLabel && s.customShortcutUrl) {
+        shortcutBtn.innerText = s.customShortcutLabel;
+        shortcutBtn.href = s.customShortcutUrl;
+        shortcutBtn.classList.remove('hidden');
+      } else {
+        shortcutBtn.classList.add('hidden');
+      }
+
+      document.getElementById('dynHelperChargeLbl').innerText = appCfg.helperCharge;
 
       appCfg.surgeActive = !!s.surgeActive;
       appCfg.surgeMultiplier = Number(s.surgeMultiplier ?? 1.2);
@@ -1246,26 +1310,31 @@
     const stopsFee = extraStopsList.length * 25;
     const pickFloorFee = Number((document.getElementById('pickupFloorSelect')?.value || "Ground|0").split('|')[1] || 0);
     const dropFloorFee = Number((document.getElementById('dropFloorSelect')?.value || "Ground|0").split('|')[1] || 0);
+    const helperCount = Number(document.getElementById('helperSelect')?.value || 0);
+    const helperFee = helperCount * Number(appCfg.helperCharge || 150);
     const insuranceFee = Number(document.getElementById('goodsInsuranceSelect')?.value || 0);
-    const addOnsTotal = stopsFee + pickFloorFee + dropFloorFee + insuranceFee + selectedTipAmount;
+    const addOnsTotal = stopsFee + pickFloorFee + dropFloorFee + helperFee + insuranceFee + selectedTipAmount;
 
     const trip2 = computeVehicleFare(km, appCfg.base2W, appCfg.rate2W, incKm, mult);
     const trip3 = computeVehicleFare(km, appCfg.base3W, appCfg.rate3W, incKm, mult);
     const tript = computeVehicleFare(km, appCfg.baseTempo, appCfg.rateTempo, incKm, mult);
     const tripb = computeVehicleFare(km, appCfg.baseBolero, appCfg.rateBolero, incKm, mult);
     const triptr = computeVehicleFare(km, appCfg.baseTruck, appCfg.rateTruck, incKm, mult);
+    const tripCustom = appCfg.customVehBase > 0 ? computeVehicleFare(km, appCfg.customVehBase, appCfg.customVehRate, incKm, mult) : 0;
 
     let activeTripFare = trip2, activeRate = appCfg.rate2W;
     if (chosenVehicle === "3-Wheeler") { activeTripFare = trip3; activeRate = appCfg.rate3W; }
-    if (chosenVehicle === "Mini Tempo") { activeTripFare = tript; activeRate = appCfg.rateTempo; }
-    if (chosenVehicle === "Bolero Pickup") { activeTripFare = tripb; activeRate = appCfg.rateBolero; }
-    if (chosenVehicle === "Truck") { activeTripFare = triptr; activeRate = appCfg.rateTruck; }
+    else if (chosenVehicle === "Mini Tempo") { activeTripFare = tript; activeRate = appCfg.rateTempo; }
+    else if (chosenVehicle === "Bolero Pickup") { activeTripFare = tripb; activeRate = appCfg.rateBolero; }
+    else if (chosenVehicle === "Truck") { activeTripFare = triptr; activeRate = appCfg.rateTruck; }
+    else if (appCfg.customVehName && chosenVehicle === appCfg.customVehName) { activeTripFare = tripCustom; activeRate = appCfg.customVehRate; }
 
     return {
       km, activeTripFare, activeRate,
-      stopsFee, floorFee: pickFloorFee + dropFloorFee, insuranceFee, tipAmount: selectedTipAmount,
+      stopsFee, floorFee: pickFloorFee + dropFloorFee, helperFee, insuranceFee, tipAmount: selectedTipAmount,
       addOnsTotal, finalFare: activeTripFare + addOnsTotal,
-      f2: trip2 + addOnsTotal, f3: trip3 + addOnsTotal, ft: tript + addOnsTotal, fb: tripb + addOnsTotal, ftr: triptr + addOnsTotal
+      f2: trip2 + addOnsTotal, f3: trip3 + addOnsTotal, ft: tript + addOnsTotal, fb: tripb + addOnsTotal, ftr: triptr + addOnsTotal,
+      fCustom: tripCustom + addOnsTotal
     };
   }
 
@@ -1277,6 +1346,7 @@
     document.getElementById('fareTempo').innerText = "₹" + bd.ft;
     document.getElementById('fareBolero').innerText = "₹" + bd.fb;
     document.getElementById('fareTruck').innerText = "₹" + bd.ftr;
+    if (document.getElementById('fareCustomVeh')) document.getElementById('fareCustomVeh').innerText = "₹" + bd.fCustom;
 
     // Show clean add-ons summary ONLY if extra services are selected (No internal formula revealed)
     const addonsBox = document.getElementById('addonsSummaryBox');
@@ -1287,6 +1357,7 @@
           <div style="display:flex; justify-content:space-between;"><span>🚚 ${chosenVehicle} डिलिव्हरी शुल्क:</span><strong>₹${bd.activeTripFare}</strong></div>
           ${bd.stopsFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#ff9800;"><span>🛑 एक्स्ट्रा स्टॉप्स (${extraStopsList.length}):</span><strong>+₹${bd.stopsFee}</strong></div>` : ''}
           ${bd.floorFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#ffaa66;"><span>🪜 मजला हाताळणी शुल्क:</span><strong>+₹${bd.floorFee}</strong></div>` : ''}
+          ${bd.helperFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#ff9800;"><span>👷 मदतनीस शुल्क (Helper):</span><strong>+₹${bd.helperFee}</strong></div>` : ''}
           ${bd.insuranceFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🛡️ पार्सल विमा संरक्षण:</span><strong>+₹${bd.insuranceFee}</strong></div>` : ''}
           ${bd.tipAmount > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🎁 रायडर टीप (100% रायडरला):</span><strong>+₹${bd.tipAmount}</strong></div>` : ''}
         `;
@@ -1350,8 +1421,11 @@
     const nowTime = new Date().toLocaleString('en-IN');
 
     const consentRec = {
-      role: "Customer (Order Booking)", name: custUser.name, phone: custUser.phone, timestampStr: nowTime,
-      lat: pLat, lng: pLng, summary: `Order: ${pickup} -> ${drop} (${bd.km} km, ${chosenVehicle}, ${weight}, ${chosenPaymentMode}, Rs.${bd.finalFare})`,
+      role: "Customer (Order Booking)", name: custUser.name, phone: custUser.phone,
+      lang: currentLang, timestampStr: nowTime,
+      lat: pLat, lng: pLng,
+      docFrontPhoto: packagePhotoBase64 || "",
+      summary: `Order: ${pickup} -> ${drop} (${bd.km} km, ${chosenVehicle}, ${weight}, ${chosenPaymentMode}, Rs.${bd.finalFare})`,
       agreementText: appCfg.consentText, createdAt: Date.now()
     };
     consentRec.pdfDataUri = createConsentPdfDataUri(consentRec);
@@ -1365,6 +1439,7 @@
       pickup, drop,
       extraStops: extraStopsList,
       pickupFloor, dropFloor,
+      helperFee: bd.helperFee,
       insuranceFee: bd.insuranceFee,
       tipAmount: bd.tipAmount,
       packagePhoto: packagePhotoBase64,
@@ -1467,6 +1542,7 @@
 
         const addonsInfo = [
           o.distanceKm ? `📏 ${o.distanceKm} km` : '',
+          o.helperFee > 0 ? `👷 मदतनीस ₹${o.helperFee}` : '',
           o.insuranceFee > 0 ? `🛡️ विमा ₹${o.insuranceFee}` : '',
           o.tipAmount > 0 ? `🎁 टीप ₹${o.tipAmount}` : '',
           o.scheduledTime ? `⏰ ${o.scheduledTime}` : ''
