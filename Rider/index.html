@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GoParcel - Rider Partner App</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
@@ -25,6 +26,9 @@
     button:disabled { background: #444 !important; color: #888 !important; cursor: not-allowed; }
     a.wa-btn { background: #25D366; color: #000; font-weight: bold; border: none; }
     a.nav-map-btn { background: #1c2e3d; color: #4db8ff; border: 1px solid #4db8ff; font-size: 13px; padding: 9px; font-weight: bold; }
+    #riderActiveMap { height: 240px; width: 100%; border-radius: 10px; margin: 8px 0; border: 2px solid #ff6600; z-index: 1; }
+    .contact-card-box { background: #111; border: 1px solid #4db8ff; border-radius: 10px; padding: 10px; margin: 8px 0; }
+    .incentive-chart { background: linear-gradient(135deg, #16261a, #111); border: 1px solid #2ecc71; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
     .otp-timer-pill { background: #2b180a; border: 1px solid #ff6600; color: #ffaa66; padding: 6px; border-radius: 6px; text-align: center; font-size: 13px; font-weight: bold; margin: 6px 0; }
     .searching-radar { background: linear-gradient(135deg, #0d2b18, #121212); border: 1px solid #2ecc71; border-radius: 12px; padding: 14px; text-align: center; margin-bottom: 12px; }
     .radar-dot { width: 14px; height: 14px; background: #2ecc71; border-radius: 50%; margin: 0 auto 8px; animation: radarPing 1.4s infinite; }
@@ -108,48 +112,42 @@
       <input type="tel" id="rLoginPhone" maxlength="10" placeholder="१० अंकी नोंदणीकृत मोबाईल नंबर">
       <button id="rTxtBtnLoginOtp" onclick="startRiderLoginOtp()">नवीन लॉगिन OTP मागवा</button>
       <div id="rLoginOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
-        <div id="rLoginTimerDisplay" class="otp-timer-pill">⏳ OTP वैधता वेळ: 10:00</div>
-        <a id="rLoginWaLink" href="#" target="_blank" class="wa-btn">📲 Admin ला WhatsApp वर कळवा</a>
-        <input type="number" id="rLoginOtpInput" placeholder="६ अंकी OTP टाका">
+        <div id="rLoginTimerDisplay" class="otp-timer-pill">⏳ OTP Valid: 10:00</div>
+        <a id="rLoginWaLink" href="#" target="_blank" class="wa-btn">📲 WhatsApp Admin</a>
+        <input type="number" id="rLoginOtpInput" placeholder="Enter 6-Digit OTP">
         <button id="rTxtBtnDashOpen" onclick="verifyRiderLoginOtp()" style="background:#2ecc71;">डॅशबोर्ड उघडा (Login)</button>
-        <button id="btnRLoginResend" class="hidden" onclick="startRiderLoginOtp()" style="background:#3498db; color:#fff; margin-top:6px;">🔄 पुन्हा OTP मागवा (Resend OTP)</button>
+        <button id="btnRLoginResend" class="hidden" onclick="startRiderLoginOtp()" style="background:#3498db; color:#fff; margin-top:6px;">🔄 Resend OTP</button>
       </div>
     </div>
 
     <div id="rSecReg" class="hidden">
-      <input type="text" id="rName" placeholder="पूर्ण नाव (आधार कार्डप्रमाणे)">
-      <input type="tel" id="rPhone" maxlength="10" placeholder="१० अंकी खरा मोबाईल नंबर">
-      
+      <input type="text" id="rName" placeholder="Full Name">
+      <input type="tel" id="rPhone" maxlength="10" placeholder="10-Digit Mobile Number">
       <select id="rGender" style="border-color:#ff6600;">
-        <option value="Male">पुरुष (Male)</option>
-        <option value="Female">महिला (Female)</option>
+        <option value="Male">Male / पुरुष</option>
+        <option value="Female">Female / महिला</option>
       </select>
-
-      <label style="font-size:12px; color:#ff6600; margin-top:6px; display:block;">🚚 वाहनाचा प्रकार निवडा:</label>
       <select id="rVehCategory" onchange="handleVehicleCategoryChange()">
-        <option value="2-Wheeler">🏍️ 2-Wheeler (बाईक / स्कूटर)</option>
-        <option value="3-Wheeler">🛺 3-Wheeler (रिक्षा / टेम्पो)</option>
-        <option value="Mini Tempo">🚐 Mini Tempo (छोटा हत्ती)</option>
+        <option value="2-Wheeler">🏍️ 2-Wheeler</option>
+        <option value="3-Wheeler">🛺 3-Wheeler</option>
+        <option value="Mini Tempo">🚐 Mini Tempo</option>
         <option value="Bolero Pickup">🛻 Bolero Pickup</option>
-        <option value="Truck">🚛 Truck / मोठा टेम्पो</option>
+        <option value="Truck">🚛 Truck</option>
       </select>
-
       <select id="rOwnerRole" onchange="handleVehicleCategoryChange()" style="border-color:#4db8ff;">
-        <option value="SelfOwner">मी स्वतः गाडी मालक व ड्रायव्हर आहे (Self Owner)</option>
-        <option value="HiredDriver">मी ड्रायव्हर आहे (गाडी मालक वेगळा आहे)</option>
+        <option value="SelfOwner">Self Owner & Driver</option>
+        <option value="HiredDriver">Hired Driver (Different Owner)</option>
       </select>
+      <input type="text" id="rVehicle" placeholder="Vehicle Number (MH12AB1234)">
+      <input type="tel" id="rAadhaar" maxlength="12" placeholder="12-Digit Aadhaar Number">
+      <input type="text" id="rLicense" placeholder="Driving License Number">
+      <input type="text" id="rRcBook" class="hidden" placeholder="RC Book Number">
+      <input type="text" id="rPanCard" class="hidden" placeholder="PAN Card Number">
+      <input type="text" id="rReferCodeInput" placeholder="Referral Code (Optional)">
 
-      <input type="text" id="rVehicle" placeholder="गाडीचा नंबर (उदा. MH12AB1234)">
-      <input type="tel" id="rAadhaar" maxlength="12" placeholder="१२ अंकी ड्रायव्हर आधार कार्ड नंबर">
-      <input type="text" id="rLicense" placeholder="ड्रायव्हिंग लायसन्स नंबर">
-      <input type="text" id="rRcBook" class="hidden" placeholder="गाडीचा RC बुक नंबर">
-      <input type="text" id="rPanCard" class="hidden" placeholder="पॅन कार्ड नंबर">
-      <input type="text" id="rReferCodeInput" placeholder="रेफरल कोड (ऐच्छिक)">
-
-      <div style="font-size:13px; color:#ff6600; font-weight:bold; margin-top:10px;">📋 ड्रायव्हरचे कागदपत्रे:</div>
       <div id="boxDocFront" class="doc-upload-box">
         <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">
-          📄 १. Aadhaar Front <span id="badgeModeFront" class="mode-pill">File / Camera</span>
+          📄 1. Aadhaar Front <span id="badgeModeFront" class="mode-pill">File / Camera</span>
         </label>
         <input type="file" id="docFrontInput" accept="image/*" onchange="handleDocPhoto(this, 'front')">
         <img id="docFrontPreview" class="preview-img hidden" style="margin-top:6px;">
@@ -157,7 +155,7 @@
 
       <div id="boxDocBack" class="doc-upload-box">
         <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">
-          📄 २. Aadhaar Back <span id="badgeModeBack" class="mode-pill">File / Camera</span>
+          📄 2. Aadhaar Back <span id="badgeModeBack" class="mode-pill">File / Camera</span>
         </label>
         <input type="file" id="docBackInput" accept="image/*" onchange="handleDocPhoto(this, 'back')">
         <img id="docBackPreview" class="preview-img hidden" style="margin-top:6px;">
@@ -165,7 +163,7 @@
 
       <div id="boxDocLicense" class="doc-upload-box">
         <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">
-          🪪 ३. Driving License <span id="badgeModeLicense" class="mode-pill">File / Camera</span>
+          🪪 3. Driving License <span id="badgeModeLicense" class="mode-pill">File / Camera</span>
         </label>
         <input type="file" id="docLicenseInput" accept="image/*" onchange="handleDocPhoto(this, 'license')">
         <img id="docLicensePreview" class="preview-img hidden" style="margin-top:6px;">
@@ -173,7 +171,7 @@
 
       <div id="boxDocRc" class="doc-upload-box hidden">
         <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">
-          🚘 ४. RC Book <span id="badgeModeRc" class="mode-pill">File / Camera</span>
+          🚘 4. RC Book <span id="badgeModeRc" class="mode-pill">File / Camera</span>
         </label>
         <input type="file" id="docRcInput" accept="image/*" onchange="handleDocPhoto(this, 'rc')">
         <img id="docRcPreview" class="preview-img hidden" style="margin-top:6px;">
@@ -181,57 +179,55 @@
 
       <div id="boxDocPan" class="doc-upload-box hidden">
         <label style="font-size:12px; color:#4db8ff; display:block; margin-bottom:5px;">
-          💳 ५. PAN Card <span id="badgeModePan" class="mode-pill">File / Camera</span>
+          💳 5. PAN Card <span id="badgeModePan" class="mode-pill">File / Camera</span>
         </label>
         <input type="file" id="docPanInput" accept="image/*" onchange="handleDocPhoto(this, 'pan')">
         <img id="docPanPreview" class="preview-img hidden" style="margin-top:6px;">
       </div>
 
       <div id="ownerDocsSection" class="owner-section hidden">
-        <strong style="color:#4db8ff; font-size:13px; display:block; margin-bottom:6px;">🏢 गाडी मालकाचे कागदपत्रे (Vehicle Owner):</strong>
-        <input type="text" id="rOwnerName" placeholder="गाडी मालकाचे पूर्ण नाव">
-        <input type="tel" id="rOwnerPhone" maxlength="10" placeholder="गाडी मालकाचा मोबाईल नंबर">
+        <strong style="color:#4db8ff; font-size:13px; display:block; margin-bottom:6px;">🏢 Vehicle Owner Documents:</strong>
+        <input type="text" id="rOwnerName" placeholder="Vehicle Owner Name">
+        <input type="tel" id="rOwnerPhone" maxlength="10" placeholder="Owner Mobile Number">
         <div id="boxOwnerAadhaar" class="doc-upload-box">
-          <label style="font-size:12px; color:#2ecc71;">📄 मालकाचे आधार कार्ड:</label>
+          <label style="font-size:12px; color:#2ecc71;">📄 Owner Aadhaar Photo:</label>
           <input type="file" id="ownerAadhaarInput" accept="image/*" onchange="handleDocPhoto(this, 'ownerAadhaar')">
           <img id="docOwnerAadhaarPreview" class="preview-img hidden" style="margin-top:6px;">
         </div>
         <div id="boxOwnerRc" class="doc-upload-box">
-          <label style="font-size:12px; color:#2ecc71;">🚘 मालकाचे RC Book / Permit:</label>
+          <label style="font-size:12px; color:#2ecc71;">🚘 Owner RC Book / Permit:</label>
           <input type="file" id="ownerRcInput" accept="image/*" onchange="handleDocPhoto(this, 'ownerRc')">
           <img id="docOwnerRcPreview" class="preview-img hidden" style="margin-top:6px;">
         </div>
         <div id="boxOwnerNoc" class="doc-upload-box">
-          <label style="font-size:12px; color:#2ecc71;">📝 मालकाचे संमती पत्र / NOC:</label>
+          <label style="font-size:12px; color:#2ecc71;">📝 Owner NOC / Agreement:</label>
           <input type="file" id="ownerNocInput" accept="image/*" onchange="handleDocPhoto(this, 'ownerNoc')">
           <img id="docOwnerNocPreview" class="preview-img hidden" style="margin-top:6px;">
         </div>
       </div>
 
       <div class="cam-box">
-        <p style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 मूळ नोंदणी सेल्फी (Face Recognition Reference):</p>
+        <p style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 Registration Selfie:</p>
         <video id="regVideo" autoplay playsinline class="hidden"></video>
         <img id="regPreview" class="preview-img hidden" style="transform:scaleX(-1);">
-        <button type="button" onclick="openCamera('reg')" style="background:#333; color:#fff; font-size:13px;">📷 फ्रंट कॅमेरा उघडा</button>
-        <button type="button" id="btnSnapReg" onclick="takeSnapshot()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ मूळ सेल्फी घ्या</button>
+        <button type="button" onclick="openCamera('reg')" style="background:#333; color:#fff; font-size:13px;">📷 Open Camera</button>
+        <button type="button" id="btnSnapReg" onclick="takeSnapshot()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ Capture Selfie</button>
       </div>
 
       <div class="consent-box">
         <strong style="color:#ff6600; display:block; margin-bottom:4px;">📜 Consent Agreement:</strong>
-        <p id="consentAgreementText" style="font-size:12px; color:#ccc; line-height:1.4; margin-bottom:6px;">
-          मी GoParcel चे सर्व नियम व वाहतूक अटी पाळेन.
-        </p>
+        <p id="consentAgreementText" style="font-size:12px; color:#ccc; line-height:1.4; margin-bottom:6px;">...</p>
         <div style="font-size:11px; color:#4db8ff; margin-bottom:6px;">
           ⏱️ <span id="regConsentClock">--:--:--</span> | 📍 GPS Active
         </div>
         <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:#fff;">
-          <input type="checkbox" id="regConsentCheck" style="width:auto; margin:0;"> I Agree (मला अटी मान्य आहेत)
+          <input type="checkbox" id="regConsentCheck" style="width:auto; margin:0;"> I Agree
         </label>
       </div>
 
       <button id="btnStartReg" onclick="startRiderRegOtp()">Verify Docs & Request OTP</button>
       <div id="rRegOtpBox" class="hidden" style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
-        <div id="rRegTimerDisplay" class="otp-timer-pill">⏳ OTP वैधता वेळ: 10:00</div>
+        <div id="rRegTimerDisplay" class="otp-timer-pill">⏳ OTP Valid: 10:00</div>
         <a id="rRegWaLink" href="#" target="_blank" class="wa-btn">📲 WhatsApp Admin</a>
         <input type="number" id="rRegOtpInput" placeholder="Enter 6-Digit OTP">
         <button id="btnRRegVerify" onclick="verifyRiderRegOtp()" style="background:#2ecc71;">Complete Registration</button>
@@ -247,53 +243,64 @@
       <button id="rTxtBtnSound" onclick="enableAudioAndTest()" style="width:auto; padding:6px 10px; background:#222; color:#2ecc71; border:1px solid #2ecc71; font-size:11px; margin:0;">🔊 रिंगटोन चालू</button>
     </div>
 
-    <!-- 60-Minute Temporary Block Card (Triggered after 4 Selfie Rejections) -->
+    <!-- Temporary Block Card (Fully Translated) -->
     <div id="tempBlockCard" class="temp-block-card hidden">
-      <h3 style="color:#ff453a;">⛔ तुमचे खाते ६० मिनिटांसाठी तात्पुरते ब्लॉक (Temporary Block) केले आहे!</h3>
-      <p style="font-size:12px; color:#ddd; margin:8px 0;">सलग ४ वेळा सेल्फी चेहरा न जुळल्यामुळे (Selfie Rejected 4/4) हा तात्पुरता ब्लॉक लागू झाला आहे.</p>
+      <h3 id="txtTempBlockTitle" style="color:#ff453a;">⛔ तुमचे खाते ६० मिनिटांसाठी तात्पुरते ब्लॉक केले आहे!</h3>
+      <p id="txtTempBlockSub" style="font-size:12px; color:#ddd; margin:8px 0;">सलग ४ वेळा सेल्फी चेहरा न जुळल्यामुळे हा तात्पुरता ब्लॉक लागू झाला आहे.</p>
       <div style="background:#000; border:1px solid #ff453a; padding:10px; border-radius:8px; font-size:20px; font-weight:bold; color:#ff453a; margin-top:8px;">
-        ⏳ शिल्लक वेळ: <span id="tempBlockTimerTxt">60:00</span>
+        ⏳ <span id="txtBlockRemLbl">शिल्लक वेळ:</span> <span id="tempBlockTimerTxt">60:00</span>
       </div>
     </div>
 
-    <!-- Account Approval Pending by Admin -->
+    <!-- Account Approval Pending (Fully Translated) -->
     <div id="accountPendingCard" class="card hidden" style="background:#1c252c; border:2px solid #3498db; text-align:center;">
-      <h4 style="color:#3498db;">⏳ प्रोफाईल अप्रूव्हल प्रलंबित (Profile Approval Pending)</h4>
-      <p style="font-size:12px; color:#ddd; margin-top:5px;">Admin ने तुमचे प्रोफाईल Approve केल्याशिवाय तुम्हाला ऑर्डर पडणार नाहीत.</p>
+      <h4 id="txtAccPendTitle" style="color:#3498db;">⏳ प्रोफाईल अप्रूव्हल प्रलंबित (Profile Approval Pending)</h4>
+      <p id="txtAccPendSub" style="font-size:12px; color:#ddd; margin-top:5px;">Admin ने तुमचे प्रोफाईल Approve केल्याशिवाय तुम्हाला ऑर्डर पडणार नाहीत.</p>
     </div>
 
-    <!-- Face-Match Duty Selfie Card (Every 2 Hours + Whenever Going Offline -> Online) -->
+    <!-- Face-Match Duty Selfie Card (Fully Translated) -->
     <div id="dutyFaceMatchCard" class="card hidden" style="border:2px solid #ff6600; background:#24180e; text-align:center;">
-      <h3 style="color:#ff6600;">📸 फेस मॅच सेल्फी अनिवार्य (Face Verification)</h3>
+      <h3 id="txtFaceCardTitle" style="color:#ff6600;">📸 फेस मॅच सेल्फी अनिवार्य (Face Verification)</h3>
       <p id="facePromptReason" style="font-size:12px; color:#ffd2b3; margin:6px 0;">
-        ऑनलाईन येण्यासाठी किंवा दर २ तासांनी तुमचा ताजा लाईव्ह सेल्फी काढा (नोंदणीच्या सेल्फीशी चेहरा जुळणे आवश्यक आहे).
+        ऑनलाईन येण्यासाठी किंवा दर २ तासांनी तुमचा ताजा लाईव्ह सेल्फी काढा.
       </p>
-      <div id="selfieWarningBadge" class="warn-badge hidden">⚠️ चेहरा जुळला नाही! Warning: 1 / 4</div>
+      <div id="selfieWarningBadge" class="warn-badge hidden">⚠️ Warning: 1 / 4</div>
       <video id="dutyVideo" autoplay playsinline class="hidden" style="margin-top:8px;"></video>
-      <button type="button" onclick="openCamera('duty')" style="background:#3498db; color:#fff;">📷 फेस सेल्फी कॅमेरा उघडा</button>
+      <button type="button" id="txtBtnOpenFaceCam" onclick="openCamera('duty')" style="background:#3498db; color:#fff;">📷 फेस सेल्फी कॅमेरा उघडा</button>
       <button type="button" id="btnSnapDuty" onclick="verifyFaceAndGoOnline()" class="hidden" style="background:#2ecc71;">✅ सेल्फी तपासा व ONLINE व्हा</button>
     </div>
 
-    <!-- Online Searching Orders Radar Animation (In 3 Languages + 2-Hour Countdown) -->
+    <!-- Online Searching Radar (Fully Translated) -->
     <div id="searchingRadarBox" class="searching-radar hidden">
       <div class="radar-dot"></div>
       <strong id="txtSearchingRadar" style="color:#2ecc71; font-size:15px;">🔍 नवीन ऑर्डर शोधत आहे...</strong>
       <div style="font-size:11px; color:#aaa; margin-top:4px;">
-        GPS Active • पुढील सेल्फी तपासणी: <strong id="nextSelfieTimerTxt" style="color:#ffaa66;">02:00:00</strong>
+        GPS Active • <span id="txtNextSelfieLbl">पुढील सेल्फी तपासणी:</span> <strong id="nextSelfieTimerTxt" style="color:#ffaa66;">02:00:00</strong>
       </div>
     </div>
 
     <div id="ringingAlertBox" class="ringing-banner hidden">
-      🚨 नवीन ऑर्डर आली आहे! मोठ्या आवाजात अलर्ट वाजत आहे...
-      <button onclick="stopOrderRingtone()" style="background:#000; color:#fff; padding:6px; margin-top:6px; font-size:12px;">🔕 रिंगटोन थांबवा (Mute)</button>
+      <span id="txtRingAlertMsg">🚨 नवीन ऑर्डर आली आहे!</span>
+      <button id="txtBtnMuteRing" onclick="stopOrderRingtone()" style="background:#000; color:#fff; padding:6px; margin-top:6px; font-size:12px;">🔕 Mute</button>
     </div>
 
     <div id="riderNoticeBanner" class="banner-strip hidden"></div>
 
+    <!-- Peak Hour Incentive Chart Card (Synced Live from Admin Panel) -->
+    <div id="peakIncentiveBanner" class="incentive-chart">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong id="txtIncChartTitle" style="color:#2ecc71; font-size:13px;">🎁 पीक अवर इन्सेंटिव्ह चार्ट (Peak Hour Bonus)</strong>
+        <span id="incStatusBadge" style="font-size:10px; padding:2px 7px; border-radius:6px; background:#2ecc71; color:#000; font-weight:bold;">ACTIVE</span>
+      </div>
+      <div style="font-size:12px; color:#ddd; margin-top:4px;">
+        ⏰ <span id="txtIncTimeLbl">वेळ:</span> <strong id="incTimeWindowDisplay" style="color:#ffaa66;">18:00 - 22:00</strong> | 
+        💰 <span id="txtIncBonusLbl">प्रति राईड बोनस:</span> <strong style="color:#2ecc71; font-size:14px;">+₹<span id="incBonusPerRideDisplay">25</span></strong>
+      </div>
+    </div>
+
     <!-- Minus Balance Banner -->
     <div id="minusLockBanner" class="minus-lock-banner hidden">
-      <h4>🚫 वॉलेट बॅलन्स मायनस (<span id="minusAmtLabel">₹0</span>)!</h4>
-      <p style="font-size:12px; color:#ddd; margin:6px 0;">कृपया वॉलेटमध्ये पैसे जमा (Deposit) करा.</p>
+      <h4>🚫 Wallet Minus (<span id="minusAmtLabel">₹0</span>)!</h4>
       <button onclick="switchBottomTab('Wallet', document.querySelectorAll('.b-nav-item')[1]); switchWalletSub('deposit');" style="background:#2ecc71; color:#000; padding:8px; font-size:13px;">➕ Deposit Now</button>
     </div>
 
@@ -302,9 +309,7 @@
       <h4 style="color:#ff6b6b;">❌ KYC Rejected!</h4>
       <p id="rejectReasonText" style="font-size:13px; color:#ddd; margin:6px 0;"></p>
       <div class="doc-upload-box">
-        <label style="font-size:12px; color:#4db8ff;">Re-upload Aadhaar Front:</label>
         <input type="file" accept="image/*" onchange="reuploadKycDoc(this, 'front')">
-        <label style="font-size:12px; color:#4db8ff; margin-top:6px;">Re-upload Aadhaar Back:</label>
         <input type="file" accept="image/*" onchange="reuploadKycDoc(this, 'back')">
       </div>
     </div>
@@ -318,17 +323,20 @@
       </div>
       <input type="text" id="feeUtrInput" maxlength="20" placeholder="Enter 12-Digit UPI UTR">
       <div class="doc-upload-box">
-        <label style="font-size:12px; color:#2ecc71;">📸 Payment Screenshot:</label>
         <input type="file" accept="image/*" onchange="handleFeeScreenshot(this)">
         <img id="feeShotPreview" class="preview-img hidden" style="margin-top:6px;">
       </div>
       <button onclick="submitOnboardingUtr()" style="background:#2ecc71;">✅ Submit UTR</button>
     </div>
 
-    <!-- SECTION 1: ORDERS + LIVE CHAT -->
+    <!-- SECTION 1: ACTIVE DELIVERY (WITH IN-APP LIVE MAP, GOOGLE MAPS DIRECTIONS, STAGE-WISE PICKUP/DROP PERSON & 150m AUTO-REACH) + AVAILABLE ORDERS + CHAT -->
     <div id="secOrders">
       <div class="card">
         <h3 id="rTxtActiveDeliv" style="color:#ff6600; margin-bottom:10px;">🚚 माझ्या चालू डिलिव्हरी</h3>
+        <!-- In-App Live Rider Navigation Map -->
+        <div id="riderLiveMapWrapper" class="hidden">
+          <div id="riderActiveMap"></div>
+        </div>
         <div id="myDeliveries">...</div>
       </div>
 
@@ -348,10 +356,10 @@
       </div>
     </div>
 
-    <!-- SECTION 2: WALLET, COD, WEEKLY PROFIT, BANK & DIRECT UPI DEPOSIT -->
+    <!-- SECTION 2: WALLET, COD, INCENTIVE TALLY & WEEKLY PROFIT -->
     <div id="secWallet" class="hidden">
       <div class="card">
-        <h3 id="rTxtWalletTitle" style="color:#ff6600; margin-bottom:10px;">💰 वॉलेट, COD हिशोब आणि साप्ताहिक नफा</h3>
+        <h3 id="rTxtWalletTitle" style="color:#ff6600; margin-bottom:10px;">💰 वॉलेट, इन्सेंटिव्ह व साप्ताहिक नफा</h3>
         <div class="wallet-grid" style="margin-bottom:10px;">
           <div class="w-box">
             <div id="rTxtBalLbl" style="font-size:11px; color:#aaa;">वॉलेट शिल्लक</div>
@@ -364,12 +372,13 @@
         </div>
 
         <div class="weekly-card">
-          <div id="rTxtWkHead" style="font-size:13px; color:#ff6600; font-weight:bold; margin-bottom:6px;">🗓️ मागील ७ दिवसांचा हिशोब (Weekly Profit):</div>
+          <div id="rTxtWkHead" style="font-size:13px; color:#ff6600; font-weight:bold; margin-bottom:6px;">🗓️ मागील ७ दिवसांचा हिशोब (Weekly Tally):</div>
           <div class="weekly-row"><span id="rTxtWkRides">पूर्ण राईड्स:</span><strong id="wkRidesCount">0</strong></div>
           <div class="weekly-row"><span id="rTxtWkGross">एकूण भाडे:</span><strong>₹<span id="wkGrossFare">0</span></strong></div>
+          <div class="weekly-row"><span id="rTxtWkInc">पीक अवर इन्सेंटिव्ह बोनस:</span><strong style="color:#4db8ff;">+₹<span id="wkIncentiveEarned">0</span></strong></div>
           <div class="weekly-row"><span id="rTxtWkComm">कमिशन कपात:</span><span style="color:#e74c3c;">-₹<span id="wkCommission">0</span></span></div>
           <div class="weekly-row" style="font-size:15px; padding-top:6px;">
-            <span id="rTxtWkProfit" style="color:#2ecc71; font-weight:bold;">साप्ताहिक नफा:</span>
+            <span id="rTxtWkProfit" style="color:#2ecc71; font-weight:bold;">साप्ताहिक एकूण नफा:</span>
             <strong style="color:#2ecc71;">₹<span id="wkNetProfit">0</span></strong>
           </div>
         </div>
@@ -506,6 +515,7 @@
 
 <canvas id="snapCanvas" width="240" height="240" class="hidden"></canvas>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getFirestore, collection, addDoc, doc, setDoc, getDoc, getDocs, updateDoc, runTransaction, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -526,6 +536,7 @@
   let riderLang = localStorage.getItem("gp_rider_lang") || "mr";
   let adminWaNumber = "919999999999", adminUpiId = "Techesupp-2@okhdfcbank", currentOnboardingFee = 1000, currentCommPct = 20, maxRadiusKm = 10;
   let currentReferBonus = 100, deliveryRangeMeters = 150, selfieIntervalHours = 2, tempBlockMinutes = 60;
+  let peakIncentiveActive = true, peakStartHour = 18, peakEndHour = 22, peakIncentiveAmount = 25;
   let consentTextGlobal = "मी GoParcel चे सर्व नियम व वाहतूक अटी पाळेन.";
   let isFeePaid = false, isApproved = false, isSelfieApproved = false, isRiderOnline = false;
   let selfieExpiresAt = 0, selfieRejectCount = 0, tempBlockUntil = 0;
@@ -540,17 +551,30 @@
     ownerAadhaar: true, ownerRc: true, ownerNoc: true
   };
   let ringLoopInterval = null, audioCtx = null, currentRiderProfile = null;
-  let latestWeeklySummary = { rides: 0, gross: 0, comm: 0, netProfit: 0 };
+  let latestWeeklySummary = { rides: 0, gross: 0, comm: 0, incentive: 0, netProfit: 0 };
+  let riderMapObj = null, rSelfMarker = null, rPickMarker = null, rDropMarker = null;
+  let currentActiveOrderCache = null;
 
+  // संपूर्ण ३ भाषांची डिक्शनरी (Selfie Verification, Searching Radar, Block, Incentive सर्व समाविष्ट)
   const rDict = {
     mr: {
       pTitle: "रायडर पार्टनर पोर्टल", tLog: "🔑 जुना रायडर लॉगिन", tReg: "📝 नवीन रायडर नोंदणी",
       bLogOtp: "नवीन लॉगिन OTP मागवा", bDash: "डॅशबोर्ड उघडा", bSound: "🔊 रिंगटोन चालू",
-      searchTxt: "🔍 नवीन ऑर्डर शोधत आहे...",
+      blkTitle: "⛔ तुमचे खाते ६० मिनिटांसाठी तात्पुरते ब्लॉक केले आहे!",
+      blkSub: "सलग ४ वेळा सेल्फी चेहरा न जुळल्यामुळे हा तात्पुरता ब्लॉक लागू झाला आहे.",
+      blkRem: "शिल्लक वेळ:",
+      accTitle: "⏳ प्रोफाईल अप्रूव्हल प्रलंबित (Profile Approval Pending)",
+      accSub: "Admin ने तुमचे प्रोफाईल Approve केल्याशिवाय तुम्हाला ऑर्डर पडणार नाहीत.",
+      faceTitle: "📸 फेस मॅच सेल्फी अनिवार्य (Face Verification)",
+      faceSub: "ऑनलाईन येण्यासाठी किंवा दर २ तासांनी तुमचा ताजा लाईव्ह सेल्फी काढा.",
+      btnFaceCam: "📷 फेस सेल्फी कॅमेरा उघडा", btnFaceVer: "✅ सेल्फी तपासा व ONLINE व्हा",
+      searchTxt: "🔍 नवीन ऑर्डर शोधत आहे...", nextSlf: "पुढील सेल्फी तपासणी:",
+      ringMsg: "🚨 नवीन ऑर्डर आली आहे!", btnMute: "🔕 रिंगटोन थांबवा",
+      incTitle: "🎁 पीक अवर इन्सेंटिव्ह चार्ट (Peak Hour Bonus)", incTime: "वेळ:", incBonus: "प्रति राईड बोनस:",
       actDel: "🚚 माझ्या चालू डिलिव्हरी", avOrd: "नवीन उपलब्ध ऑर्डर्स",
       cTitle: "💬 लाईव्ह हेल्प चॅट (Company Admin Support)", cSub: "मदतीसाठी थेट ॲडमिनशी चॅट करा:", cPh: "तुमचा मेसेज लिहा...", bSend: "पाठवा",
-      wTitle: "💰 वॉलेट, COD हिशोब आणि साप्ताहिक नफा", bal: "वॉलेट शिल्लक", cod: "एकूण गोळा केलेली COD",
-      wkH: "🗓️ मागील ७ दिवसांचा हिशोब (Weekly Profit):", wkR: "पूर्ण राईड्स:", wkG: "एकूण भाडे:", wkC: "कमिशन कपात:", wkP: "साप्ताहिक नफा:",
+      wTitle: "💰 वॉलेट, इन्सेंटिव्ह व साप्ताहिक नफा", bal: "वॉलेट शिल्लक", cod: "एकूण गोळा केलेली COD",
+      wkH: "🗓️ मागील ७ दिवसांचा हिशोब (Weekly Tally):", wkR: "पूर्ण राईड्स:", wkG: "एकूण भाडे:", wkInc: "पीक अवर इन्सेंटिव्ह बोनस:", wkC: "कमिशन कपात:", wkP: "साप्ताहिक एकूण नफा:",
       bHead: "🏦 बँक खाते तपशील:", bSave: "💾 बँक तपशील सेव्ह करा", bWith: "💳 विथड्रॉवल विनंती पाठवा", bDep: "➕ डिपॉझिट सबमिट करा",
       pHead: "👤 रायडर प्रोफाईल", bPdf: "📄 संमती पत्र PDF डाउनलोड करा", sHead: "🆘 हेल्प आणि इमर्जन्सी सपोर्ट",
       setH: "⚙️ ॲप सेटिंग्ज & रेफर बोनस", rLbl: "🔔 रिंगटोन व व्हायब्रेशन", bOut: "🚪 लॉगआउट",
@@ -559,11 +583,21 @@
     hi: {
       pTitle: "राइडर पार्टनर पोर्टल", tLog: "🔑 पुराना राइडर लॉगिन", tReg: "📝 नया राइडर पंजीकरण",
       bLogOtp: "लॉगिन OTP मंगवाएं", bDash: "डैशबोर्ड खोलें", bSound: "🔊 रिंगटोन चालू",
-      searchTxt: "🔍 नए ऑर्डर ढूंढ रहे हैं...",
+      blkTitle: "⛔ आपका खाता ६० मिनट के लिए अस्थायी रूप से ब्लॉक किया गया है!",
+      blkSub: "लगातार ४ बार सेल्फी चेहरा मैच न होने के कारण यह अस्थायी ब्लॉक लगाया गया है।",
+      blkRem: "शेष समय:",
+      accTitle: "⏳ प्रोफाइल अप्रूवल लंबित (Profile Approval Pending)",
+      accSub: "एडमिन द्वारा प्रोफाइल अप्रूव किए बिना आपको ऑर्डर नहीं मिलेंगे।",
+      faceTitle: "📸 फेस मैच सेल्फी अनिवार्य (Face Verification)",
+      faceSub: "ऑनलाइन आने के लिए या हर २ घंटे में अपनी ताजा लाइव सेल्फी लें।",
+      btnFaceCam: "📷 फेस सेल्फी कैमरा खोलें", btnFaceVer: "✅ सेल्फी जांचें और ONLINE हों",
+      searchTxt: "🔍 नए ऑर्डर ढूंढ रहे हैं...", nextSlf: "अगली सेल्फी जांच:",
+      ringMsg: "🚨 नया ऑर्डर आया है!", btnMute: "🔕 रिंगटोन बंद करें",
+      incTitle: "🎁 पीक आवर इंसेंटिव चार्ट (Peak Hour Bonus)", incTime: "समय:", incBonus: "प्रति राइड बोनस:",
       actDel: "🚚 मेरी चालू डिलीवरी", avOrd: "नए उपलब्ध ऑर्डर्स",
       cTitle: "💬 लाइव हेल्प चैट (Company Admin Support)", cSub: "मदद के लिए सीधे एडमिन से चैट करें:", cPh: "अपना संदेश लिखें...", bSend: "भेजें",
-      wTitle: "💰 वॉलेट, COD हिसाब और साप्ताहिक लाभ", bal: "वॉलेट बैलेंस", cod: "कुल एकत्रित COD",
-      wkH: "🗓️ पिछले ७ दिनों का हिसाब (Weekly Profit):", wkR: "पूर्ण राइड्स:", wkG: "कुल किराया:", wkC: "कमीशन कटौती:", wkP: "साप्ताहिक लाभ:",
+      wTitle: "💰 वॉलेट, इंसेंटिव और साप्ताहिक लाभ", bal: "वॉलेट बैलेंस", cod: "कुल एकत्रित COD",
+      wkH: "🗓️ पिछले ७ दिनों का हिसाब (Weekly Tally):", wkR: "पूर्ण राइड्स:", wkG: "कुल किराया:", wkInc: "पीक आवर इंसेंटिव बोनस:", wkC: "कमीशन कटौती:", wkP: "साप्ताहिक कुल लाभ:",
       bHead: "🏦 बैंक खाता विवरण:", bSave: "💾 बैंक विवरण सेव करें", bWith: "💳 विथड्रॉवल अनुरोध भेजें", bDep: "➕ डिपॉजिट सबमिट करें",
       pHead: "👤 राइडर प्रोफाइल", bPdf: "📄 सहमति पत्र PDF डाउनलोड करें", sHead: "🆘 हेल्प और इमरजेंसी सपोर्ट",
       setH: "⚙️ ऐप सेटिंग्स & रेफर बोनस", rLbl: "🔔 रिंगटोन और वाइब्रेशन", bOut: "🚪 लॉगआउट",
@@ -572,11 +606,21 @@
     en: {
       pTitle: "Rider Partner Portal", tLog: "🔑 Existing Rider Login", tReg: "📝 New Rider Register",
       bLogOtp: "Request Login OTP", bDash: "Open Dashboard", bSound: "🔊 Ringtone ON",
-      searchTxt: "🔍 Searching for new orders...",
+      blkTitle: "⛔ Account Temporarily Blocked for 60 Minutes!",
+      blkSub: "Your selfie failed face verification 4 times in a row.",
+      blkRem: "Time Remaining:",
+      accTitle: "⏳ Profile Approval Pending",
+      accSub: "You will receive orders once Admin approves your profile.",
+      faceTitle: "📸 Face Match Selfie Verification Required",
+      faceSub: "Take a live selfie to go ONLINE or every 2 hours during duty.",
+      btnFaceCam: "📷 Open Face Selfie Camera", btnFaceVer: "✅ Verify Face & Go ONLINE",
+      searchTxt: "🔍 Searching for new orders...", nextSlf: "Next Selfie Check:",
+      ringMsg: "🚨 New Order Arrived!", btnMute: "🔕 Mute Ringtone",
+      incTitle: "🎁 Peak Hour Incentive Chart", incTime: "Time:", incBonus: "Per Ride Bonus:",
       actDel: "🚚 My Active Deliveries", avOrd: "New Available Orders",
       cTitle: "💬 Live Support Chat (Company Admin)", cSub: "Chat directly with Admin for order support:", cPh: "Type your message...", bSend: "Send",
-      wTitle: "💰 Wallet, COD & Weekly Profit", bal: "Wallet Balance", cod: "Total COD Collected",
-      wkH: "🗓️ Last 7 Days Summary (Weekly Profit):", wkR: "Completed Rides:", wkG: "Gross Fare:", wkC: "Commission:", wkP: "Net Weekly Profit:",
+      wTitle: "💰 Wallet, Incentive & Weekly Profit", bal: "Wallet Balance", cod: "Total COD Collected",
+      wkH: "🗓️ Last 7 Days Summary (Weekly Tally):", wkR: "Completed Rides:", wkG: "Gross Fare:", wkInc: "Peak Hour Incentive:", wkC: "Commission:", wkP: "Total Weekly Profit:",
       bHead: "🏦 Bank Account Details:", bSave: "💾 Save Bank Details", bWith: "💳 Request Withdrawal", bDep: "➕ Submit Deposit",
       pHead: "👤 Rider Profile", bPdf: "📄 Download Consent PDF", sHead: "🆘 Help & Emergency Support",
       setH: "⚙️ App Settings & Refer Bonus", rLbl: "🔔 Ringtone & Vibration", bOut: "🚪 Logout",
@@ -597,7 +641,22 @@
     document.getElementById('rTxtBtnLoginOtp').innerText = t.bLogOtp;
     document.getElementById('rTxtBtnDashOpen').innerText = t.bDash;
     document.getElementById('rTxtBtnSound').innerText = t.bSound;
+    document.getElementById('txtTempBlockTitle').innerText = t.blkTitle;
+    document.getElementById('txtTempBlockSub').innerText = t.blkSub;
+    document.getElementById('txtBlockRemLbl').innerText = t.blkRem;
+    document.getElementById('txtAccPendTitle').innerText = t.accTitle;
+    document.getElementById('txtAccPendSub').innerText = t.accSub;
+    document.getElementById('txtFaceCardTitle').innerText = t.faceTitle;
+    document.getElementById('facePromptReason').innerText = t.faceSub;
+    document.getElementById('txtBtnOpenFaceCam').innerText = t.btnFaceCam;
+    document.getElementById('btnSnapDuty').innerText = t.btnFaceVer;
     document.getElementById('txtSearchingRadar').innerText = t.searchTxt;
+    document.getElementById('txtNextSelfieLbl').innerText = t.nextSlf;
+    document.getElementById('txtRingAlertMsg').innerText = t.ringMsg;
+    document.getElementById('txtBtnMuteRing').innerText = t.btnMute;
+    document.getElementById('txtIncChartTitle').innerText = t.incTitle;
+    document.getElementById('txtIncTimeLbl').innerText = t.incTime;
+    document.getElementById('txtIncBonusLbl').innerText = t.incBonus;
     document.getElementById('rTxtActiveDeliv').innerText = t.actDel;
     document.getElementById('rTxtAvailOrders').innerText = t.avOrd;
     document.getElementById('rTxtChatTitle').innerText = t.cTitle;
@@ -610,6 +669,7 @@
     document.getElementById('rTxtWkHead').innerText = t.wkH;
     document.getElementById('rTxtWkRides').innerText = t.wkR;
     document.getElementById('rTxtWkGross').innerText = t.wkG;
+    document.getElementById('rTxtWkInc').innerText = t.wkInc;
     document.getElementById('rTxtWkComm').innerText = t.wkC;
     document.getElementById('rTxtWkProfit').innerText = t.wkP;
     document.getElementById('rTxtBankHead').innerText = t.bHead;
@@ -639,7 +699,13 @@
 
   function getNowTimeStr() { return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
 
-  // दर सेकंदाला २ तासांचा सेल्फी टायमर आणि ६० मिनिटांचा ब्लॉक टायमर तपासणे
+  function isCurrentTimeInPeakHours() {
+    if (!peakIncentiveActive) return false;
+    const hr = new Date().getHours();
+    if (peakStartHour <= peakEndHour) return hr >= peakStartHour && hr < peakEndHour;
+    return hr >= peakStartHour || hr < peakEndHour;
+  }
+
   setInterval(async () => {
     const clockEl = document.getElementById('regConsentClock');
     if (clockEl) clockEl.innerText = new Date().toLocaleTimeString('en-IN');
@@ -647,7 +713,6 @@
     if (!activeRiderId) return;
     const now = Date.now();
 
-    // 1. Check 60-Minute Temporary Block Countdown
     const blockCard = document.getElementById('tempBlockCard');
     if (tempBlockUntil > now) {
       blockCard.classList.remove('hidden');
@@ -657,19 +722,15 @@
       document.getElementById('tempBlockTimerTxt').innerText = `${m}:${s}`;
     } else if (!blockCard.classList.contains('hidden')) {
       blockCard.classList.add('hidden');
-      // ब्लॉक संपल्यावर वॉर्निंग रीसेट करणे
       await updateDoc(doc(db, "riders", activeRiderId), { tempBlockUntil: 0, selfieRejectCount: 0 });
     }
 
-    // 2. Check 2-Hour Periodic Selfie Expiry while Online
     if (isRiderOnline && selfieExpiresAt > 0) {
       const remSelfie = selfieExpiresAt - now;
       if (remSelfie <= 0) {
-        // २ तास पूर्ण झाले -> आपोआप OFFLINE करा आणि नवीन सेल्फी मागा
         isRiderOnline = false;
         isSelfieApproved = false;
         await updateDoc(doc(db, "riders", activeRiderId), { isOnline: false, selfieApproved: false });
-        document.getElementById('facePromptReason').innerText = "⏰ २ तास पूर्ण झाले आहेत! ड्युटी सुरू ठेवण्यासाठी कृपया नवीन लाईव्ह सेल्फी काढा.";
         updateDutyUiState();
       } else {
         const h = String(Math.floor(remSelfie / 3600000)).padStart(2, '0');
@@ -680,7 +741,6 @@
     }
   }, 1000);
 
-  // अत्यंत मोठ्या आवाजात सायरन रिंगटोन
   window.enableAudioAndTest = () => {
     if ("Notification" in window && Notification.permission !== "granted") Notification.requestPermission();
     triggerUltraLoudRing();
@@ -726,7 +786,6 @@
     document.getElementById('ringingAlertBox').classList.add('hidden');
   };
 
-  // फोटो फिंगरप्रिंट (Face Visual Signature Comparison) फंक्शन
   function computeImageSignature(base64Url) {
     return new Promise((resolve) => {
       if (!base64Url) return resolve(null);
@@ -735,16 +794,13 @@
         const c = document.createElement('canvas');
         c.width = 16; c.height = 16;
         const ctx = c.getContext('2d');
-        // मध्यभागातील चेहऱ्याचा भाग क्रॉप करून तपासणे
         const sx = img.width * 0.2, sy = img.height * 0.15, sw = img.width * 0.6, sh = img.height * 0.7;
         ctx.drawImage(img, sx, sy, sw, sh, 0, 0, 16, 16);
         const data = ctx.getImageData(0, 0, 16, 16).data;
-        const gray = [];
-        let sum = 0;
+        const gray = []; let sum = 0;
         for (let i = 0; i < data.length; i += 4) {
           const g = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-          gray.push(g);
-          sum += g;
+          gray.push(g); sum += g;
         }
         const avg = sum / gray.length;
         resolve(gray.map(v => v >= avg ? 1 : 0));
@@ -757,13 +813,10 @@
   async function compareFaceSelfies(regImgBase64, liveImgBase64) {
     const sig1 = await computeImageSignature(regImgBase64);
     const sig2 = await computeImageSignature(liveImgBase64);
-    if (!sig1 || !sig2) return true; // जर Admin ने थेट जोडलेला रायडर असेल तर
+    if (!sig1 || !sig2) return true;
     let matches = 0;
-    for (let i = 0; i < sig1.length; i++) {
-      if (sig1[i] === sig2[i]) matches++;
-    }
-    const similarityPct = (matches / sig1.length) * 100;
-    return similarityPct >= 62; // चेहऱ्याची रचना जुळल्यास True
+    for (let i = 0; i < sig1.length; i++) if (sig1[i] === sig2[i]) matches++;
+    return ((matches / sig1.length) * 100) >= 62;
   }
 
   function isValidAadhaar(num) {
@@ -794,6 +847,7 @@
     document.getElementById('sec' + tabName).classList.remove('hidden');
     document.querySelectorAll('.b-nav-item').forEach(b => b.classList.remove('active'));
     if (el) el.classList.add('active');
+    if (tabName === 'Orders' && riderMapObj) setTimeout(() => riderMapObj.invalidateSize(), 250);
   };
 
   window.switchWalletSub = (sub) => {
@@ -831,15 +885,30 @@
       selfieIntervalHours = Number(s.selfieIntervalHours ?? 2);
       tempBlockMinutes = Number(s.tempBlockMinutes ?? 60);
 
+      // Peak Hour Incentive Settings
+      peakIncentiveActive = s.peakIncentiveActive ?? true;
+      peakStartHour = Number(s.peakStartHour ?? 18);
+      peakEndHour = Number(s.peakEndHour ?? 22);
+      peakIncentiveAmount = Number(s.peakIncentiveAmount ?? 25);
+
+      document.getElementById('incTimeWindowDisplay').innerText = `${String(peakStartHour).padStart(2,'0')}:00 - ${String(peakEndHour).padStart(2,'0')}:00`;
+      document.getElementById('incBonusPerRideDisplay').innerText = peakIncentiveAmount;
+      const incBadge = document.getElementById('incStatusBadge');
+      if (peakIncentiveActive) {
+        incBadge.innerText = isCurrentTimeInPeakHours() ? "🔥 LIVE NOW" : "ACTIVE";
+        incBadge.style.background = isCurrentTimeInPeakHours() ? "#ff6600" : "#2ecc71";
+      } else {
+        incBadge.innerText = "OFF";
+        incBadge.style.background = "#555";
+      }
+
       docRules = {
         docAadhaar: s.docAadhaar ?? true, modeAadhaar: s.modeAadhaar ?? "both",
         docAadhaarBack: s.docAadhaarBack ?? true, modeAadhaarBack: s.modeAadhaarBack ?? "both",
         docLicense: s.docLicense ?? true, modeLicense: s.modeLicense ?? "both",
         docRcBook: s.docRcBook ?? false, modeRcBook: s.modeRcBook ?? "both",
         docPanCard: s.docPanCard ?? false, modePanCard: s.modePanCard ?? "both",
-        ownerAadhaar: s.ownerAadhaar ?? true,
-        ownerRc: s.ownerRc ?? true,
-        ownerNoc: s.ownerNoc ?? true
+        ownerAadhaar: s.ownerAadhaar ?? true, ownerRc: s.ownerRc ?? true, ownerNoc: s.ownerNoc ?? true
       };
 
       if (s.consentText) {
@@ -969,11 +1038,8 @@
     document.getElementById('btnSnapReg').classList.add('hidden');
   };
 
-  // ऑटोमॅटिक फेस मॅचिंग + ४ वॉर्निंग + ६० मिनिटांचा टेम्पोररी ब्लॉक
   window.verifyFaceAndGoOnline = async () => {
-    if (tempBlockUntil > Date.now()) {
-      return alert("⛔ तुमचे खाते ६० मिनिटांसाठी तात्पुरते ब्लॉक आहे!");
-    }
+    if (tempBlockUntil > Date.now()) return alert("⛔ Account Temporarily Blocked!");
     const liveImg = captureBase64(document.getElementById('dutyVideo'));
     document.getElementById('btnSnapDuty').classList.add('hidden');
 
@@ -981,67 +1047,41 @@
     const isMatched = await compareFaceSelfies(refImg, liveImg);
 
     if (isMatched) {
-      // चेहरा जुळला -> ऑटोमॅटिक सेल्फी Approve + २ तासांचा टायमर + ONLINE
       const nextExpiry = Date.now() + (selfieIntervalHours * 60 * 60 * 1000);
       await updateDoc(doc(db, "riders", activeRiderId), {
-        dailySelfie: liveImg,
-        selfieApproved: true,
-        selfieStatus: "Auto Face-Matched",
-        selfieRejectCount: 0,
-        selfieExpiresAt: nextExpiry,
-        isOnline: true,
-        lastSelfieTime: serverTimestamp()
+        dailySelfie: liveImg, selfieApproved: true, selfieStatus: "Auto Face-Matched",
+        selfieRejectCount: 0, selfieExpiresAt: nextExpiry, isOnline: true, lastSelfieTime: serverTimestamp()
       });
-      alert("✅ चेहरा यशस्वीरित्या जुळला (Face Matched)! तुम्ही आता २ तासांसाठी ONLINE आहात.");
+      alert("✅ Face Matched! You are now ONLINE.");
     } else {
-      // चेहरा जुळला नाही -> Warning +1 (4 वेळा रिजेक्ट झाल्यास 60 Min Block)
       const newCount = (selfieRejectCount || 0) + 1;
       if (newCount >= 4) {
         const blockEnd = Date.now() + (tempBlockMinutes * 60 * 1000);
         await updateDoc(doc(db, "riders", activeRiderId), {
-          dailySelfie: liveImg,
-          selfieApproved: false,
-          selfieStatus: "Rejected (4/4 - Blocked 60m)",
-          selfieRejectCount: 4,
-          tempBlockUntil: blockEnd,
-          isOnline: false
+          dailySelfie: liveImg, selfieApproved: false, selfieStatus: "Rejected (4/4 - Blocked 60m)",
+          selfieRejectCount: 4, tempBlockUntil: blockEnd, isOnline: false
         });
-        alert(`⛔ चेहरा जुळला नाही (Warning 4/4)! तुमचे खाते ${tempBlockMinutes} मिनिटांसाठी तात्पुरते ब्लॉक केले आहे.`);
+        alert(`⛔ Face Mismatch (Warning 4/4)! Blocked for ${tempBlockMinutes} minutes.`);
       } else {
         await updateDoc(doc(db, "riders", activeRiderId), {
-          dailySelfie: liveImg,
-          selfieApproved: false,
-          selfieStatus: `Rejected (Warning ${newCount}/4)`,
-          selfieRejectCount: newCount,
-          isOnline: false
+          dailySelfie: liveImg, selfieApproved: false, selfieStatus: `Rejected (Warning ${newCount}/4)`,
+          selfieRejectCount: newCount, isOnline: false
         });
-        alert(`⚠️ चेहरा जुळला नाही! सेल्फी रिजेक्ट झाला आहे (Warning ${newCount} / 4). ४ वेळा रिजेक्ट झाल्यास १ तासासाठी ब्लॉक व्हाल!`);
+        alert(`⚠️ Face Mismatch! Selfie Rejected (Warning ${newCount} / 4).`);
       }
     }
   };
 
-  // Online / Offline Toggle Button (ऑफलाईन जाऊन परत ऑनलाईन येताना नेहमी सेल्फी मागेल)
   window.toggleRiderDuty = async () => {
-    if (tempBlockUntil > Date.now()) {
-      return alert("⛔ तुमचे खाते ६० मिनिटांसाठी तात्पुरते ब्लॉक आहे!");
-    }
-    if (!isApproved) {
-      return alert("⏳ तुमचे प्रोफाईल अजून Admin ने Approve केलेले नाही!");
-    }
+    if (tempBlockUntil > Date.now()) return alert("⛔ Account Temporarily Blocked!");
+    if (!isApproved) return alert("⏳ Profile Approval Pending by Admin!");
 
     if (isRiderOnline) {
-      // रायडर स्वतःहून OFFLINE जात आहे -> पुढच्या वेळी ऑनलाईन येताना नवीन सेल्फी अनिवार्य राहील
-      await updateDoc(doc(db, "riders", activeRiderId), {
-        isOnline: false,
-        selfieApproved: false,
-        selfieExpiresAt: 0
-      });
+      await updateDoc(doc(db, "riders", activeRiderId), { isOnline: false, selfieApproved: false, selfieExpiresAt: 0 });
     } else {
-      // रायडर OFFLINE वरून परत ONLINE येण्याचा प्रयत्न करत आहे
       if (!isSelfieApproved || selfieExpiresAt <= Date.now()) {
         document.getElementById('dutyFaceMatchCard').classList.remove('hidden');
-        document.getElementById('facePromptReason').innerText = "📸 ऑनलाईन येण्यासाठी कृपया तुमचा ताजा लाईव्ह सेल्फी काढा.";
-        alert("📸 ऑनलाईन येण्यासाठी आधी खालील कॅमेऱ्याने तुमचा लाईव्ह सेल्फी व्हेरिफाय करा!");
+        alert("📸 Please capture live face selfie to go ONLINE!");
       } else {
         await updateDoc(doc(db, "riders", activeRiderId), { isOnline: true });
       }
@@ -1059,10 +1099,8 @@
 
     if (selfieRejectCount > 0 && selfieRejectCount < 4) {
       warnBadge.classList.remove('hidden');
-      warnBadge.innerText = `⚠️ सेल्फी रिजेक्ट! Warning: ${selfieRejectCount} / 4`;
-    } else {
-      warnBadge.classList.add('hidden');
-    }
+      warnBadge.innerText = `⚠️ Selfie Rejected! Warning: ${selfieRejectCount} / 4`;
+    } else warnBadge.classList.add('hidden');
 
     const selfieValid = isSelfieApproved && (selfieExpiresAt > Date.now());
     faceCard.classList.toggle('hidden', selfieValid || tempBlockUntil > Date.now());
@@ -1096,19 +1134,14 @@
       const disp = document.getElementById(mode === 'login' ? 'rLoginTimerDisplay' : 'rRegTimerDisplay');
       if (rem <= 0) {
         clearInterval(rOtpTimerInt);
-        disp.innerText = "⚠️ OTP वेळ (10 मिनिटे) संपली आहे! पुन्हा OTP मागवा.";
+        disp.innerText = "⚠️ OTP Expired! Click Resend OTP.";
         disp.style.color = "#e74c3c";
-        if (mode === 'login') {
-          document.getElementById('btnRLoginResend').classList.remove('hidden');
-          document.getElementById('rTxtBtnDashOpen').disabled = true;
-        } else {
-          document.getElementById('btnRRegResend').classList.remove('hidden');
-          document.getElementById('btnRRegVerify').disabled = true;
-        }
+        if (mode === 'login') { document.getElementById('btnRLoginResend').classList.remove('hidden'); document.getElementById('rTxtBtnDashOpen').disabled = true; }
+        else { document.getElementById('btnRRegResend').classList.remove('hidden'); document.getElementById('btnRRegVerify').disabled = true; }
       } else {
         const m = String(Math.floor(rem / 60000)).padStart(2, '0');
         const s = String(Math.floor((rem % 60000) / 1000)).padStart(2, '0');
-        disp.innerText = `⏳ OTP वैधता वेळ: ${m}:${s}`;
+        disp.innerText = `⏳ OTP Valid: ${m}:${s}`;
         disp.style.color = "#ffaa66";
       }
     }, 1000);
@@ -1311,11 +1344,19 @@
     if (!isApproved) return alert("Pending Admin Profile Approval!");
 
     const orderRef = doc(db, "orders", orderId);
+    const incEarned = isCurrentTimeInPeakHours() ? peakIncentiveAmount : 0;
+
     try {
       await runTransaction(db, async (transaction) => {
         const oSnap = await transaction.get(orderRef);
         if (!oSnap.exists() || oSnap.data().status !== "Pending") throw "ALREADY_TAKEN";
-        transaction.update(orderRef, { status: "Accepted", riderId: activeRiderId, riderEmail: activeRiderName, acceptedAt: serverTimestamp() });
+        transaction.update(orderRef, {
+          status: "Accepted",
+          riderId: activeRiderId,
+          riderEmail: activeRiderName,
+          incentiveBonus: incEarned,
+          acceptedAt: serverTimestamp()
+        });
       });
     } catch (err) {
       if (err === "ALREADY_TAKEN") alert("⚠️ Order already accepted by another rider!");
@@ -1325,12 +1366,10 @@
 
   window.markReachedPickup = async (orderId) => {
     await updateDoc(doc(db, "orders", orderId), { status: "ReachedPickup", reachedPickupAt: serverTimestamp() });
-    alert("📍 Reached Pickup!");
   };
 
   window.markPickedUp = async (orderId) => {
     await updateDoc(doc(db, "orders", orderId), { status: "PickedUp", pickedUpAt: serverTimestamp() });
-    alert("📦 Picked Up!");
   };
 
   window.completeOrderWithPin = async (orderId, expectedPin, dropLat, dropLng) => {
@@ -1388,11 +1427,66 @@
     alert("✅ Deposit Submitted!");
   };
 
+  // इन-बिल्ट रायडर लाईव्ह मॅप अपडेट करणे
+  function updateRiderInAppMap(order) {
+    const wrap = document.getElementById('riderLiveMapWrapper');
+    if (!order) {
+      wrap.classList.add('hidden');
+      return;
+    }
+    wrap.classList.remove('hidden');
+
+    const pLat = Number(order.pickupLat || 18.5204);
+    const pLng = Number(order.pickupLng || 73.8567);
+    const dLat = Number(order.dropLat || 18.5314);
+    const dLng = Number(order.dropLng || 73.8446);
+    const rLat = Number(riderLat || pLat);
+    const rLng = Number(riderLng || pLng);
+
+    if (!riderMapObj) {
+      riderMapObj = L.map('riderActiveMap').setView([rLat, rLng], 14);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(riderMapObj);
+      const greenPin = L.divIcon({ html: '<div style="font-size:24px;">🟢</div>', className: '', iconSize: [26, 26], iconAnchor: [13, 13] });
+      const redPin = L.divIcon({ html: '<div style="font-size:24px;">🔴</div>', className: '', iconSize: [26, 26], iconAnchor: [13, 13] });
+      const bikePin = L.divIcon({ html: '<div style="font-size:28px;">🛵</div>', className: '', iconSize: [30, 30], iconAnchor: [15, 15] });
+
+      rPickMarker = L.marker([pLat, pLng], { icon: greenPin }).addTo(riderMapObj).bindPopup("🟢 Pickup");
+      rDropMarker = L.marker([dLat, dLng], { icon: redPin }).addTo(riderMapObj).bindPopup("🔴 Drop");
+      rSelfMarker = L.marker([rLat, rLng], { icon: bikePin }).addTo(riderMapObj).bindPopup("🛵 मी (You)");
+    } else {
+      rPickMarker.setLatLng([pLat, pLng]);
+      rDropMarker.setLatLng([dLat, dLng]);
+      rSelfMarker.setLatLng([rLat, rLng]);
+      riderMapObj.panTo([rLat, rLng]);
+    }
+    setTimeout(() => riderMapObj.invalidateSize(), 200);
+  }
+
+  // १५० मीटर रेंजमध्ये आल्यावर ऑटो-रीच (Auto-Reach) तपासणी
+  async function checkAutoReachMilestones() {
+    if (!currentActiveOrderCache || !riderLat || !riderLng) return;
+    const o = currentActiveOrderCache;
+
+    if (o.status === "Accepted" && o.pickupLat && o.pickupLng) {
+      const distPickM = Math.round(getDistanceKm(riderLat, riderLng, o.pickupLat, o.pickupLng) * 1000);
+      if (distPickM <= deliveryRangeMeters) {
+        await updateDoc(doc(db, "orders", o.id), { status: "ReachedPickup", reachedPickupAt: serverTimestamp() });
+      }
+    } else if (o.status === "PickedUp" && o.dropLat && o.dropLng) {
+      const distDropM = Math.round(getDistanceKm(riderLat, riderLng, o.dropLat, o.dropLng) * 1000);
+      if (distDropM <= deliveryRangeMeters) {
+        await updateDoc(doc(db, "orders", o.id), { status: "ReachedDrop", reachedDropAt: serverTimestamp() });
+      }
+    }
+  }
+
   function startGpsTracking(rid) {
     if ("geolocation" in navigator) {
       navigator.geolocation.watchPosition(async (pos) => {
         riderLat = pos.coords.latitude; riderLng = pos.coords.longitude;
         await updateDoc(doc(db, "riders", rid), { lat: riderLat, lng: riderLng, lastSeen: serverTimestamp() });
+        if (rSelfMarker) rSelfMarker.setLatLng([riderLat, riderLng]);
+        checkAutoReachMilestones();
       }, () => {}, { enableHighAccuracy: true });
     }
   }
@@ -1457,7 +1551,7 @@
       const selfieValid = isSelfieApproved && (selfieExpiresAt > Date.now());
       if (!isRiderOnline || !selfieValid || !isApproved || tempBlockUntil > Date.now()) {
         stopOrderRingtone();
-        div.innerHTML = `<div style="color:#aaa; font-size:13px; padding:8px;">⚠️ ऑर्डर पाहण्यासाठी फेस सेल्फी व्हेरिफाय करून <b>ONLINE</b> व्हा.</div>`;
+        div.innerHTML = `<div style="color:#aaa; font-size:13px; padding:8px;">⚠️ Please verify Face Selfie & go <b>ONLINE</b> to see orders.</div>`;
         return;
       }
 
@@ -1469,6 +1563,7 @@
 
       let foundOrders = 0, hasBrandNewOrder = false, newestOrderSummary = "";
       const currentIds = new Set();
+      const incBonusNow = isCurrentTimeInPeakHours() ? peakIncentiveAmount : 0;
 
       snap.forEach(d => {
         const o = d.data();
@@ -1486,6 +1581,7 @@
           const payBadge = (o.paymentMode === "ONLINE")
             ? `<span class="pay-badge-onl">📱 ONLINE PAID</span>`
             : `<span class="pay-badge-cod">💵 COD (₹${o.fare})</span>`;
+          const incTag = incBonusNow > 0 ? `<span style="color:#4db8ff; font-size:11px;"> + ₹${incBonusNow} Peak Bonus</span>` : '';
 
           div.innerHTML += `<div class="order-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
@@ -1494,7 +1590,7 @@
             </div>
             <div style="font-size:11px; color:#4db8ff; margin-bottom:4px;">${distLabel}</div>
             <small>🟢 Pickup: ${o.pickup}<br>🔴 Drop: ${o.drop}</small><br>
-            <div style="margin:6px 0; color:#2ecc71;">Profit: <b>₹${net}</b> (Fare: ₹${o.fare})</div>
+            <div style="margin:6px 0; color:#2ecc71;">Profit: <b>₹${net}</b>${incTag} (Fare: ₹${o.fare})</div>
             <button onclick="acceptOrder('${d.id}')" style="background:#2ecc71;">⚡ Accept Order</button>
           </div>`;
         }
@@ -1506,68 +1602,122 @@
       isFirstOrderLoad = false;
     });
 
-    let onlineNetTotal = 0, codCommOwedTotal = 0, totalCodCashCollected = 0;
+    let onlineNetTotal = 0, codCommOwedTotal = 0, totalCodCashCollected = 0, totalIncentiveEarnedAll = 0;
     const sevenDaysAgoMs = Date.now() - (7 * 24 * 60 * 60 * 1000);
 
     onSnapshot(query(collection(db, "orders"), where("riderId", "==", rid)), (snap) => {
       const div = document.getElementById('myDeliveries'), histDiv = document.getElementById('orderHistoryList');
       div.innerHTML = ""; histDiv.innerHTML = "";
-      onlineNetTotal = 0; codCommOwedTotal = 0; totalCodCashCollected = 0;
-      let wkRides = 0, wkGross = 0, wkComm = 0, wkNet = 0;
+      onlineNetTotal = 0; codCommOwedTotal = 0; totalCodCashCollected = 0; totalIncentiveEarnedAll = 0;
+      let wkRides = 0, wkGross = 0, wkComm = 0, wkInc = 0, wkNet = 0;
+      let activeOrderFound = null;
 
       snap.forEach(d => {
         const o = d.data();
         const fareNum = Number(o.fare || 0);
+        const incBonus = Number(o.incentiveBonus || 0);
         const net = Math.round(fareNum * ((100 - currentCommPct) / 100));
         const comm = fareNum - net;
         const isCod = (o.paymentMode !== "ONLINE");
 
         if (o.status === "Delivered") {
+          totalIncentiveEarnedAll += incBonus;
           if (isCod) { totalCodCashCollected += fareNum; codCommOwedTotal += comm; }
           else { onlineNetTotal += net; }
 
           const delivMs = o.deliveredTimestampMs || Date.now();
-          if (delivMs >= sevenDaysAgoMs) { wkRides++; wkGross += fareNum; wkComm += comm; wkNet += net; }
+          if (delivMs >= sevenDaysAgoMs) {
+            wkRides++; wkGross += fareNum; wkComm += comm; wkInc += incBonus;
+            wkNet += (net + incBonus);
+          }
 
           histDiv.innerHTML += `<div class="hist-item">
             <div style="display:flex; justify-content:space-between;">
               <strong>📦 ${o.vehicle} • ${o.parcel} (${o.parcelWeight || '1-5 kg'})</strong>
-              <span style="color:${isCod ? '#4db8ff' : '#2ecc71'}; font-weight:bold;">${isCod ? `COD ₹${fareNum}` : `+₹${net}`}</span>
+              <span style="color:${isCod ? '#4db8ff' : '#2ecc71'}; font-weight:bold;">${isCod ? `COD ₹${fareNum}` : `+₹${net}`} ${incBonus > 0 ? `(+₹${incBonus} Bonus)` : ''}</span>
             </div>
             <div style="font-size:12px; color:#ddd; margin-top:4px;">🟢 ${o.pickup}<br>🔴 ${o.drop}</div>
           </div>`;
         } else {
-          const gMapsUrl = o.pickupLat ? `https://www.google.com/maps/dir/?api=1&destination=${o.dropLat},${o.dropLng}&waypoints=${o.pickupLat},${o.pickupLng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.pickup)}`;
+          activeOrderFound = { id: d.id, ...o };
+
           const payAlert = isCod
             ? `<div style="background:#3b0d0d; color:#ff8a8a; padding:6px; border-radius:6px; font-size:12px; margin:5px 0; font-weight:bold;">💵 COD: Collect ₹${fareNum} Cash!</div>`
             : `<div style="background:#0d3b1e; color:#2ecc71; padding:6px; border-radius:6px; font-size:12px; margin:5px 0; font-weight:bold;">📱 ONLINE PAID</div>`;
 
-          let stepBtnHtml = '';
-          if (o.status === "Accepted") stepBtnHtml = `<button onclick="markReachedPickup('${d.id}')" style="background:#3498db; color:#fff;">📍 Reached Pickup</button>`;
-          else if (o.status === "ReachedPickup") stepBtnHtml = `<button onclick="markPickedUp('${d.id}')" style="background:#ff9800; color:#000;">📦 Confirm Pickup</button>`;
-          else if (o.status === "PickedUp") {
-            const distToDropM = (o.dropLat && o.dropLng && riderLat && riderLng) ? Math.round(getDistanceKm(riderLat, riderLng, o.dropLat, o.dropLng) * 1000) : 0;
-            const inRange = distToDropM <= deliveryRangeMeters;
-            stepBtnHtml = `<div class="gps-lock-box">Distance: <strong>${distToDropM}m</strong> (Range: ${deliveryRangeMeters}m)</div><button ${inRange ? '' : 'disabled'} onclick="completeOrderWithPin('${d.id}', '${o.deliveryPin || ''}', ${o.dropLat || 0}, ${o.dropLng || 0})" style="background:#2ecc71;">${inRange ? '🔐 Enter PIN & Deliver' : `🔒 Move within ${deliveryRangeMeters}m`}</button>`;
+          // स्टेज १ (Accepted / ReachedPickup): फक्त पिकअप व्यक्तीचे नाव, कॉल बटन आणि Google Maps Pickup Direction
+          // स्टेज २ (PickedUp / ReachedDrop): फक्त ड्रॉप व्यक्तीचे नाव, कॉल बटन आणि Google Maps Drop Direction
+          let stageHtml = '';
+          if (o.status === "Accepted" || o.status === "ReachedPickup") {
+            const pickNavUrl = o.pickupLat
+              ? `https://www.google.com/maps/dir/?api=1&destination=${o.pickupLat},${o.pickupLng}&travelmode=driving`
+              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.pickup)}`;
+            const distPickM = (o.pickupLat && o.pickupLng && riderLat && riderLng) ? Math.round(getDistanceKm(riderLat, riderLng, o.pickupLat, o.pickupLng) * 1000) : 0;
+
+            stageHtml = `
+              <div class="contact-card-box">
+                <div style="font-size:11px; color:#2ecc71; font-weight:bold;">🟢 PICKUP CONTACT (पिकअप व्यक्ती):</div>
+                <div style="font-size:14px; font-weight:bold; margin:3px 0;">👤 ${o.pickupContactName || 'Customer'}</div>
+                <div style="font-size:12px; color:#ccc;">📍 ${o.pickup}</div>
+                <div style="font-size:11px; color:#4db8ff; margin-top:4px;">अंतर: ${distPickM}m (150m आत आल्यावर ऑटो-रीच होईल)</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
+                  <a href="tel:${o.pickupContactPhone || o.customerPhone}" class="wa-btn" style="margin:0; padding:9px; font-size:13px;">📞 Call Pickup</a>
+                  <a href="${pickNavUrl}" target="_blank" class="nav-map-btn" style="margin:0; padding:9px;">🧭 Pickup Direction</a>
+                </div>
+              </div>
+              ${o.status === "Accepted" ? `<button onclick="markReachedPickup('${d.id}')" style="background:#3498db; color:#fff;">📍 Reached Pickup (पोहोचलो)</button>` : ''}
+              <button onclick="markPickedUp('${d.id}')" style="background:#ff9800; color:#000;">📦 Confirm Parcel Pickup (पार्सल घेतले)</button>
+            `;
+          } else if (o.status === "PickedUp" || o.status === "ReachedDrop") {
+            const dropNavUrl = o.dropLat
+              ? `https://www.google.com/maps/dir/?api=1&destination=${o.dropLat},${o.dropLng}&travelmode=driving`
+              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.drop)}`;
+            const distDropM = (o.dropLat && o.dropLng && riderLat && riderLng) ? Math.round(getDistanceKm(riderLat, riderLng, o.dropLat, o.dropLng) * 1000) : 0;
+            const inRange = (distDropM <= deliveryRangeMeters) || (o.status === "ReachedDrop");
+
+            stageHtml = `
+              <div class="contact-card-box" style="border-color:#e74c3c;">
+                <div style="font-size:11px; color:#ff6b6b; font-weight:bold;">🔴 DROP CONTACT (डिलिव्हरी व्यक्ती):</div>
+                <div style="font-size:14px; font-weight:bold; margin:3px 0;">👤 ${o.dropContactName || 'Receiver'}</div>
+                <div style="font-size:12px; color:#ccc;">📍 ${o.drop}</div>
+                <div style="font-size:11px; color:#4db8ff; margin-top:4px;">अंतर: ${distDropM}m (150m आत आल्यावर ऑटो-रीच होईल)</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
+                  <a href="tel:${o.dropContactPhone || ''}" class="wa-btn" style="margin:0; padding:9px; font-size:13px;">📞 Call Drop</a>
+                  <a href="${dropNavUrl}" target="_blank" class="nav-map-btn" style="margin:0; padding:9px;">🧭 Drop Direction</a>
+                </div>
+              </div>
+              <button ${inRange ? '' : 'disabled'} onclick="completeOrderWithPin('${d.id}', '${o.deliveryPin || ''}', ${o.dropLat || 0}, ${o.dropLng || 0})" style="background:#2ecc71;">
+                ${inRange ? '🔐 Enter PIN & Deliver (डिलिव्हर करा)' : `🔒 Move within ${deliveryRangeMeters}m to Deliver`}
+              </button>
+            `;
           }
-          div.innerHTML += `<div class="order-card"><b>${o.vehicle} (${o.status})</b>${payAlert}<small>🟢 ${o.pickup} ➔ 🔴 ${o.drop}</small><a href="${gMapsUrl}" target="_blank" class="nav-map-btn">🗺️ Google Maps</a>${stepBtnHtml}</div>`;
+
+          div.innerHTML += `<div class="order-card">
+            <b>${o.vehicle} (${o.status}) • ${o.parcelWeight || '1-5 kg'}</b>
+            ${payAlert}
+            ${stageHtml}
+          </div>`;
         }
       });
 
-      latestWeeklySummary = { rides: wkRides, gross: wkGross, comm: wkComm, netProfit: wkNet };
+      currentActiveOrderCache = activeOrderFound;
+      updateRiderInAppMap(activeOrderFound);
+
+      latestWeeklySummary = { rides: wkRides, gross: wkGross, comm: wkComm, incentive: wkInc, netProfit: wkNet };
       document.getElementById('wkRidesCount').innerText = wkRides;
       document.getElementById('wkGrossFare').innerText = wkGross;
+      document.getElementById('wkIncentiveEarned').innerText = wkInc;
       document.getElementById('wkCommission').innerText = wkComm;
       document.getElementById('wkNetProfit').innerText = wkNet;
       document.getElementById('totalCodCollected').innerText = totalCodCashCollected;
 
       if (!div.innerHTML) div.innerHTML = "No active deliveries.";
       if (!histDiv.innerHTML) histDiv.innerHTML = "No order history.";
-      recalcWalletBalance(onlineNetTotal, codCommOwedTotal, rid);
+      recalcWalletBalance(onlineNetTotal + totalIncentiveEarnedAll, codCommOwedTotal, rid);
     });
   }
 
-  function recalcWalletBalance(onlineNet, codCommOwed, rid) {
+  function recalcWalletBalance(onlinePlusIncentive, codCommOwed, rid) {
     onSnapshot(query(collection(db, "walletTransactions"), where("riderId", "==", rid)), (snap) => {
       const payDiv = document.getElementById('paymentHistoryList');
       payDiv.innerHTML = "";
@@ -1587,7 +1737,7 @@
       });
 
       if (!payDiv.innerHTML) payDiv.innerHTML = "No transactions.";
-      currentWalletBalance = (onlineNet + approvedDeposits) - (codCommOwed + deductedWithdrawals);
+      currentWalletBalance = (onlinePlusIncentive + approvedDeposits) - (codCommOwed + deductedWithdrawals);
 
       const balEl = document.getElementById('netEarnings');
       balEl.innerText = (currentWalletBalance < 0 ? "-₹" + Math.abs(currentWalletBalance) : "₹" + currentWalletBalance);
