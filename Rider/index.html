@@ -248,7 +248,7 @@
 
       <div class="cam-box">
         <p style="font-size:12px; color:#ff6600; margin-bottom:6px;">📸 Registration Selfie:</p>
-        <video id="regVideo" autoplay playsinline class="hidden"></video>
+        <video id="regVideo" autoplay playsinline muted class="hidden"></video>
         <img id="regPreview" class="preview-img hidden" style="transform:scaleX(-1);">
         <button type="button" onclick="openCamera('reg')" style="background:#333; color:#fff; font-size:13px;">📷 Open Camera</button>
         <button type="button" id="btnSnapReg" onclick="takeSnapshot()" class="hidden" style="background:#2ecc71; font-size:13px;">✅ Capture Selfie</button>
@@ -302,7 +302,7 @@
         ऑनलाईन येण्यासाठी किंवा दर २ तासांनी तुमचा ताजा लाईव्ह सेल्फी काढा.
       </p>
       <div id="selfieWarningBadge" class="warn-badge hidden">⚠️ Warning: 1 / 4</div>
-      <video id="dutyVideo" autoplay playsinline class="hidden" style="margin-top:8px;"></video>
+      <video id="dutyVideo" autoplay playsinline muted class="hidden" style="margin-top:8px;"></video>
       <button type="button" id="txtBtnOpenFaceCam" onclick="openCamera('duty')" style="background:#3498db; color:#fff;">📷 फेस सेल्फी कॅमेरा उघडा</button>
       <button type="button" id="btnSnapDuty" onclick="verifyFaceAndGoOnline()" class="hidden" style="background:#2ecc71;">✅ सेल्फी तपासा व ONLINE व्हा</button>
     </div>
@@ -315,7 +315,7 @@
       </div>
     </div>
 
-    <div class="go-home-strip">
+    <div id="goHomeStripBox" class="go-home-strip">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <strong style="color:#4db8ff; font-size:13px;">🏠 गो-टू-होम मोड (Go Home Filter)</strong>
         <span id="goHomeUsageBadge" style="font-size:11px; color:#aaa;">वापर: 0 / 2 आज</span>
@@ -332,6 +332,7 @@
     </div>
 
     <div id="riderNoticeBanner" class="banner-strip hidden"></div>
+    <a id="riderCustomShortcutBtn" href="#" target="_blank" class="nav-map-btn hidden" style="margin-bottom:10px;">🔗 Quick Shortcut</a>
 
     <div id="peakIncentiveBanner" class="incentive-chart">
       <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -568,7 +569,7 @@
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
     <span id="rNavOrders">ऑर्डर्स</span>
   </div>
-  <div class="b-nav-item" onclick="switchBottomTab('Wallet', this)">
+  <div id="navWalletTabItem" class="b-nav-item" onclick="switchBottomTab('Wallet', this)">
     <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
     <span id="rNavWallet">वॉलेट/COD</span>
   </div>
@@ -583,6 +584,7 @@
 </div>
 
 <canvas id="snapCanvas" width="240" height="240" class="hidden"></canvas>
+<input type="file" id="nativeSelfieFallbackInput" accept="image/*" capture="user" class="hidden">
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
@@ -607,6 +609,8 @@
   let currentReferBonus = 100, deliveryRangeMeters = 150, selfieIntervalHours = 2, tempBlockMinutes = 60;
   let peakIncentiveActive = true, peakStartHour = 18, peakEndHour = 22, peakIncentiveAmount = 25;
   let freePickupKm = 1.0, longPickupRatePerKm = 5;
+  let freeWaitingMins = 10, waitingRatePerMin = 2;
+  let featRiderGoHome = true, featRiderNextQueue = true, featRiderBreakdown = true, featRiderStrictVehMatch = true, featRiderPickupPhoto = true;
   let consentTextGlobal = "मी GoParcel चे सर्व नियम व वाहतूक अटी पाळेन.";
   let isFeePaid = false, isApproved = false, isSelfieApproved = false, isRiderOnline = false;
   let selfieExpiresAt = 0, selfieRejectCount = 0, tempBlockUntil = 0;
@@ -865,7 +869,7 @@
   window.handleVehicleCategoryChange = () => {
     const veh = document.getElementById('rVehCategory').value;
     const role = document.getElementById('rOwnerRole').value;
-    const isHeavy = (veh === "3-Wheeler" || veh === "Mini Tempo" || veh === "Bolero Pickup" || veh === "Truck");
+    const isHeavy = (veh !== "2-Wheeler");
     const showOwner = isHeavy || (role === "HiredDriver");
     document.getElementById('ownerDocsSection').classList.toggle('hidden', !showOwner);
   };
@@ -889,7 +893,7 @@
       const reachedMs = Number(o.reachedPickupMs || o.reachedDropMs || 0);
       if (reachedMs > 0 && (o.status === "ReachedPickup" || o.status === "ReachedDrop")) {
         const elapsedSec = Math.max(0, Math.floor((Date.now() - reachedMs) / 1000));
-        const freeLimitSec = 10 * 60;
+        const freeLimitSec = freeWaitingMins * 60;
         if (elapsedSec <= freeLimitSec) {
           const rem = freeLimitSec - elapsedSec;
           const m = String(Math.floor(rem / 60)).padStart(2, '0');
@@ -897,7 +901,7 @@
           waitEl.innerHTML = `<span style="color:#2ecc71;">मोफत वेटिंग: ${m}:${s} बाकी</span>`;
         } else {
           const extraMins = Math.ceil((elapsedSec - freeLimitSec) / 60);
-          const extraCharge = extraMins * 2;
+          const extraCharge = extraMins * waitingRatePerMin;
           waitEl.innerHTML = `<span style="color:#ff6b6b;">+${extraMins} मिनिटे जादा • वेटिंग चार्ज: +₹${extraCharge}</span>`;
         }
       }
@@ -1080,6 +1084,40 @@
 
       freePickupKm = Number(s.freePickupKm ?? 1.0);
       longPickupRatePerKm = Number(s.longPickupRatePerKm ?? 5);
+      freeWaitingMins = Number(s.freeWaitingMins ?? 10);
+      waitingRatePerMin = Number(s.waitingRatePerMin ?? 2);
+
+      // Admin Master Feature Toggles Sync
+      featRiderGoHome = s.featRiderGoHome ?? true;
+      featRiderNextQueue = s.featRiderNextQueue ?? true;
+      featRiderBreakdown = s.featRiderBreakdown ?? true;
+      featRiderStrictVehMatch = s.featRiderStrictVehMatch ?? true;
+      featRiderPickupPhoto = s.featRiderPickupPhoto ?? true;
+
+      document.getElementById('goHomeStripBox').classList.toggle('hidden', !featRiderGoHome);
+      document.getElementById('navWalletTabItem').classList.toggle('hidden', s.featRiderWalletTab === false);
+
+      // Sync Custom Fleet Vehicle in Registration Dropdown
+      const vehSel = document.getElementById('rVehCategory');
+      if (s.customVehName && vehSel) {
+        const existingOpt = Array.from(vehSel.options).find(o => o.value === s.customVehName);
+        if (!existingOpt) {
+          const opt = document.createElement('option');
+          opt.value = s.customVehName;
+          opt.text = `${s.customVehIcon || '🛺'} ${s.customVehName}`;
+          vehSel.appendChild(opt);
+        }
+      }
+
+      // Custom Shortcut Button from Admin
+      const rShortcut = document.getElementById('riderCustomShortcutBtn');
+      if (s.customShortcutLabel && s.customShortcutUrl) {
+        rShortcut.innerText = s.customShortcutLabel;
+        rShortcut.href = s.customShortcutUrl;
+        rShortcut.classList.remove('hidden');
+      } else {
+        rShortcut.classList.add('hidden');
+      }
 
       peakIncentiveActive = s.peakIncentiveActive ?? true;
       peakStartHour = Number(s.peakStartHour ?? 18);
@@ -1208,20 +1246,72 @@
     }
   };
 
+  // --- SAFE LOW-RAM CAMERA ENGINE + NATIVE SELFIE FALLBACK (PREVENTS PHONE SWITCH-OFF) ---
+  let pendingSelfieMode = 'reg';
+  const fallbackSelfieInput = document.getElementById('nativeSelfieFallbackInput');
+  if (fallbackSelfieInput) {
+    fallbackSelfieInput.addEventListener('change', function () {
+      if (this.files && this.files[0]) {
+        compressImageFile(this.files[0], async (base64) => {
+          if (pendingSelfieMode === 'reg') {
+            regSelfieData = base64;
+            const prev = document.getElementById('regPreview');
+            prev.src = regSelfieData;
+            prev.classList.remove('hidden');
+            document.getElementById('btnSnapReg').classList.add('hidden');
+          } else {
+            await processDutySelfieBase64(base64);
+          }
+        });
+      }
+      this.value = '';
+    });
+  }
+
+  function triggerNativeSelfieFallback(mode) {
+    pendingSelfieMode = mode;
+    if (fallbackSelfieInput) fallbackSelfieInput.click();
+  }
+
   window.openCamera = async (mode) => {
+    pendingSelfieMode = mode;
     try {
-      if (activeStream) activeStream.getTracks().forEach(t => t.stop());
-      activeStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+      if (activeStream) {
+        activeStream.getTracks().forEach(t => t.stop());
+        activeStream = null;
+      }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        triggerNativeSelfieFallback(mode);
+        return;
+      }
+      activeStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user",
+          width: { ideal: 320, max: 480 },
+          height: { ideal: 320, max: 480 },
+          frameRate: { ideal: 15, max: 20 }
+        },
+        audio: false
+      });
       const vid = document.getElementById(mode === 'reg' ? 'regVideo' : 'dutyVideo');
-      vid.srcObject = activeStream; vid.classList.remove('hidden');
+      vid.srcObject = activeStream;
+      vid.muted = true;
+      vid.setAttribute('playsinline', 'true');
+      vid.classList.remove('hidden');
+      await vid.play();
       document.getElementById(mode === 'reg' ? 'btnSnapReg' : 'btnSnapDuty').classList.remove('hidden');
-    } catch (err) { alert("Allow Camera Permission!"); }
+    } catch (err) {
+      triggerNativeSelfieFallback(mode);
+    }
   };
 
   function captureBase64(videoEl) {
     const canvas = document.getElementById('snapCanvas');
     canvas.getContext('2d').drawImage(videoEl, 0, 0, 240, 240);
-    if (activeStream) activeStream.getTracks().forEach(t => t.stop());
+    if (activeStream) {
+      activeStream.getTracks().forEach(t => t.stop());
+      activeStream = null;
+    }
     videoEl.classList.add('hidden');
     return canvas.toDataURL('image/jpeg', 0.65);
   }
@@ -1233,9 +1323,8 @@
     document.getElementById('btnSnapReg').classList.add('hidden');
   };
 
-  window.verifyFaceAndGoOnline = async () => {
+  async function processDutySelfieBase64(liveImg) {
     if (tempBlockUntil > Date.now()) return alert("⛔ Account Temporarily Blocked!");
-    const liveImg = captureBase64(document.getElementById('dutyVideo'));
     document.getElementById('btnSnapDuty').classList.add('hidden');
 
     const refImg = currentRiderProfile?.regSelfie || "";
@@ -1265,6 +1354,11 @@
         alert(`⚠️ Face Mismatch! Selfie Rejected (Warning ${newCount} / 4).`);
       }
     }
+  }
+
+  window.verifyFaceAndGoOnline = async () => {
+    const liveImg = captureBase64(document.getElementById('dutyVideo'));
+    await processDutySelfieBase64(liveImg);
   };
 
   window.toggleRiderDuty = async () => {
@@ -1382,17 +1476,25 @@
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF();
     pdf.setFontSize(16);
-    pdf.text("GoParcel - Rider Partner Consent Agreement", 15, 20);
+    pdf.text("GoParcel - Rider Partner Legal Consent & KYC Record", 15, 20);
     pdf.setFontSize(11);
     pdf.text(`Rider Name: ${rec.name}`, 15, 35);
-    pdf.text(`Mobile: ${rec.phone}`, 15, 43);
-    pdf.text(`Vehicle: ${rec.summary}`, 15, 51);
-    pdf.text(`Timestamp: ${rec.timestampStr}`, 15, 59);
-    pdf.text(`GPS Location: Lat ${rec.lat || 0}, Lng ${rec.lng || 0}`, 15, 67);
-    pdf.text("Agreement Terms Accepted:", 15, 80);
+    pdf.text(`Mobile: +91 ${rec.phone}`, 15, 43);
+    pdf.text(`Gender: ${rec.gender || 'Male'}`, 15, 51);
+    pdf.text(`Vehicle: ${rec.summary}`, 15, 59);
+    pdf.text(`Timestamp: ${rec.timestampStr}`, 15, 67);
+    pdf.text(`GPS Location: Lat ${rec.lat || 0}, Lng ${rec.lng || 0}`, 15, 75);
+    pdf.text("Agreement Terms Accepted:", 15, 88);
     const lines = pdf.splitTextToSize(rec.agreementText, 180);
-    pdf.text(lines, 15, 88);
-    pdf.text("Status: DIGITALLY SIGNED & AGREED BY RIDER", 15, 130);
+    pdf.text(lines, 15, 96);
+    let y = 132;
+    if (rec.selfiePhoto && rec.selfiePhoto.startsWith("data:image")) {
+      try { pdf.addImage(rec.selfiePhoto, 'JPEG', 15, y, 38, 38); pdf.text("Live Selfie", 15, y + 43); } catch (e) {}
+    }
+    if (rec.docFrontPhoto && rec.docFrontPhoto.startsWith("data:image")) {
+      try { pdf.addImage(rec.docFrontPhoto, 'JPEG', 60, y, 38, 38); pdf.text("ID Proof", 60, y + 43); } catch (e) {}
+    }
+    pdf.text("Status: DIGITALLY SIGNED & GPS VERIFIED BY RIDER", 15, y + 54);
     return pdf.output('datauristring');
   }
 
@@ -1436,8 +1538,13 @@
     const fullTimestamp = new Date().toLocaleString('en-IN');
 
     const consentRec = {
-      role: "Rider (Registration)", name, phone, timestampStr: fullTimestamp,
+      role: "Rider (Registration)", name, phone, gender, lang: riderLang, timestampStr: fullTimestamp,
       lat: riderLat || 18.5204, lng: riderLng || 73.8567,
+      selfiePhoto: regSelfieData,
+      docFrontPhoto: docPhotos.front || "",
+      docBackPhoto: docPhotos.back || "",
+      docLicensePhoto: docPhotos.license || "",
+      docRcPhoto: docPhotos.rc || docPhotos.ownerRc || "",
       summary: `${vehCategory} - ${vehicleNo} (${gender})`, agreementText: consentTextGlobal, createdAt: Date.now()
     };
     consentRec.pdfDataUri = createRiderConsentPdf(consentRec);
@@ -1570,7 +1677,20 @@
     await updateDoc(doc(db, "orders", orderId), { status: "ReachedPickup", reachedPickupAt: serverTimestamp(), reachedPickupMs: Date.now() });
   };
 
+  window.handlePickupProofUpload = (input, orderId) => {
+    if (input.files && input.files[0]) {
+      compressImageFile(input.files[0], async (base64) => {
+        await updateDoc(doc(db, "orders", orderId), { pickupProofPhoto: base64 });
+        alert("✅ पार्सल पिकअप फोटो पुरावा अपलोड झाला!");
+      });
+    }
+  };
+
   window.markPickedUp = async (orderId) => {
+    if (featRiderPickupPhoto && currentActiveOrderCache && !currentActiveOrderCache.pickupProofPhoto) {
+      const ok = confirm("📸 मालाचा फोटो अपलोड केलेला नाही. तरीही पार्सल उचलले म्हणून पुढे जायचे का?");
+      if (!ok) return;
+    }
     await updateDoc(doc(db, "orders", orderId), { status: "PickedUp", pickedUpAt: serverTimestamp() });
   };
 
@@ -1609,7 +1729,7 @@
       const reachedMs = Number(currentActiveOrderCache.reachedDropMs || currentActiveOrderCache.reachedPickupMs || 0);
       if (reachedMs > 0) {
         const elapsedMin = Math.floor((Date.now() - reachedMs) / 60000);
-        if (elapsedMin > 10) waitingCharge = (elapsedMin - 10) * 2;
+        if (elapsedMin > freeWaitingMins) waitingCharge = (elapsedMin - freeWaitingMins) * waitingRatePerMin;
       }
     }
 
@@ -1894,9 +2014,16 @@
       let foundOrders = 0, hasBrandNewOrder = false, newestOrderSummary = "";
       const currentIds = new Set();
       const incBonusNow = isCurrentTimeInPeakHours() ? peakIncentiveAmount : 0;
+      const myVehCat = (currentRiderProfile?.vehCategory || "").trim().toLowerCase();
 
       snap.forEach(d => {
         const o = d.data();
+
+        // Strict Vehicle Category Matching (Controlled by Admin Master Settings)
+        if (featRiderStrictVehMatch && myVehCat && o.vehicle) {
+          if (o.vehicle.trim().toLowerCase() !== myVehCat) return;
+        }
+
         if (goHomeActive && goHomeTargetArea) {
           const dropText = (o.drop || "").toLowerCase();
           if (!dropText.includes(goHomeTargetArea)) return;
@@ -1913,9 +2040,10 @@
 
           const fareNum = Number(o.fare || 0);
           const tipAmt = Number(o.tipAmount || 0);
-          const commissionableFare = Math.max(0, fareNum - tipAmt);
+          const helperAmt = Number(o.helperFee || 0);
+          const commissionableFare = Math.max(0, fareNum - tipAmt - helperAmt);
           const tripNet = Math.round(commissionableFare * ((100 - currentCommPct) / 100));
-          const totalRiderPayout = tripNet + lp.bonus + incBonusNow + tipAmt;
+          const totalRiderPayout = tripNet + lp.bonus + incBonusNow + tipAmt + helperAmt;
 
           const distLabel = (riderLat && riderLng && o.pickupLat)
             ? `🛵 पिकअप तुमच्यापासून: <b>${lp.awayKm} km</b> लांब | 🛣️ ट्रिप: <b>${o.distanceKm || '-'} km</b>`
@@ -1939,6 +2067,7 @@
             ${pkgPhotoHtml}
             <div class="payout-tally-card">
               <div style="display:flex; justify-content:space-between;"><span>कस्टमर भाडे ₹${fareNum} (कमिशन ${currentCommPct}% वजा):</span><span>₹${tripNet}</span></div>
+              ${helperAmt > 0 ? `<div style="display:flex; justify-content:space-between; color:#ff9800;"><span>👷 मदतनीस शुल्क (Helper 100%):</span><strong>+₹${helperAmt}</strong></div>` : ''}
               ${lp.bonus > 0 ? `<div style="display:flex; justify-content:space-between; color:#ffaa66;"><span>🛵 लांब पिकअप भत्ता (${lp.extraKm} km जादा × ₹${longPickupRatePerKm}):</span><strong>+₹${lp.bonus}</strong></div>` : ''}
               ${incBonusNow > 0 ? `<div style="display:flex; justify-content:space-between; color:#4db8ff;"><span>🔥 पीक अवर बोनस:</span><strong>+₹${incBonusNow}</strong></div>` : ''}
               ${tipAmt > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🎁 कस्टमर टीप (100%):</span><strong>+₹${tipAmt}</strong></div>` : ''}
@@ -1949,7 +2078,7 @@
             <button onclick="acceptOrder('${d.id}')" style="background:#2ecc71;">⚡ Accept Order (₹${totalRiderPayout})</button>
           </div>`;
 
-          if (currentActiveOrderCache && currentActiveOrderCache.dropLat && o.pickupLat) {
+          if (featRiderNextQueue && currentActiveOrderCache && currentActiveOrderCache.dropLat && o.pickupLat) {
             const distFromDropKm = getDistanceKm(currentActiveOrderCache.dropLat, currentActiveOrderCache.dropLng, o.pickupLat, o.pickupLng);
             if (distFromDropKm <= 2.5 && queuedCount < 2) {
               queuedCount++;
@@ -1963,9 +2092,9 @@
         }
       });
 
-      queueBox.classList.toggle('hidden', queuedCount === 0);
+      queueBox.classList.toggle('hidden', !featRiderNextQueue || queuedCount === 0);
       if (hasBrandNewOrder) startContinuousOrderRingtone(newestOrderSummary);
-      if (foundOrders === 0) { stopOrderRingtone(); div.innerHTML = goHomeActive ? `🏠 "${goHomeTargetArea}" च्या दिशेने सध्या ऑर्डर नाही.` : `No orders within ${maxRadiusKm} km.`; }
+      if (foundOrders === 0) { stopOrderRingtone(); div.innerHTML = goHomeActive ? `🏠 "${goHomeTargetArea}" च्या दिशेने सध्या ऑर्डर नाही.` : `No ${currentRiderProfile?.vehCategory || ''} orders within ${maxRadiusKm} km.`; }
       lastKnownOrderIds = currentIds;
       isFirstOrderLoad = false;
     });
@@ -1986,9 +2115,10 @@
         const incBonus = Number(o.incentiveBonus || 0);
         const longPickBonus = Number(o.longPickupBonus || 0);
         const tipAmt = Number(o.tipAmount || 0);
+        const helperAmt = Number(o.helperFee || 0);
         const waitAmt = Number(o.waitingCharge || 0);
-        const commissionableFare = Math.max(0, fareNum - tipAmt);
-        const tripNet = Math.round(commissionableFare * ((100 - currentCommPct) / 100)) + waitAmt;
+        const commissionableFare = Math.max(0, fareNum - tipAmt - helperAmt);
+        const tripNet = Math.round(commissionableFare * ((100 - currentCommPct) / 100)) + waitAmt + helperAmt;
         const comm = commissionableFare - Math.round(commissionableFare * ((100 - currentCommPct) / 100));
         const isCod = (o.paymentMode !== "ONLINE");
         const totalOrderEarning = tripNet + incBonus + longPickBonus + tipAmt;
@@ -2024,7 +2154,7 @@
             : `<div style="background:#0d3b1e; color:#2ecc71; padding:6px; border-radius:6px; font-size:12px; margin:5px 0; font-weight:bold;">📱 ONLINE PAID (₹${fareNum}) | तुमची कमाई: ₹${totalOrderEarning}</div>`;
 
           const waitingBanner = (o.status === "ReachedPickup" || o.status === "ReachedDrop")
-            ? `<div class="waiting-box"><span>⏱️ वेटिंग टायमर (10m Free, ₹2/m):</span><strong id="liveWaitingTimerText">मोजत आहे...</strong></div>`
+            ? `<div class="waiting-box"><span>⏱️ वेटिंग टायमर (${freeWaitingMins}m Free, ₹${waitingRatePerMin}/m):</span><strong id="liveWaitingTimerText">मोजत आहे...</strong></div>`
             : '';
 
           let stageHtml = '';
@@ -2034,19 +2164,27 @@
               : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.pickup)}`;
             const distPickM = (o.pickupLat && o.pickupLng && riderLat && riderLng) ? Math.round(getDistanceKm(riderLat, riderLng, o.pickupLat, o.pickupLng) * 1000) : 0;
 
+            const proofUploadHtml = featRiderPickupPhoto ? `
+              <div style="background:#111; border:1px dashed #4db8ff; padding:8px; border-radius:8px; margin:6px 0; font-size:12px;">
+                <label style="color:#4db8ff; display:block; margin-bottom:4px;">📸 पार्सल पिकअप फोटो पुरावा (Proof of Pickup):</label>
+                <input type="file" accept="image/*" capture="environment" onchange="handlePickupProofUpload(this, '${d.id}')" style="padding:6px; font-size:12px; margin:0;">
+                ${o.pickupProofPhoto ? `<span style="color:#2ecc71; font-size:11px;">✅ फोटो अपलोड झाला आहे</span>` : ''}
+              </div>` : '';
+
             stageHtml = `
               <div class="contact-card-box">
                 <div style="font-size:11px; color:#2ecc71; font-weight:bold;">🟢 PICKUP CONTACT (पिकअप व्यक्ती):</div>
                 <div style="font-size:14px; font-weight:bold; margin:3px 0;">👤 ${o.pickupContactName || 'Customer'}</div>
                 <div style="font-size:12px; color:#ccc;">📍 ${o.pickup}</div>
                 ${o.pickupFloor ? `<div style="font-size:11px; color:#ffaa66;">🏢 मजला: ${o.pickupFloor}</div>` : ''}
-                <div style="font-size:11px; color:#4db8ff; margin-top:4px;">अंतर: ${distPickM}m (150m आत आल्यावर ऑटो-रीच होईल)</div>
+                <div style="font-size:11px; color:#4db8ff; margin-top:4px;">अंतर: ${distPickM}m (${deliveryRangeMeters}m आत आल्यावर ऑटो-रीच होईल)</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
                   <a href="tel:${o.pickupContactPhone || o.customerPhone}" class="wa-btn" style="margin:0; padding:9px; font-size:13px;">📞 Call Pickup</a>
                   <a href="${pickNavUrl}" target="_blank" class="nav-map-btn" style="margin:0; padding:9px;">🧭 External Maps</a>
                 </div>
               </div>
               ${waitingBanner}
+              ${proofUploadHtml}
               ${o.status === "Accepted" ? `<button onclick="markReachedPickup('${d.id}')" style="background:#3498db; color:#fff;">📍 Reached Pickup (पोहोचलो)</button>` : ''}
               <button onclick="markPickedUp('${d.id}')" style="background:#ff9800; color:#000;">📦 Confirm Parcel Pickup (पार्सल घेतले)</button>
             `;
@@ -2063,7 +2201,7 @@
                 <div style="font-size:14px; font-weight:bold; margin:3px 0;">👤 ${o.dropContactName || 'Receiver'}</div>
                 <div style="font-size:12px; color:#ccc;">📍 ${o.drop}</div>
                 ${o.dropFloor ? `<div style="font-size:11px; color:#ffaa66;">🏢 मजला: ${o.dropFloor}</div>` : ''}
-                <div style="font-size:11px; color:#4db8ff; margin-top:4px;">अंतर: ${distDropM}m (150m आत आल्यावर ऑटो-रीच होईल)</div>
+                <div style="font-size:11px; color:#4db8ff; margin-top:4px;">अंतर: ${distDropM}m (${deliveryRangeMeters}m आत आल्यावर ऑटो-रीच होईल)</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
                   <a href="tel:${o.dropContactPhone || ''}" class="wa-btn" style="margin:0; padding:9px; font-size:13px;">📞 Call Drop</a>
                   <a href="${dropNavUrl}" target="_blank" class="nav-map-btn" style="margin:0; padding:9px;">🧭 External Maps</a>
@@ -2076,12 +2214,16 @@
             `;
           }
 
+          const breakdownHtml = featRiderBreakdown
+            ? `<button onclick="reportVehicleBreakdown('${d.id}')" class="breakdown-btn">🚨 गाडी बिघडली / पंक्चर (Transfer Order)</button>`
+            : '';
+
           div.innerHTML += `<div class="order-card">
             <b>${o.vehicle} (${o.status}) • ${o.distanceKm || '-'} km</b>
             ${payAlert}
             ${longPickBonus > 0 ? `<div style="font-size:11px; color:#ffaa66;">🛵 लांब पिकअप अंतर भत्ता समाविष्ट: +₹${longPickBonus}</div>` : ''}
             ${stageHtml}
-            <button onclick="reportVehicleBreakdown('${d.id}')" class="breakdown-btn">🚨 गाडी बिघडली / पंक्चर (Transfer Order)</button>
+            ${breakdownHtml}
           </div>`;
         }
       });
