@@ -27,26 +27,22 @@
     a.wa-btn { background: #25D366; color: #000; font-weight: bold; border: none; }
     a.nav-map-btn { background: #1c2e3d; color: #4db8ff; border: 1px solid #4db8ff; font-size: 13px; padding: 9px; font-weight: bold; }
     
-    /* Porter-Style In-App Navigation HUD & Map */
     #riderActiveMap { height: 270px; width: 100%; border-radius: 0 0 10px 10px; margin: 0 0 8px 0; border: 2px solid #ff6600; border-top: none; z-index: 1; }
     .nav-hud-banner { background: linear-gradient(135deg, #0b2e1b, #081c11); border: 2px solid #2ecc71; border-radius: 10px 10px 0 0; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .nav-arrow-box { background: #2ecc71; color: #000; font-size: 24px; font-weight: 900; width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .nav-eta-strip { background: #000; border-left: 2px solid #ff6600; border-right: 2px solid #ff6600; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #ffaa66; font-weight: bold; }
     .dark-tiles .leaflet-tile-pane { filter: invert(100%) hue-rotate(180deg) brightness(92%) contrast(90%); }
 
-    /* Waiting Timer & Breakdown UI */
+    .payout-tally-card { background: #0f1c14; border: 1px solid #2ecc71; border-radius: 8px; padding: 8px 10px; margin: 6px 0; font-size: 12px; line-height: 1.6; }
     .waiting-box { background: #261808; border: 1px dashed #ff9800; border-radius: 8px; padding: 8px 10px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
     .breakdown-btn { background: #3b0d0d !important; color: #ff6b6b !important; border: 1px solid #e74c3c !important; font-size: 12px !important; padding: 8px !important; margin-top: 6px !important; }
 
-    /* Go Home & Next Order Queue */
     .go-home-strip { background: #142230; border: 1px solid #4db8ff; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
     .next-queue-card { background: linear-gradient(135deg, #1f160a, #121212); border: 1px solid #ff9800; border-radius: 10px; padding: 10px; margin-top: 8px; }
 
-    /* Floating GoParcel Bubble Widget */
     .floating-gp-bubble { position: fixed; bottom: 82px; right: 14px; width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #ff6600, #e65c00); color: #000; font-weight: 900; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(255,102,0,0.7); border: 2px solid #fff; z-index: 1000; cursor: pointer; animation: floatBob 2.5s ease-in-out infinite; }
     @keyframes floatBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
-    /* System Health Alerts (Offline, Low Battery, Fake GPS) */
     .sys-alert-bar { padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 10px; }
     .offline-bar { background: #4a3500; border: 1px solid #f1c40f; color: #f1c40f; }
     .battery-bar { background: #4a1500; border: 1px solid #ff6600; color: #ffaa66; }
@@ -71,7 +67,6 @@
     .minus-lock-banner { background: #3b0d0d; border: 2px solid #e74c3c; color: #ff8a8a; padding: 14px; border-radius: 10px; text-align: center; margin-bottom: 12px; }
     .ringing-banner { background: #e74c3c; color: #fff; padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 10px; animation: pulseRing 0.8s infinite; border: 2px solid #fff; }
     @keyframes pulseRing { 0% { opacity: 1; } 50% { opacity: 0.65; } 100% { opacity: 1; } }
-    .gps-lock-box { background: #1c1c1c; border: 1px solid #4db8ff; padding: 8px; border-radius: 6px; font-size: 12px; color: #4db8ff; margin: 6px 0; text-align: center; }
     .cam-box { background: #000; border: 2px dashed #ff6600; border-radius: 10px; padding: 10px; text-align: center; margin: 10px 0; }
     .doc-upload-box { background: #111; border: 1px solid #444; padding: 10px; border-radius: 8px; margin: 8px 0; }
     .owner-section { background: #141c24; border: 1px solid #4db8ff; border-radius: 10px; padding: 10px; margin: 10px 0; }
@@ -124,7 +119,6 @@
   </div>
 </header>
 
-<!-- Fake GPS / Mock Location Fraud Protection Blocker -->
 <div id="fakeGpsBlockModal" class="fake-gps-modal hidden">
   <div style="font-size:48px; margin-bottom:10px;">🚨🚫</div>
   <h2 style="color:#ff3b30; margin-bottom:8px;">बनावट GPS आढळले! (Fake GPS Detected)</h2>
@@ -133,14 +127,12 @@
   </p>
 </div>
 
-<!-- Floating GoParcel Bubble Widget -->
 <div id="floatingGpWidget" class="floating-gp-bubble hidden" onclick="quickJumpToActiveOrder()" title="GoParcel Quick Overlay">
   <span style="font-size:15px;">🛵</span>
   <span>GP</span>
 </div>
 
 <div class="container">
-  <!-- Offline / Low Network & Low Battery System Alerts -->
   <div id="offlineNetworkBar" class="sys-alert-bar offline-bar hidden">
     📡 नेटवर्क नाही (Offline Mode) — बेसमेंट/लो नेटवर्कमध्ये डेटा सेव्ह होत आहे, नेटवर्क येताच आपोआप सिंक होईल.
   </div>
@@ -291,7 +283,6 @@
       <button id="rTxtBtnSound" onclick="enableAudioAndTest()" style="width:auto; padding:6px 10px; background:#222; color:#2ecc71; border:1px solid #2ecc71; font-size:11px; margin:0;">🔊 रिंगटोन चालू</button>
     </div>
 
-    <!-- Temporary Block Card -->
     <div id="tempBlockCard" class="temp-block-card hidden">
       <h3 id="txtTempBlockTitle" style="color:#ff453a;">⛔ तुमचे खाते ६० मिनिटांसाठी तात्पुरते ब्लॉक केले आहे!</h3>
       <p id="txtTempBlockSub" style="font-size:12px; color:#ddd; margin:8px 0;">सलग ४ वेळा सेल्फी चेहरा न जुळल्यामुळे हा तात्पुरता ब्लॉक लागू झाला आहे.</p>
@@ -300,13 +291,11 @@
       </div>
     </div>
 
-    <!-- Account Approval Pending -->
     <div id="accountPendingCard" class="card hidden" style="background:#1c252c; border:2px solid #3498db; text-align:center;">
       <h4 id="txtAccPendTitle" style="color:#3498db;">⏳ प्रोफाईल अप्रूव्हल प्रलंबित (Profile Approval Pending)</h4>
       <p id="txtAccPendSub" style="font-size:12px; color:#ddd; margin-top:5px;">Admin ने तुमचे प्रोफाईल Approve केल्याशिवाय तुम्हाला ऑर्डर पडणार नाहीत.</p>
     </div>
 
-    <!-- Face-Match Duty Selfie Card -->
     <div id="dutyFaceMatchCard" class="card hidden" style="border:2px solid #ff6600; background:#24180e; text-align:center;">
       <h3 id="txtFaceCardTitle" style="color:#ff6600;">📸 फेस मॅच सेल्फी अनिवार्य (Face Verification)</h3>
       <p id="facePromptReason" style="font-size:12px; color:#ffd2b3; margin:6px 0;">
@@ -318,7 +307,6 @@
       <button type="button" id="btnSnapDuty" onclick="verifyFaceAndGoOnline()" class="hidden" style="background:#2ecc71;">✅ सेल्फी तपासा व ONLINE व्हा</button>
     </div>
 
-    <!-- Online Searching Radar -->
     <div id="searchingRadarBox" class="searching-radar hidden">
       <div class="radar-dot"></div>
       <strong id="txtSearchingRadar" style="color:#2ecc71; font-size:15px;">🔍 नवीन ऑर्डर शोधत आहे...</strong>
@@ -327,7 +315,6 @@
       </div>
     </div>
 
-    <!-- Go-To-Home Mode Strip (Max 2 Uses/Day) -->
     <div class="go-home-strip">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <strong style="color:#4db8ff; font-size:13px;">🏠 गो-टू-होम मोड (Go Home Filter)</strong>
@@ -346,7 +333,6 @@
 
     <div id="riderNoticeBanner" class="banner-strip hidden"></div>
 
-    <!-- Peak Hour Incentive Chart Card -->
     <div id="peakIncentiveBanner" class="incentive-chart">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <strong id="txtIncChartTitle" style="color:#2ecc71; font-size:13px;">🎁 पीक अवर इन्सेंटिव्ह चार्ट (Peak Hour Bonus)</strong>
@@ -358,13 +344,11 @@
       </div>
     </div>
 
-    <!-- Minus Balance Banner -->
     <div id="minusLockBanner" class="minus-lock-banner hidden">
       <h4>🚫 Wallet Minus (<span id="minusAmtLabel">₹0</span>)!</h4>
       <button onclick="switchBottomTab('Wallet', document.querySelectorAll('.b-nav-item')[1]); switchWalletSub('deposit');" style="background:#2ecc71; color:#000; padding:8px; font-size:13px;">➕ Deposit Now</button>
     </div>
 
-    <!-- Rejected KYC Banner -->
     <div id="rejectedBanner" class="card hidden" style="background:#2b1212; border:2px solid #e74c3c;">
       <h4 style="color:#ff6b6b;">❌ KYC Rejected!</h4>
       <p id="rejectReasonText" style="font-size:13px; color:#ddd; margin:6px 0;"></p>
@@ -374,7 +358,6 @@
       </div>
     </div>
 
-    <!-- Onboarding Fee Banner -->
     <div id="onboardingBanner" class="card" style="background:#2b1708; border:2px solid #ff6600;">
       <h4 style="color:#ff6600;">💳 Onboarding Fee: ₹<span class="dynFee">1000</span></h4>
       <div class="upi-box" id="adminUpiDisplay">UPI ID: Techesupp-2@okhdfcbank</div>
@@ -389,7 +372,7 @@
       <button onclick="submitOnboardingUtr()" style="background:#2ecc71;">✅ Submit UTR</button>
     </div>
 
-    <!-- SECTION 1: ACTIVE DELIVERY (PORTER-STYLE IN-APP TURN-BY-TURN NAV, ROUTE POLYLINE, NIGHT MODE, WAITING TIMER, BREAKDOWN & NEXT ORDER QUEUE) -->
+    <!-- SECTION 1: ACTIVE DELIVERY + AVAILABLE ORDERS (WITH PORTER LONG PICKUP PAYOUT) -->
     <div id="secOrders">
       <div class="card" id="activeDeliverySectionCard">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -397,7 +380,6 @@
           <button id="btnToggleMapTheme" onclick="toggleManualMapTheme()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#222; color:#ffaa66; border:1px solid #444;">🌙 Night Map</button>
         </div>
 
-        <!-- Porter-Style Turn-by-Turn HUD + Live Route Map -->
         <div id="riderLiveMapWrapper" class="hidden">
           <div class="nav-hud-banner">
             <div class="nav-arrow-box" id="navTurnArrow">⬆️</div>
@@ -419,7 +401,6 @@
 
         <div id="myDeliveries">...</div>
 
-        <!-- Back-to-Back Next Order Queue (Shows near drop location) -->
         <div id="nextOrderQueueBox" class="next-queue-card hidden">
           <div style="font-size:12px; color:#ff9800; font-weight:bold; margin-bottom:4px;">⚡ बॅक-टू-बॅक पुढची ऑर्डर (ड्रॉप जवळ उपलब्ध):</div>
           <div id="nextOrderQueueContent"></div>
@@ -442,7 +423,7 @@
       </div>
     </div>
 
-    <!-- SECTION 2: WALLET, COD, 100% TIPS, INCENTIVE TALLY & WEEKLY PROFIT -->
+    <!-- SECTION 2: WALLET, COD, LONG PICKUP PAYOUT, 100% TIPS & WEEKLY PROFIT -->
     <div id="secWallet" class="hidden">
       <div class="card">
         <h3 id="rTxtWalletTitle" style="color:#ff6600; margin-bottom:10px;">💰 वॉलेट, इन्सेंटिव्ह व साप्ताहिक नफा</h3>
@@ -460,7 +441,8 @@
         <div class="weekly-card">
           <div id="rTxtWkHead" style="font-size:13px; color:#ff6600; font-weight:bold; margin-bottom:6px;">🗓️ मागील ७ दिवसांचा हिशोब (Weekly Tally):</div>
           <div class="weekly-row"><span id="rTxtWkRides">पूर्ण राईड्स:</span><strong id="wkRidesCount">0</strong></div>
-          <div class="weekly-row"><span id="rTxtWkGross">एकूण भाडे:</span><strong>₹<span id="wkGrossFare">0</span></strong></div>
+          <div class="weekly-row"><span id="rTxtWkGross">एकूण कस्टमर भाडे:</span><strong>₹<span id="wkGrossFare">0</span></strong></div>
+          <div class="weekly-row"><span>🛵 लांब पिकअप अंतर भत्ता (Long Pickup):</span><strong style="color:#ffaa66;">+₹<span id="wkLongPickupEarned">0</span></strong></div>
           <div class="weekly-row"><span id="rTxtWkInc">पीक अवर इन्सेंटिव्ह बोनस:</span><strong style="color:#4db8ff;">+₹<span id="wkIncentiveEarned">0</span></strong></div>
           <div class="weekly-row"><span>🎁 १००% कस्टमर टीप (No Commission):</span><strong style="color:#2ecc71;">+₹<span id="wkTipsEarned">0</span></strong></div>
           <div class="weekly-row"><span id="rTxtWkComm">कमिशन कपात:</span><span style="color:#e74c3c;">-₹<span id="wkCommission">0</span></span></div>
@@ -624,6 +606,7 @@
   let adminWaNumber = "919999999999", adminUpiId = "Techesupp-2@okhdfcbank", currentOnboardingFee = 1000, currentCommPct = 20, maxRadiusKm = 10;
   let currentReferBonus = 100, deliveryRangeMeters = 150, selfieIntervalHours = 2, tempBlockMinutes = 60;
   let peakIncentiveActive = true, peakStartHour = 18, peakEndHour = 22, peakIncentiveAmount = 25;
+  let freePickupKm = 1.0, longPickupRatePerKm = 5; // Porter Long Pickup Payout Config
   let consentTextGlobal = "मी GoParcel चे सर्व नियम व वाहतूक अटी पाळेन.";
   let isFeePaid = false, isApproved = false, isSelfieApproved = false, isRiderOnline = false;
   let selfieExpiresAt = 0, selfieRejectCount = 0, tempBlockUntil = 0;
@@ -638,12 +621,11 @@
     ownerAadhaar: true, ownerRc: true, ownerNoc: true
   };
   let ringLoopInterval = null, audioCtx = null, currentRiderProfile = null;
-  let latestWeeklySummary = { rides: 0, gross: 0, comm: 0, incentive: 0, tips: 0, netProfit: 0 };
+  let latestWeeklySummary = { rides: 0, gross: 0, comm: 0, incentive: 0, longPickup: 0, tips: 0, netProfit: 0 };
   let riderMapObj = null, rSelfMarker = null, rPickMarker = null, rDropMarker = null, rStopMarkers = [], rRoutePolyline = null;
   let currentActiveOrderCache = null, lastRouteFetchKey = "", lastRouteSteps = [];
   let manualMapDarkOverride = null;
 
-  // Go-To-Home Mode State (Max 2 uses/day)
   let goHomeActive = false, goHomeTargetArea = "";
   const todayStrKey = new Date().toISOString().slice(0, 10);
   let goHomeData = JSON.parse(localStorage.getItem("gp_go_home") || `{"date":"${todayStrKey}","count":0,"area":""}`);
@@ -652,7 +634,6 @@
     localStorage.setItem("gp_go_home", JSON.stringify(goHomeData));
   }
 
-  // Fake GPS Fraud Detection State
   let prevGpsSample = null, isFakeGpsBlocked = false;
 
   const rDict = {
@@ -673,7 +654,7 @@
       actDel: "🚚 माझ्या चालू डिलिव्हरी", avOrd: "नवीन उपलब्ध ऑर्डर्स",
       cTitle: "💬 लाईव्ह हेल्प चॅट (Company Admin Support)", cSub: "मदतीसाठी थेट ॲडमिनशी चॅट करा:", cPh: "तुमचा मेसेज लिहा...", bSend: "पाठवा",
       wTitle: "💰 वॉलेट, इन्सेंटिव्ह व साप्ताहिक नफा", bal: "वॉलेट शिल्लक", cod: "एकूण गोळा केलेली COD",
-      wkH: "🗓️ मागील ७ दिवसांचा हिशोब (Weekly Tally):", wkR: "पूर्ण राईड्स:", wkG: "एकूण भाडे:", wkInc: "पीक अवर इन्सेंटिव्ह बोनस:", wkC: "कमिशन कपात:", wkP: "साप्ताहिक एकूण नफा:",
+      wkH: "🗓️ मागील ७ दिवसांचा हिशोब (Weekly Tally):", wkR: "पूर्ण राईड्स:", wkG: "एकूण कस्टमर भाडे:", wkInc: "पीक अवर इन्सेंटिव्ह बोनस:", wkC: "कमिशन कपात:", wkP: "साप्ताहिक एकूण नफा:",
       bHead: "🏦 बँक खाते तपशील:", bSave: "💾 बँक तपशील सेव्ह करा", bWith: "💳 विथड्रॉवल विनंती पाठवा", bDep: "➕ डिपॉझिट सबमिट करा",
       pHead: "👤 रायडर प्रोफाईल", bPdf: "📄 संमती पत्र PDF डाउनलोड करा", sHead: "🆘 हेल्प आणि इमर्जन्सी सपोर्ट",
       setH: "⚙️ ॲप सेटिंग्ज & रेफर बोनस", rLbl: "🔔 रिंगटोन व व्हायब्रेशन", bOut: "🚪 लॉगआउट",
@@ -719,7 +700,7 @@
       actDel: "🚚 My Active Deliveries", avOrd: "New Available Orders",
       cTitle: "💬 Live Support Chat (Company Admin)", cSub: "Chat directly with Admin for order support:", cPh: "Type your message...", bSend: "Send",
       wTitle: "💰 Wallet, Incentive & Weekly Profit", bal: "Wallet Balance", cod: "Total COD Collected",
-      wkH: "🗓️ Last 7 Days Summary (Weekly Tally):", wkR: "Completed Rides:", wkG: "Gross Fare:", wkInc: "Peak Hour Incentive:", wkC: "Commission:", wkP: "Total Weekly Profit:",
+      wkH: "🗓️ Last 7 Days Summary (Weekly Tally):", wkR: "Completed Rides:", wkG: "Gross Customer Fare:", wkInc: "Peak Hour Incentive:", wkC: "Commission:", wkP: "Total Weekly Profit:",
       bHead: "🏦 Bank Account Details:", bSave: "💾 Save Bank Details", bWith: "💳 Request Withdrawal", bDep: "➕ Submit Deposit",
       pHead: "👤 Rider Profile", bPdf: "📄 Download Consent PDF", sHead: "🆘 Help & Emergency Support",
       setH: "⚙️ App Settings & Refer Bonus", rLbl: "🔔 Ringtone & Vibration", bOut: "🚪 Logout",
@@ -788,7 +769,18 @@
   };
   changeRiderLang(riderLang);
 
-  // Offline / Low Network Monitor
+  // Porter Long Pickup Distance Bonus Calculator (After Free Pickup KM)
+  function calculateLongPickupDetails(pickupLat, pickupLng) {
+    if (!riderLat || !riderLng || !pickupLat || !pickupLng) {
+      return { awayKm: 0, extraKm: 0, bonus: 0 };
+    }
+    const straightKm = getDistanceKm(riderLat, riderLng, pickupLat, pickupLng);
+    const roadAwayKm = Number((straightKm * 1.2).toFixed(1)); // Road factor 1.2x
+    const extraKm = Math.max(0, Number((roadAwayKm - freePickupKm).toFixed(1)));
+    const bonus = Math.round(extraKm * longPickupRatePerKm);
+    return { awayKm: roadAwayKm, extraKm, bonus };
+  }
+
   function updateOnlineNetworkStatus() {
     const bar = document.getElementById('offlineNetworkBar');
     if (bar) bar.classList.toggle('hidden', navigator.onLine);
@@ -797,7 +789,6 @@
   window.addEventListener('offline', updateOnlineNetworkStatus);
   updateOnlineNetworkStatus();
 
-  // Battery Level Optimization Alert (< 15%)
   if ('getBattery' in navigator) {
     navigator.getBattery().then(bat => {
       const checkBat = () => {
@@ -814,14 +805,12 @@
     }).catch(() => {});
   }
 
-  // Floating Bubble Quick Jump
   window.quickJumpToActiveOrder = () => {
     switchBottomTab('Orders', document.querySelectorAll('.b-nav-item')[0]);
     const el = document.getElementById('activeDeliverySectionCard');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Go-To-Home Mode Toggle (Max 2 uses per day)
   function refreshGoHomeUi() {
     document.getElementById('goHomeUsageBadge').innerText = `वापर: ${goHomeData.count} / 2 आज`;
     document.getElementById('riderHomeAreaInput').value = goHomeData.area || "";
@@ -856,7 +845,6 @@
     alert(`🏠 Go-Home Mode ON! आता फक्त "${area}" च्या दिशेने जाणाऱ्या ऑर्डर्स दिसतील.`);
   };
 
-  // Night Map Theme Auto & Manual Control
   function applyAutoMapNightTheme() {
     const mapEl = document.getElementById('riderActiveMap');
     const btn = document.getElementById('btnToggleMapTheme');
@@ -892,12 +880,10 @@
     return hr >= peakStartHour || hr < peakEndHour;
   }
 
-  // Live 1-Second Tick: Clock, Block Timer, Selfie Timer & Free 10-Min Waiting Timer
   setInterval(async () => {
     const clockEl = document.getElementById('regConsentClock');
     if (clockEl) clockEl.innerText = new Date().toLocaleTimeString('en-IN');
 
-    // Update Free 10-Min Waiting Timer UI if active
     const waitEl = document.getElementById('liveWaitingTimerText');
     if (waitEl && currentActiveOrderCache) {
       const o = currentActiveOrderCache;
@@ -1092,6 +1078,10 @@
       deliveryRangeMeters = s.deliveryRangeMeters ?? 150;
       selfieIntervalHours = Number(s.selfieIntervalHours ?? 2);
       tempBlockMinutes = Number(s.tempBlockMinutes ?? 60);
+
+      // Porter Long Pickup Distance Config
+      freePickupKm = Number(s.freePickupKm ?? 1.0);
+      longPickupRatePerKm = Number(s.longPickupRatePerKm ?? 5);
 
       peakIncentiveActive = s.peakIncentiveActive ?? true;
       peakStartHour = Number(s.peakStartHour ?? 18);
@@ -1541,6 +1531,7 @@
     });
   }
 
+  // ACCEPT ORDER: LOCK EXACT LONG PICKUP DISTANCE PAYOUT + INCENTIVE BONUS
   window.acceptOrder = async (orderId) => {
     stopOrderRingtone();
     if (isFakeGpsBlocked) return alert("🚨 Fake GPS Detected! Disable Mock Location first.");
@@ -1558,10 +1549,16 @@
       await runTransaction(db, async (transaction) => {
         const oSnap = await transaction.get(orderRef);
         if (!oSnap.exists() || oSnap.data().status !== "Pending") throw "ALREADY_TAKEN";
+        const oData = oSnap.data();
+        const lp = calculateLongPickupDetails(oData.pickupLat, oData.pickupLng);
+
         transaction.update(orderRef, {
           status: "Accepted",
           riderId: activeRiderId,
           riderEmail: activeRiderName,
+          pickupAwayKm: lp.awayKm,
+          longPickupExtraKm: lp.extraKm,
+          longPickupBonus: lp.bonus,
           incentiveBonus: incEarned,
           acceptedAt: serverTimestamp()
         });
@@ -1580,7 +1577,6 @@
     await updateDoc(doc(db, "orders", orderId), { status: "PickedUp", pickedUpAt: serverTimestamp() });
   };
 
-  // Vehicle Breakdown / Emergency Order Transfer to Another Nearby Rider
   window.reportVehicleBreakdown = async (orderId) => {
     const confirmTransfer = confirm("🚨 गाडी बिघडली/पंक्चर झाली आहे का? ही ऑर्डर तात्काळ दुसऱ्या जवळच्या रायडरकडे ट्रान्सफर करायची का?");
     if (!confirmTransfer) return;
@@ -1588,6 +1584,8 @@
       status: "Pending",
       riderId: "",
       riderEmail: "",
+      pickupAwayKm: 0,
+      longPickupBonus: 0,
       breakdownTransferredFrom: activeRiderName,
       breakdownNote: "Vehicle Breakdown - Reassigned to nearby rider",
       breakdownAt: serverTimestamp()
@@ -1609,7 +1607,6 @@
       if (enteredPin.trim() !== expectedPin) return alert("❌ Wrong PIN!");
     }
 
-    // Calculate Final Waiting Charge (> 10 min free, ₹2/min after)
     let waitingCharge = 0;
     if (currentActiveOrderCache) {
       const reachedMs = Number(currentActiveOrderCache.reachedDropMs || currentActiveOrderCache.reachedPickupMs || 0);
@@ -1666,7 +1663,6 @@
     alert("✅ Deposit Submitted!");
   };
 
-  // Fetch Real Road Route Polyline & Turn-by-Turn Steps via OSRM
   async function fetchInAppTurnByTurnRoute(startLat, startLng, endLat, endLng) {
     const routeKey = `${startLat.toFixed(4)},${startLng.toFixed(4)}->${endLat.toFixed(4)},${endLng.toFixed(4)}`;
     if (routeKey === lastRouteFetchKey) return;
@@ -1708,13 +1704,11 @@
         }
       }
     } catch (e) {
-      // Fallback straight line if offline
       if (rRoutePolyline) rRoutePolyline.setLatLngs([[startLat, startLng], [endLat, endLng]]);
       else rRoutePolyline = L.polyline([[startLat, startLng], [endLat, endLng]], { color: '#ff6600', weight: 5, dashArray: '8, 8' }).addTo(riderMapObj);
     }
   }
 
-  // इन-ॲप Porter-Style लाईव्ह नेव्हिगेशन मॅप अपडेट करणे
   function updateRiderInAppMap(order) {
     const wrap = document.getElementById('riderLiveMapWrapper');
     if (!order) {
@@ -1756,7 +1750,6 @@
       riderMapObj.panTo([rLat, rLng]);
     }
 
-    // Render Multi-Stops if present
     rStopMarkers.forEach(m => riderMapObj.removeLayer(m));
     rStopMarkers = [];
     if (Array.isArray(order.extraStops)) {
@@ -1773,7 +1766,6 @@
     setTimeout(() => riderMapObj.invalidateSize(), 200);
   }
 
-  // १५० मीटर रेंजमध्ये आल्यावर ऑटो-रीच (Auto-Reach) व वेटिंग टायमर सुरू करणे
   async function checkAutoReachMilestones() {
     if (!currentActiveOrderCache || !riderLat || !riderLng) return;
     const o = currentActiveOrderCache;
@@ -1791,7 +1783,6 @@
     }
   }
 
-  // GPS Tracking + Live Speedometer + Fake GPS Fraud Protection
   function startGpsTracking(rid) {
     if ("geolocation" in navigator) {
       navigator.geolocation.watchPosition(async (pos) => {
@@ -1799,7 +1790,6 @@
         const newLng = pos.coords.longitude;
         const nowMs = Date.now();
 
-        // Fake GPS / Impossible Teleportation Check (> 160 km/h instant jump)
         if (prevGpsSample) {
           const dtHours = (nowMs - prevGpsSample.time) / 3600000;
           if (dtHours > 0.0005) {
@@ -1815,7 +1805,6 @@
         }
         prevGpsSample = { lat: newLat, lng: newLng, time: nowMs };
 
-        // Live Speedometer HUD Update
         const speedKmh = pos.coords.speed ? Math.max(0, Math.round(pos.coords.speed * 3.6)) : 0;
         const speedEl = document.getElementById('navLiveSpeed');
         if (speedEl) speedEl.innerText = speedKmh;
@@ -1882,6 +1871,7 @@
       }
     });
 
+    // AVAILABLE ORDERS WITH EXACT PORTER PAYOUT BREAKDOWN (TRIP NET + LONG PICKUP BONUS + PEAK BONUS + 100% TIP)
     onSnapshot(query(collection(db, "orders"), where("status", "==", "Pending")), (snap) => {
       const div = document.getElementById('availableOrders');
       const queueBox = document.getElementById('nextOrderQueueBox');
@@ -1911,14 +1901,13 @@
 
       snap.forEach(d => {
         const o = d.data();
-        // Go-To-Home Mode Filter Check
         if (goHomeActive && goHomeTargetArea) {
           const dropText = (o.drop || "").toLowerCase();
           if (!dropText.includes(goHomeTargetArea)) return;
         }
 
-        const awayKm = (riderLat && riderLng && o.pickupLat && o.pickupLng) ? getDistanceKm(riderLat, riderLng, o.pickupLat, o.pickupLng) : 0;
-        if (!riderLat || !riderLng || awayKm <= maxRadiusKm) {
+        const lp = calculateLongPickupDetails(o.pickupLat, o.pickupLng);
+        if (!riderLat || !riderLng || lp.awayKm <= maxRadiusKm) {
           foundOrders++;
           currentIds.add(d.id);
           if (!isFirstOrderLoad && !lastKnownOrderIds.has(d.id)) {
@@ -1926,14 +1915,20 @@
             newestOrderSummary = `${o.vehicle}: ${o.pickup} ➔ ${o.drop} (₹${o.fare})`;
           }
 
-          const net = Math.round(Number(o.fare || 0) * ((100 - currentCommPct) / 100));
+          const fareNum = Number(o.fare || 0);
           const tipAmt = Number(o.tipAmount || 0);
-          const distLabel = (riderLat && riderLng && o.pickupLat) ? `📍 ${awayKm.toFixed(1)} km` : `📍 New`;
+          const commissionableFare = Math.max(0, fareNum - tipAmt);
+          const tripNet = Math.round(commissionableFare * ((100 - currentCommPct) / 100));
+          const totalRiderPayout = tripNet + lp.bonus + incBonusNow + tipAmt;
+
+          const distLabel = (riderLat && riderLng && o.pickupLat)
+            ? `🛵 पिकअप तुमच्यापासून: <b>${lp.awayKm} km</b> लांब | 🛣️ ट्रिप: <b>${o.distanceKm || '-'} km</b>`
+            : `🛣️ ट्रिप: <b>${o.distanceKm || '-'} km</b>`;
+
           const payBadge = (o.paymentMode === "ONLINE")
             ? `<span class="pay-badge-onl">📱 ONLINE PAID</span>`
-            : `<span class="pay-badge-cod">💵 COD (₹${o.fare})</span>`;
-          const incTag = incBonusNow > 0 ? `<span style="color:#4db8ff; font-size:11px;"> + ₹${incBonusNow} Peak Bonus</span>` : '';
-          const tipTag = tipAmt > 0 ? `<span style="color:#2ecc71; font-size:11px;"> + ₹${tipAmt} 100% Tip</span>` : '';
+            : `<span class="pay-badge-cod">💵 COD (₹${fareNum})</span>`;
+
           const floorInfo = (o.pickupFloor || o.dropFloor) ? `<div style="font-size:11px; color:#ffaa66;">🏢 Floor: Pickup ${o.pickupFloor || 'Ground'} ➔ Drop ${o.dropFloor || 'Ground'}</div>` : '';
           const pkgPhotoHtml = o.packagePhoto ? `<img src="${o.packagePhoto}" style="width:65px; height:65px; border-radius:6px; object-fit:cover; margin-top:5px; border:1px solid #ff6600;">` : '';
 
@@ -1942,21 +1937,28 @@
               <b>${o.vehicle} • ${o.parcel} (${o.parcelWeight || '1-5 kg'})</b>
               ${payBadge}
             </div>
-            <div style="font-size:11px; color:#4db8ff; margin-bottom:4px;">${distLabel} ${o.scheduledTime ? `• ⏰ Scheduled: ${o.scheduledTime}` : ''}</div>
+            <div style="font-size:11px; color:#4db8ff; margin-bottom:4px;">${distLabel} ${o.scheduledTime ? `• ⏰ ${o.scheduledTime}` : ''}</div>
             <small>🟢 Pickup: ${o.pickup}<br>🔴 Drop: ${o.drop}</small>
             ${floorInfo}
             ${pkgPhotoHtml}
-            <div style="margin:6px 0; color:#2ecc71;">Profit: <b>₹${net}</b>${incTag}${tipTag} (Fare: ₹${o.fare})</div>
-            <button onclick="acceptOrder('${d.id}')" style="background:#2ecc71;">⚡ Accept Order</button>
+            <div class="payout-tally-card">
+              <div style="display:flex; justify-content:space-between;"><span>कस्टमर भाडे (कमिशन वजा):</span><span>₹${tripNet}</span></div>
+              ${lp.bonus > 0 ? `<div style="display:flex; justify-content:space-between; color:#ffaa66;"><span>🛵 लांब पिकअप भत्ता (${lp.extraKm} km जादा × ₹${longPickupRatePerKm}):</span><strong>+₹${lp.bonus}</strong></div>` : ''}
+              ${incBonusNow > 0 ? `<div style="display:flex; justify-content:space-between; color:#4db8ff;"><span>🔥 पीक अवर बोनस:</span><strong>+₹${incBonusNow}</strong></div>` : ''}
+              ${tipAmt > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🎁 कस्टमर टीप (100%):</span><strong>+₹${tipAmt}</strong></div>` : ''}
+              <div style="display:flex; justify-content:space-between; border-top:1px dashed #333; margin-top:4px; padding-top:4px; font-size:14px; color:#2ecc71;">
+                <strong>तुमची एकूण कमाई (Net Profit):</strong><strong>₹${totalRiderPayout}</strong>
+              </div>
+            </div>
+            <button onclick="acceptOrder('${d.id}')" style="background:#2ecc71;">⚡ Accept Order (₹${totalRiderPayout})</button>
           </div>`;
 
-          // Back-to-Back Next Order Queue Check (Within 2.5 km of Active Drop Location)
           if (currentActiveOrderCache && currentActiveOrderCache.dropLat && o.pickupLat) {
             const distFromDropKm = getDistanceKm(currentActiveOrderCache.dropLat, currentActiveOrderCache.dropLng, o.pickupLat, o.pickupLng);
             if (distFromDropKm <= 2.5 && queuedCount < 2) {
               queuedCount++;
               queueContent.innerHTML += `<div style="background:#111; padding:8px; border-radius:8px; margin-top:5px; border-left:3px solid #2ecc71; font-size:12px;">
-                <strong>${o.vehicle} • ₹${net} Profit</strong> (${distFromDropKm.toFixed(1)} km from your drop)<br>
+                <strong>${o.vehicle} • ₹${totalRiderPayout} Profit</strong> (${distFromDropKm.toFixed(1)} km from your drop)<br>
                 <span style="color:#ccc;">🟢 ${o.pickup} ➔ 🔴 ${o.drop}</span>
                 <button onclick="acceptOrder('${d.id}')" style="padding:6px; margin-top:5px; font-size:12px; background:#ff9800;">⚡ Queue Next Order</button>
               </div>`;
@@ -1972,51 +1974,58 @@
       isFirstOrderLoad = false;
     });
 
-    let onlineNetTotal = 0, codCommOwedTotal = 0, totalCodCashCollected = 0, totalIncentiveEarnedAll = 0, totalTipsEarnedAll = 0;
+    let onlineNetTotal = 0, codCommOwedTotal = 0, totalCodCashCollected = 0, totalIncentiveEarnedAll = 0, totalTipsEarnedAll = 0, totalLongPickupAll = 0;
     const sevenDaysAgoMs = Date.now() - (7 * 24 * 60 * 60 * 1000);
 
     onSnapshot(query(collection(db, "orders"), where("riderId", "==", rid)), (snap) => {
       const div = document.getElementById('myDeliveries'), histDiv = document.getElementById('orderHistoryList');
       div.innerHTML = ""; histDiv.innerHTML = "";
-      onlineNetTotal = 0; codCommOwedTotal = 0; totalCodCashCollected = 0; totalIncentiveEarnedAll = 0; totalTipsEarnedAll = 0;
-      let wkRides = 0, wkGross = 0, wkComm = 0, wkInc = 0, wkTips = 0, wkNet = 0;
+      onlineNetTotal = 0; codCommOwedTotal = 0; totalCodCashCollected = 0; totalIncentiveEarnedAll = 0; totalTipsEarnedAll = 0; totalLongPickupAll = 0;
+      let wkRides = 0, wkGross = 0, wkComm = 0, wkInc = 0, wkLongPick = 0, wkTips = 0, wkNet = 0;
       let activeOrderFound = null;
 
       snap.forEach(d => {
         const o = d.data();
         const fareNum = Number(o.fare || 0);
         const incBonus = Number(o.incentiveBonus || 0);
-        const tipAmt = Number(o.tipAmount || 0); // 100% Tip without commission
+        const longPickBonus = Number(o.longPickupBonus || 0);
+        const tipAmt = Number(o.tipAmount || 0);
         const waitAmt = Number(o.waitingCharge || 0);
-        const net = Math.round(fareNum * ((100 - currentCommPct) / 100)) + waitAmt;
-        const comm = fareNum - Math.round(fareNum * ((100 - currentCommPct) / 100));
+        const commissionableFare = Math.max(0, fareNum - tipAmt);
+        const tripNet = Math.round(commissionableFare * ((100 - currentCommPct) / 100)) + waitAmt;
+        const comm = commissionableFare - Math.round(commissionableFare * ((100 - currentCommPct) / 100));
         const isCod = (o.paymentMode !== "ONLINE");
+        const totalOrderEarning = tripNet + incBonus + longPickBonus + tipAmt;
 
         if (o.status === "Delivered") {
           totalIncentiveEarnedAll += incBonus;
+          totalLongPickupAll += longPickBonus;
           totalTipsEarnedAll += tipAmt;
           if (isCod) { totalCodCashCollected += (fareNum + waitAmt); codCommOwedTotal += comm; }
-          else { onlineNetTotal += net; }
+          else { onlineNetTotal += tripNet; }
 
           const delivMs = o.deliveredTimestampMs || Date.now();
           if (delivMs >= sevenDaysAgoMs) {
-            wkRides++; wkGross += fareNum; wkComm += comm; wkInc += incBonus; wkTips += tipAmt;
-            wkNet += (net + incBonus + tipAmt);
+            wkRides++; wkGross += fareNum; wkComm += comm; wkInc += incBonus; wkLongPick += longPickBonus; wkTips += tipAmt;
+            wkNet += totalOrderEarning;
           }
 
           histDiv.innerHTML += `<div class="hist-item">
             <div style="display:flex; justify-content:space-between;">
-              <strong>📦 ${o.vehicle} • ${o.parcel} (${o.parcelWeight || '1-5 kg'})</strong>
-              <span style="color:${isCod ? '#4db8ff' : '#2ecc71'}; font-weight:bold;">${isCod ? `COD ₹${fareNum}` : `+₹${net}`} ${incBonus > 0 ? `(+₹${incBonus} Bonus)` : ''} ${tipAmt > 0 ? `(+₹${tipAmt} Tip)` : ''}</span>
+              <strong>📦 ${o.vehicle} • ${o.distanceKm || '-'} km</strong>
+              <span style="color:#2ecc71; font-weight:bold;">Profit: +₹${totalOrderEarning}</span>
+            </div>
+            <div style="font-size:11px; color:#aaa;">
+              कस्टमर बिल: ₹${fareNum} (${isCod ? 'COD' : 'ONLINE'}) ${longPickBonus > 0 ? `• +₹${longPickBonus} पिकअप भत्ता` : ''} ${tipAmt > 0 ? `• +₹${tipAmt} टीप` : ''}
             </div>
             <div style="font-size:12px; color:#ddd; margin-top:4px;">🟢 ${o.pickup}<br>🔴 ${o.drop}</div>
           </div>`;
-        } else {
+        } else if (o.status !== "Cancelled") {
           activeOrderFound = { id: d.id, ...o };
 
           const payAlert = isCod
-            ? `<div style="background:#3b0d0d; color:#ff8a8a; padding:6px; border-radius:6px; font-size:12px; margin:5px 0; font-weight:bold;">💵 COD: Collect ₹${fareNum} Cash! ${tipAmt > 0 ? `(Includes ₹${tipAmt} Tip)` : ''}</div>`
-            : `<div style="background:#0d3b1e; color:#2ecc71; padding:6px; border-radius:6px; font-size:12px; margin:5px 0; font-weight:bold;">📱 ONLINE PAID ${tipAmt > 0 ? `(+₹${tipAmt} 100% Tip Added)` : ''}</div>`;
+            ? `<div style="background:#3b0d0d; color:#ff8a8a; padding:6px; border-radius:6px; font-size:12px; margin:5px 0; font-weight:bold;">💵 कस्टमरकडून रोख घ्या (COD): ₹${fareNum} | तुमची कमाई: ₹${totalOrderEarning}</div>`
+            : `<div style="background:#0d3b1e; color:#2ecc71; padding:6px; border-radius:6px; font-size:12px; margin:5px 0; font-weight:bold;">📱 ONLINE PAID (₹${fareNum}) | तुमची कमाई: ₹${totalOrderEarning}</div>`;
 
           const waitingBanner = (o.status === "ReachedPickup" || o.status === "ReachedDrop")
             ? `<div class="waiting-box"><span>⏱️ वेटिंग टायमर (10m Free, ₹2/m):</span><strong id="liveWaitingTimerText">मोजत आहे...</strong></div>`
@@ -2072,8 +2081,9 @@
           }
 
           div.innerHTML += `<div class="order-card">
-            <b>${o.vehicle} (${o.status}) • ${o.parcelWeight || '1-5 kg'}</b>
+            <b>${o.vehicle} (${o.status}) • ${o.distanceKm || '-'} km</b>
             ${payAlert}
+            ${longPickBonus > 0 ? `<div style="font-size:11px; color:#ffaa66;">🛵 लांब पिकअप अंतर भत्ता समाविष्ट: +₹${longPickBonus}</div>` : ''}
             ${stageHtml}
             <button onclick="reportVehicleBreakdown('${d.id}')" class="breakdown-btn">🚨 गाडी बिघडली / पंक्चर (Transfer Order)</button>
           </div>`;
@@ -2083,9 +2093,10 @@
       currentActiveOrderCache = activeOrderFound;
       updateRiderInAppMap(activeOrderFound);
 
-      latestWeeklySummary = { rides: wkRides, gross: wkGross, comm: wkComm, incentive: wkInc, tips: wkTips, netProfit: wkNet };
+      latestWeeklySummary = { rides: wkRides, gross: wkGross, comm: wkComm, incentive: wkInc, longPickup: wkLongPick, tips: wkTips, netProfit: wkNet };
       document.getElementById('wkRidesCount').innerText = wkRides;
       document.getElementById('wkGrossFare').innerText = wkGross;
+      document.getElementById('wkLongPickupEarned').innerText = wkLongPick;
       document.getElementById('wkIncentiveEarned').innerText = wkInc;
       document.getElementById('wkTipsEarned').innerText = wkTips;
       document.getElementById('wkCommission').innerText = wkComm;
@@ -2094,11 +2105,11 @@
 
       if (!div.innerHTML) div.innerHTML = "No active deliveries.";
       if (!histDiv.innerHTML) histDiv.innerHTML = "No order history.";
-      recalcWalletBalance(onlineNetTotal + totalIncentiveEarnedAll + totalTipsEarnedAll, codCommOwedTotal, rid);
+      recalcWalletBalance(onlineNetTotal + totalIncentiveEarnedAll + totalLongPickupAll + totalTipsEarnedAll, codCommOwedTotal, rid);
     });
   }
 
-  function recalcWalletBalance(onlinePlusIncentiveAndTips, codCommOwed, rid) {
+  function recalcWalletBalance(totalCredits, codCommOwed, rid) {
     onSnapshot(query(collection(db, "walletTransactions"), where("riderId", "==", rid)), (snap) => {
       const payDiv = document.getElementById('paymentHistoryList');
       payDiv.innerHTML = "";
@@ -2118,7 +2129,7 @@
       });
 
       if (!payDiv.innerHTML) payDiv.innerHTML = "No transactions.";
-      currentWalletBalance = (onlinePlusIncentiveAndTips + approvedDeposits) - (codCommOwed + deductedWithdrawals);
+      currentWalletBalance = (totalCredits + approvedDeposits) - (codCommOwed + deductedWithdrawals);
 
       const balEl = document.getElementById('netEarnings');
       balEl.innerText = (currentWalletBalance < 0 ? "-₹" + Math.abs(currentWalletBalance) : "₹" + currentWalletBalance);
