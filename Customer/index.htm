@@ -14,9 +14,11 @@
     .lang-sel { background: #1a1a1a; color: #ff6600; border: 1px solid #ff6600; padding: 5px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; width: auto; margin: 0; }
     .container { max-width: 540px; margin: auto; padding: 14px; }
     .card { background: #1a1a1a; padding: 15px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #2c2c2c; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-    input, select, button, a.btn-link { width: 100%; padding: 12px; margin: 7px 0; border-radius: 8px; border: 1px solid #333; background: #111; color: #fff; font-size: 15px; display: block; text-decoration: none; }
+    input, select, button, a.btn-link { width: 100%; padding: 12px; margin: 6px 0; border-radius: 8px; border: 1px solid #333; background: #111; color: #fff; font-size: 14px; display: block; text-decoration: none; }
     button, a.btn-link { background: #ff6600; color: #000; font-weight: bold; border: none; cursor: pointer; text-align: center; }
     .btn-gps { background: #1c2e3d; color: #4db8ff; border: 1px solid #4db8ff; font-size: 13px; padding: 9px; margin: 4px 0; }
+    .contact-group { background: #121212; border: 1px solid #2e2e2e; border-radius: 10px; padding: 10px; margin: 8px 0; }
+    .contact-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
     #custMap { height: 350px; width: 100%; border-radius: 12px; margin: 10px 0; border: 2px solid #ff6600; z-index: 1; transition: height 0.3s; }
     #custMap.expanded { height: 480px; }
     #liveTrackMap { height: 340px; width: 100%; border-radius: 12px; margin: 10px 0; border: 2px solid #2ecc71; z-index: 1; }
@@ -80,7 +82,7 @@
 </header>
 
 <div class="container">
-  <!-- Customer Login with 10-Minute Auto-Validation Timer & Resend Option -->
+  <!-- Customer Login -->
   <div id="custAuthCard" class="card">
     <h3 id="txtLoginTitle" style="color:#ff6600; margin-bottom:8px;">कस्टमर लॉगिन</h3>
     <input type="text" id="cName" placeholder="तुमचे पूर्ण नाव">
@@ -91,7 +93,7 @@
       <a id="cWaOtpLink" href="#" target="_blank" class="btn-link" style="background:#25D366;">📲 WhatsApp वर OTP मागवा</a>
       <input type="number" id="cOtpInput" placeholder="६ अंकी OTP टाका">
       <button id="txtBtnVerifyOtp" onclick="verifyCustOtp()" style="background:#2ecc71;">लॉगिन पूर्ण करा</button>
-      <button id="btnCustResendOtp" class="hidden" onclick="startCustOtp()" style="background:#3498db; color:#fff; margin-top:6px;">🔄 वेळ संपली! पुन्हा OTP मागवा (Resend OTP)</button>
+      <button id="btnCustResendOtp" class="hidden" onclick="startCustOtp()" style="background:#3498db; color:#fff; margin-top:6px;">🔄 पुन्हा OTP मागवा (Resend OTP)</button>
     </div>
   </div>
 
@@ -108,10 +110,25 @@
           <button type="button" id="txtBtnBigMap" class="btn-gps" style="width:auto; white-space:nowrap; border-color:#ff6600; color:#ff6600;" onclick="toggleMapSize()">🔍 मोठा नकाशा</button>
         </div>
 
-        <label id="txtLblPickup" style="font-size:12px; color:#2ecc71;">🟢 पिकअप पत्ता (नकाशावर हिरवा मार्कर सरकवा)</label>
-        <input type="text" id="pickupInput" placeholder="पिकअप पत्ता टाका">
-        <label id="txtLblDrop" style="font-size:12px; color:#e74c3c;">🔴 ड्रॉप पत्ता (नकाशावर लाल मार्कर सरकवा)</label>
-        <input type="text" id="dropInput" placeholder="ड्रॉप पत्ता टाका">
+        <!-- Pickup Location + Contact Person Name & Phone -->
+        <div class="contact-group" style="border-left: 3px solid #2ecc71;">
+          <label id="txtLblPickup" style="font-size:12px; color:#2ecc71; font-weight:bold;">🟢 पिकअप पत्ता व व्यक्तीची माहिती:</label>
+          <input type="text" id="pickupInput" placeholder="पिकअप पत्ता टाका">
+          <div class="contact-row">
+            <input type="text" id="pickupPersonName" placeholder="पिकअप व्यक्तीचे नाव">
+            <input type="tel" id="pickupPersonPhone" maxlength="10" placeholder="पिकअप मोबाईल नंबर">
+          </div>
+        </div>
+
+        <!-- Drop Location + Contact Person Name & Phone -->
+        <div class="contact-group" style="border-left: 3px solid #e74c3c;">
+          <label id="txtLblDrop" style="font-size:12px; color:#e74c3c; font-weight:bold;">🔴 ड्रॉप पत्ता व व्यक्तीची माहिती:</label>
+          <input type="text" id="dropInput" placeholder="ड्रॉप पत्ता टाका">
+          <div class="contact-row">
+            <input type="text" id="dropPersonName" placeholder="ड्रॉप व्यक्तीचे नाव">
+            <input type="tel" id="dropPersonPhone" maxlength="10" placeholder="ड्रॉप मोबाईल नंबर">
+          </div>
+        </div>
 
         <div id="custMap"></div>
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#aaa;">
@@ -141,7 +158,6 @@
           </div>
         </div>
 
-        <!-- Vehicles including Bolero & Truck -->
         <div class="veh-grid">
           <div class="veh-box active" onclick="pickVeh('2-Wheeler', this)">
             <div>🏍️</div>
@@ -189,20 +205,17 @@
           </div>
         </div>
 
-        <!-- Dynamic QR + Direct UPI App Buttons (GPay, PhonePe, Paytm, BHIM / Any UPI App) -->
         <div id="onlineQrBox" class="qr-card hidden">
           <strong id="txtQrHead" style="font-size:14px; color:#000;">📲 QR स्कॅन करा किंवा थेट UPI ॲपने पेमेंट करा</strong>
           <div style="font-size:12px; color:#333; margin-top:2px;"><span id="txtQrAmt">रक्कम:</span> <strong id="qrAmountText" style="color:#e65c00; font-size:16px;">₹30</strong></div>
           <img id="dynamicUpiQrImg" src="" alt="UPI Payment QR">
           <div style="font-size:11px; color:#444;">UPI ID: <strong id="qrUpiIdLabel">Techesupp-2@okhdfcbank</strong></div>
-          
           <div class="upi-apps-grid">
             <a id="payGpayLink" href="#" class="upi-app-btn" style="background:#1a73e8;">Google Pay</a>
             <a id="payPhonepeLink" href="#" class="upi-app-btn" style="background:#5f259f;">PhonePe</a>
             <a id="payBhimLink" href="#" class="upi-app-btn" style="background:#ff6600; color:#000;">BHIM UPI</a>
             <a id="payAnyUpiLink" href="#" class="upi-app-btn" style="background:#2ecc71; color:#000;">Any UPI App</a>
           </div>
-
           <div id="txtQrNote" style="font-size:11px; color:#008000; font-weight:bold; margin-top:6px;">✅ पेमेंट पूर्ण झाल्यावर खालील बटन दाबा</div>
         </div>
 
@@ -255,7 +268,7 @@
         <table class="order-tbl">
           <thead>
             <tr>
-              <th id="thAddr">पत्ता</th>
+              <th id="thAddr">पत्ता व व्यक्ती</th>
               <th id="thVeh">वाहन & भाडे</th>
               <th id="thStat">स्थिती</th>
               <th>PIN</th>
@@ -291,7 +304,7 @@
       </div>
     </div>
 
-    <!-- TAB 4: HELP & SOS (WITH AMBULANCE 108) -->
+    <!-- TAB 4: HELP & SOS -->
     <div id="cTabHelp" class="hidden">
       <div class="card">
         <h3 id="txtSosTitle" style="color:#ff6600; margin-bottom:10px;">🆘 हेल्प आणि इमर्जन्सी सपोर्ट</h3>
@@ -378,8 +391,8 @@
     mr: {
       loginTitle: "कस्टमर लॉगिन", namePh: "तुमचे पूर्ण नाव", phonePh: "१० अंकी मोबाईल नंबर", reqOtp: "OTP मागवा", verifyOtp: "लॉगिन पूर्ण करा",
       currLoc: "📍 माझे सध्याचे लोकेशन घ्या", bigMap: "🔍 मोठा नकाशा",
-      lblPickup: "🟢 पिकअप पत्ता (नकाशावर हिरवा मार्कर सरकवा)", phPickup: "पिकअप पत्ता टाका",
-      lblDrop: "🔴 ड्रॉप पत्ता (नकाशावर लाल मार्कर सरकवा)", phDrop: "ड्रॉप पत्ता टाका",
+      lblPickup: "🟢 पिकअप पत्ता व व्यक्तीची माहिती:", phPickup: "पिकअप पत्ता टाका", phPickName: "पिकअप व्यक्तीचे नाव", phPickPhone: "पिकअप मोबाईल नंबर",
+      lblDrop: "🔴 ड्रॉप पत्ता व व्यक्तीची माहिती:", phDrop: "ड्रॉप पत्ता टाका", phDropName: "ड्रॉप व्यक्तीचे नाव", phDropPhone: "ड्रॉप मोबाईल नंबर",
       lblDist: "अंतर (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
       lblPay: "💳 पेमेंट पद्धत निवडा:", subCod: "रोख पेमेंट (COD)", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 QR स्कॅन करा किंवा थेट UPI ॲपने पेमेंट करा", qrAmt: "रक्कम:", qrNote: "✅ पेमेंट पूर्ण झाल्यावर खालील बटन दाबा",
@@ -387,7 +400,7 @@
       totFare: "एकूण भाडे", btnBook: "📦 पार्सल बुक करा",
       trackTitle: "रायडर लाईव्ह लोकेशन ट्रॅकिंग", chatTitle: "💬 लाईव्ह ऑर्डर हेल्प चॅट (Company Customer Care)",
       chatSub: "ऑर्डर संबंधित मदतीसाठी थेट कंपनी ॲडमिनशी बोला:", chatPh: "तुमचा मेसेज इथे लिहा...", btnSend: "पाठवा",
-      myOrders: "🚚 माझ्या ऑर्डर्स व स्थिती", thAddr: "पत्ता", thVeh: "वाहन & भाडे", thStat: "स्थिती",
+      myOrders: "🚚 माझ्या ऑर्डर्स व स्थिती", thAddr: "पत्ता व व्यक्ती", thVeh: "वाहन & भाडे", thStat: "स्थिती",
       profTitle: "👤 कस्टमर प्रोफाईल व सेटिंग्ज", pName: "तुमचे नाव:", pPhone: "मोबाईल नंबर:", pAddr: "कायमचा पत्ता:", pLang: "ॲप भाषा:",
       btnSave: "💾 प्रोफाईल सेव्ह करा", btnPdf: "📄 संमती पत्र PDF डाउनलोड करा", btnOut: "🚪 लॉगआउट",
       sosTitle: "🆘 हेल्प आणि इमर्जन्सी सपोर्ट", polHead: "👮 पोलीस हेल्पलाईन (Police)", polSub: "आपत्कालीन पोलीस मदत - 112",
@@ -398,8 +411,8 @@
     hi: {
       loginTitle: "कस्टमर लॉगिन", namePh: "आपका पूरा नाम", phonePh: "१० अंकों का मोबाइल नंबर", reqOtp: "OTP मंगवाएं", verifyOtp: "लॉगिन पूरा करें",
       currLoc: "📍 मेरी वर्तमान लोकेशन लें", bigMap: "🔍 बड़ा मैप",
-      lblPickup: "🟢 पिकअप पता (मैप पर हरा मार्कर खिसकाएं)", phPickup: "पिकअप पता दर्ज करें",
-      lblDrop: "🔴 ड्रॉप पता (मैप पर लाल मार्कर खिसकाएं)", phDrop: "ड्रॉप पता दर्ज करें",
+      lblPickup: "🟢 पिकअप पता और व्यक्ति की जानकारी:", phPickup: "पिकअप पता दर्ज करें", phPickName: "पिकअप व्यक्ति का नाम", phPickPhone: "पिकअप मोबाइल नंबर",
+      lblDrop: "🔴 ड्रॉप पता और व्यक्ति की जानकारी:", phDrop: "ड्रॉप पता दर्ज करें", phDropName: "ड्रॉप व्यक्ति का नाम", phDropPhone: "ड्रॉप मोबाइल नंबर",
       lblDist: "दूरी (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
       lblPay: "💳 पेमेंट का तरीका चुनें:", subCod: "नकद भुगतान (COD)", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 QR स्कैन करें या सीधे UPI ऐप से पेमेंट करें", qrAmt: "राशि:", qrNote: "✅ पेमेंट पूरा होने के बाद नीचे बटन दबाएं",
@@ -407,7 +420,7 @@
       totFare: "कुल किराया", btnBook: "📦 पार्सल बुक करें",
       trackTitle: "राइडर लाइव लोकेशन ट्रैकिंग", chatTitle: "💬 लाइव ऑर्डर हेल्प चैट (Company Customer Care)",
       chatSub: "ऑर्डर संबंधित मदद के लिए सीधे कंपनी एडमिन से बात करें:", chatPh: "अपना संदेश यहाँ लिखें...", btnSend: "भेजें",
-      myOrders: "🚚 मेरे ऑर्डर्स और स्थिति", thAddr: "पता", thVeh: "वाहन & किराया", thStat: "स्थिति",
+      myOrders: "🚚 मेरे ऑर्डर्स और स्थिति", thAddr: "पता व व्यक्ति", thVeh: "वाहन & किराया", thStat: "स्थिति",
       profTitle: "👤 कस्टमर प्रोफाइल और सेटिंग्स", pName: "आपका नाम:", pPhone: "मोबाइल नंबर:", pAddr: "स्थायी पता:", pLang: "ऐप भाषा:",
       btnSave: "💾 प्रोफाइल सेव करें", btnPdf: "📄 सहमति पत्र PDF डाउनलोड करें", btnOut: "🚪 लॉगआउट",
       sosTitle: "🆘 हेल्प और इमरजेंसी सपोर्ट", polHead: "👮 पुलिस हेल्पलाइन (Police)", polSub: "आपातकालीन पुलिस मदद - 112",
@@ -418,8 +431,8 @@
     en: {
       loginTitle: "Customer Login", namePh: "Enter Your Full Name", phonePh: "10-Digit Mobile Number", reqOtp: "Request OTP", verifyOtp: "Verify & Login",
       currLoc: "📍 Use My Current Location", bigMap: "🔍 Expand Map",
-      lblPickup: "🟢 Pickup Address (Drag green pin on map)", phPickup: "Enter Pickup Address",
-      lblDrop: "🔴 Drop Address (Drag red pin on map)", phDrop: "Enter Drop Address",
+      lblPickup: "🟢 Pickup Address & Contact Person:", phPickup: "Enter Pickup Address", phPickName: "Pickup Person Name", phPickPhone: "Pickup Mobile Number",
+      lblDrop: "🔴 Drop Address & Contact Person:", phDrop: "Enter Drop Address", phDropName: "Drop Person Name", phDropPhone: "Drop Mobile Number",
       lblDist: "Distance (KM):", lblParcel: "📦 Parcel Type:", lblWeight: "⚖️ Parcel Weight:",
       lblPay: "💳 Select Payment Method:", subCod: "Cash on Delivery", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 Scan QR or Pay Directly via UPI App", qrAmt: "Amount:", qrNote: "✅ Click Book button below after completing payment",
@@ -427,7 +440,7 @@
       totFare: "Total Fare", btnBook: "📦 Book Parcel Now",
       trackTitle: "Live Rider GPS Tracking", chatTitle: "💬 Live Order Support Chat (Company Customer Care)",
       chatSub: "Chat directly with Company Admin for order support:", chatPh: "Type your message here...", btnSend: "Send",
-      myOrders: "🚚 My Orders & Live Status", thAddr: "Address", thVeh: "Vehicle & Fare", thStat: "Status",
+      myOrders: "🚚 My Orders & Live Status", thAddr: "Address & Contact", thVeh: "Vehicle & Fare", thStat: "Status",
       profTitle: "👤 Customer Profile & Settings", pName: "Full Name:", pPhone: "Mobile Number:", pAddr: "Default Address:", pLang: "App Language:",
       btnSave: "💾 Save Profile & Settings", btnPdf: "📄 Download Consent PDF", btnOut: "🚪 Logout",
       sosTitle: "🆘 Help & Emergency Support", polHead: "👮 Police Helpline", polSub: "Emergency Police Support - 112",
@@ -453,8 +466,12 @@
     document.getElementById('txtBtnBigMap').innerText = t.bigMap;
     document.getElementById('txtLblPickup').innerText = t.lblPickup;
     document.getElementById('pickupInput').placeholder = t.phPickup;
+    document.getElementById('pickupPersonName').placeholder = t.phPickName;
+    document.getElementById('pickupPersonPhone').placeholder = t.phPickPhone;
     document.getElementById('txtLblDrop').innerText = t.lblDrop;
     document.getElementById('dropInput').placeholder = t.phDrop;
+    document.getElementById('dropPersonName').placeholder = t.phDropName;
+    document.getElementById('dropPersonPhone').placeholder = t.phDropPhone;
     document.getElementById('txtLblDist').innerText = t.lblDist;
     document.getElementById('txtLblParcelType').innerText = t.lblParcel;
     document.getElementById('txtLblWeight').innerText = t.lblWeight;
@@ -577,10 +594,9 @@
     }
   });
 
-  // 10-Minute OTP Auto-Validation Countdown & Resend Logic
   function startCustOtpTimer() {
     clearInterval(custOtpTimerInterval);
-    custOtpExpiresAt = Date.now() + (10 * 60 * 1000); // 10 मिनिटे
+    custOtpExpiresAt = Date.now() + (10 * 60 * 1000);
     document.getElementById('btnCustResendOtp').classList.add('hidden');
     document.getElementById('txtBtnVerifyOtp').disabled = false;
 
@@ -589,14 +605,14 @@
       const disp = document.getElementById('custOtpTimerDisplay');
       if (remMs <= 0) {
         clearInterval(custOtpTimerInterval);
-        disp.innerText = "⚠️ OTP वेळ (10 मिनिटे) संपली आहे! कृपया पुन्हा OTP मागवा.";
+        disp.innerText = "⚠️ OTP Expired! Click Resend OTP.";
         disp.style.color = "#e74c3c";
         document.getElementById('btnCustResendOtp').classList.remove('hidden');
         document.getElementById('txtBtnVerifyOtp').disabled = true;
       } else {
         const mins = String(Math.floor(remMs / 60000)).padStart(2, '0');
         const secs = String(Math.floor((remMs % 60000) / 1000)).padStart(2, '0');
-        disp.innerText = `⏳ OTP वैधता वेळ: ${mins}:${secs}`;
+        disp.innerText = `⏳ OTP Valid: ${mins}:${secs}`;
         disp.style.color = "#ffaa66";
       }
     }, 1000);
@@ -624,7 +640,7 @@
   };
 
   window.verifyCustOtp = async () => {
-    if (Date.now() > custOtpExpiresAt) return alert("⚠️ OTP Expired (10 mins over). Click Resend OTP!");
+    if (Date.now() > custOtpExpiresAt) return alert("⚠️ OTP Expired! Click Resend OTP.");
     const name = document.getElementById('cName').value.trim();
     const phone = document.getElementById('cPhone').value.trim();
     const entered = document.getElementById('cOtpInput').value.trim();
@@ -666,6 +682,8 @@
     document.getElementById('profCustName').value = custUser.name || "";
     document.getElementById('profCustPhone').value = custUser.phone || "";
     document.getElementById('profCustAddr').value = custUser.address || "";
+    document.getElementById('pickupPersonName').value = custUser.name || "";
+    document.getElementById('pickupPersonPhone').value = custUser.phone || "";
     initMap();
     useCurrentGpsLocation('pickup', true);
     listenOrders();
@@ -782,7 +800,6 @@
     document.getElementById('dynamicUpiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(upiUri)}`;
     document.getElementById('qrAmountText').innerText = "₹" + amount;
 
-    // थेट UPI Apps उघडणारे लिंक्स (GPay, PhonePe, BHIM, Any UPI)
     document.getElementById('payGpayLink').href = `tez://upi/pay?${baseParams}`;
     document.getElementById('payPhonepeLink').href = `phonepe://pay?${baseParams}`;
     document.getElementById('payBhimLink').href = `bhim://pay?${baseParams}`;
@@ -845,7 +862,13 @@
     if (!document.getElementById('orderConsentChk').checked) return alert("❌ Please accept Consent Agreement first!");
     const pickup = document.getElementById('pickupInput').value.trim();
     const drop = document.getElementById('dropInput').value.trim();
+    const pickupContactName = document.getElementById('pickupPersonName').value.trim() || custUser.name;
+    const pickupContactPhone = document.getElementById('pickupPersonPhone').value.trim() || custUser.phone;
+    const dropContactName = document.getElementById('dropPersonName').value.trim();
+    const dropContactPhone = document.getElementById('dropPersonPhone').value.trim();
+
     if (!pickup || !drop) return alert("Please enter Pickup & Drop address!");
+    if (!dropContactName || dropContactPhone.length < 10) return alert("कृपया ड्रॉप लोकेशनवरील व्यक्तीचे नाव आणि १० अंकी मोबाईल नंबर टाका!");
 
     const fare = recalcPrices();
     const weight = document.getElementById('weightSelect').value;
@@ -866,6 +889,8 @@
       customerPhone: custUser.phone,
       city: document.getElementById('activeCitySelect').value,
       pickup, drop,
+      pickupContactName, pickupContactPhone,
+      dropContactName, dropContactPhone,
       pickupLat: Number(pLat), pickupLng: Number(pLng),
       dropLat: Number(dLat), dropLng: Number(dLng),
       distanceKm: Number(document.getElementById('distKmInput').value),
@@ -915,7 +940,7 @@
             const rPos = [Number(rData.lat), Number(rData.lng)];
             liveRiderMarker.setLatLng(rPos);
             liveTrackMap.panTo(rPos);
-            const targetCoords = (order.status === "PickedUp") ? [oDropLat, oDropLng] : [oPickLat, oPickLng];
+            const targetCoords = (order.status === "PickedUp" || order.status === "ReachedDrop") ? [oDropLat, oDropLng] : [oPickLat, oPickLng];
             const distKm = (liveTrackMap.distance(rPos, targetCoords) / 1000).toFixed(2);
             document.getElementById('liveRiderDistTag').innerText = `📍 ${distKm} km`;
             document.getElementById('liveRiderStatusBanner').innerText = `🛵 ${rData.name} (${distKm} km away)`;
@@ -940,10 +965,13 @@
 
       snap.forEach(d => {
         const o = d.data();
-        if (o.riderId && (o.status === "Accepted" || o.status === "ReachedPickup" || o.status === "PickedUp")) activeTrackOrder = o;
+        if (o.riderId && (o.status === "Accepted" || o.status === "ReachedPickup" || o.status === "PickedUp" || o.status === "ReachedDrop")) {
+          activeTrackOrder = o;
+        }
 
         tbody.innerHTML += `<tr>
-          <td>🟢 ${o.pickup}<br>🔴 ${o.drop}</td>
+          <td>🟢 ${o.pickup} <br><small style="color:#4db8ff;">(${o.pickupContactName || ''}: ${o.pickupContactPhone || ''})</small><br>
+              🔴 ${o.drop} <br><small style="color:#ffaa66;">(${o.dropContactName || ''}: ${o.dropContactPhone || ''})</small></td>
           <td><b>${o.vehicle}</b> (${o.parcelWeight || '1-5 kg'})<br><span style="color:#2ecc71;">₹${o.fare}</span> • <small>${o.paymentMode || 'COD'}</small></td>
           <td style="color:#ff6600; font-weight:bold;">${o.status}</td>
           <td><span class="pin-badge">${o.deliveryPin}</span></td>
@@ -955,7 +983,10 @@
             <strong>${o.vehicle} • ${o.parcel} (${o.parcelWeight || '1-5 kg'})</strong>
             <span style="color:#2ecc71; font-weight:bold;">${o.status}</span>
           </div>
-          <p style="font-size:12px; color:#ccc; margin:6px 0;">🟢 ${o.pickup}<br>🔴 ${o.drop}</p>
+          <p style="font-size:12px; color:#ccc; margin:6px 0;">
+            🟢 ${o.pickup} (${o.pickupContactName || ''} - ${o.pickupContactPhone || ''})<br>
+            🔴 ${o.drop} (${o.dropContactName || ''} - ${o.dropContactPhone || ''})
+          </p>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
             <span style="font-size:12px; color:#aaa;">Rider: <b>${riderCleanName}</b> | <b>${o.paymentMode || 'COD'}</b></span>
             <span>PIN: <span class="pin-badge">${o.deliveryPin}</span></span>
