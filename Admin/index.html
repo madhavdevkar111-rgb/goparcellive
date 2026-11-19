@@ -98,7 +98,7 @@
     <button id="tMap" class="nav-btn" onclick="showTab('map')">🔥 हीट मॅप & लाईव्ह GPS</button>
   </div>
 
-  <!-- 8. MASTER SETTINGS (PORTER / RAPIDO FARE ENGINE) -->
+  <!-- 8. MASTER SETTINGS -->
   <div id="secMaster" class="panel-box">
     <div class="sub-box-green">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
@@ -165,7 +165,6 @@
         </table>
       </div>
 
-      <!-- Long Pickup Distance Payout (Porter Model for Riders) -->
       <div style="background:#0f1d14; border:1px dashed #2ecc71; border-radius:8px; padding:10px; margin-top:12px;">
         <strong style="color:#4db8ff; font-size:13px;">🛵 रायडर लांबच्या पिकअप अंतराचा भत्ता (Long Pickup Distance Payout - Porter Model):</strong>
         <p style="font-size:11px; color:#ccc; margin:3px 0 8px;">जर रायडर कस्टमरच्या पिकअप लोकेशनपासून लांब असेल, तर फ्री रेंज नंतर प्रत्येक जादा किलोमीटरसाठी रायडरला हा एक्स्ट्रा भत्ता मिळेल:</p>
@@ -516,7 +515,6 @@
   let allChatMsgs = [], selectedChatRoomId = null;
   let allOrdersCache = [];
 
-  // Exact Porter / Rapido Fare Formula: Base Fare + (Billable KM * Rate)
   function computePorterFare(km, baseFare, perKmRate, includedFreeKm, surgeMult) {
     const billableKm = Math.max(0, km - includedFreeKm);
     const raw = baseFare + (billableKm * perKmRate);
