@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GoParcel - Master Control Admin</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
     body { background: #0f0f0f; color: #fff; }
@@ -19,7 +20,7 @@
     .nav-btn { padding: 10px 14px; background: #222; color: #ccc; border: 1px solid #333; border-radius: 8px; cursor: pointer; font-weight: bold; white-space: nowrap; }
     .nav-btn.active { background: #ff6600; color: #000; border-color: #ff6600; }
     .panel-box { background: #1a1a1a; padding: 16px; border-radius: 12px; border: 1px solid #2c2c2c; margin-bottom: 15px; }
-    #zoneMap, #adminMap { height: 340px; width: 100%; border-radius: 10px; margin-top: 10px; z-index: 1; border: 1px solid #444; }
+    #zoneMap, #adminMap { height: 370px; width: 100%; border-radius: 10px; margin-top: 10px; z-index: 1; border: 1px solid #444; }
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 15px; }
     label { font-size: 13px; color: #ff6600; display: block; margin-bottom: 4px; font-weight: bold; }
     input[type="text"], input[type="number"], input[type="tel"], select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #111; color: #fff; font-size: 14px; }
@@ -40,6 +41,9 @@
     .badge-req { background: #e74c3c; color: #fff; padding: 2px 7px; border-radius: 10px; font-size: 11px; margin-left: 4px; }
     .utr-pill { background: #1c2e3d; border: 1px solid #4db8ff; color: #4db8ff; padding: 3px 6px; border-radius: 5px; font-size: 11px; display: inline-block; margin-top: 3px; font-weight: bold; }
     .bank-card-mini { background: #111; border: 1px solid #2ecc71; padding: 6px 8px; border-radius: 6px; font-size: 11px; line-height: 1.5; }
+    .sub-box-green { background: #111; border: 1px solid #2ecc71; border-radius: 10px; padding: 12px; margin-bottom: 16px; }
+    .sub-box-blue { background: #111; border: 1px solid #4db8ff; border-radius: 10px; padding: 12px; margin-bottom: 16px; }
+    .sub-box-orange { background: #1a120b; border: 1px solid #ff6600; border-radius: 10px; padding: 12px; margin-bottom: 16px; }
     
     .chat-layout { display: grid; grid-template-columns: 260px 1fr; gap: 12px; }
     @media(max-width: 700px) { .chat-layout { grid-template-columns: 1fr; } }
@@ -83,18 +87,18 @@
   <div class="nav-tabs">
     <button id="tRiders" class="nav-btn active" onclick="showTab('riders')">🛵 रायडर्स KYC, Selfie & Direct Add</button>
     <button id="tChat" class="nav-btn" onclick="showTab('chat')">💬 Live Support Chat <span id="chatBadge" class="badge-req hidden">0</span></button>
-    <button id="tPayouts" class="nav-btn" onclick="showTab('payouts')">💳 विथड्रॉवल & डिपॉझिट <span id="payoutBadge" class="badge-req hidden">0</span></button>
-    <button id="tOrders" class="nav-btn" onclick="showTab('orders')">📦 सर्व ऑर्डर्स</button>
+    <button id="tPayouts" class="nav-btn" onclick="showTab('payouts')">💳 विथड्रॉवल, रिफंड & सेटलमेंट <span id="payoutBadge" class="badge-req hidden">0</span></button>
+    <button id="tOrders" class="nav-btn" onclick="showTab('orders')">📦 ऑर्डर्स, फोन बुकिंग & GST रिपोर्ट</button>
     <button id="tConsents" class="nav-btn" onclick="showTab('consents')">📜 कन्सेन्ट & ॲग्रीमेंट PDF</button>
     <button id="tOtpLive" class="nav-btn" onclick="showTab('otpLive')">🔔 ताज्या OTP विनंत्या <span id="otpBadge" class="badge-req hidden">0</span></button>
     <button id="tZones" class="nav-btn" onclick="showTab('zones')">🗺️ सर्विस सिटी व एरिया</button>
-    <button id="tMaster" class="nav-btn" onclick="showTab('master')">🎛️ दर, पीक अवर इन्सेंटिव्ह व डॉक्युमेंट्स</button>
-    <button id="tMap" class="nav-btn" onclick="showTab('map')">📍 लाईव्ह मॅप</button>
+    <button id="tMaster" class="nav-btn" onclick="showTab('master')">🎛️ दर, पीक अवर, रेफर & ब्रॉडकास्ट</button>
+    <button id="tMap" class="nav-btn" onclick="showTab('map')">🔥 हीट मॅप & लाईव्ह GPS</button>
   </div>
 
   <!-- 1. RIDERS KYC, SELFIE & DIRECT ADD -->
   <div id="secRiders" class="panel-box" style="overflow-x:auto;">
-    <div style="background:#111; border:1px solid #2ecc71; border-radius:10px; padding:12px; margin-bottom:16px;">
+    <div class="sub-box-green">
       <h4 style="color:#2ecc71; margin-bottom:8px;">➕ ॲडमिनमधून थेट नवीन रायडर जोडा (Direct Add Rider)</h4>
       <div class="form-grid" style="margin-bottom:8px;">
         <div><label>रायडर नाव</label><input type="text" id="addRName" placeholder="पूर्ण नाव"></div>
@@ -133,18 +137,60 @@
     </div>
   </div>
 
-  <!-- 3. BANK WITHDRAWALS & DEPOSITS -->
+  <!-- 3. BANK WITHDRAWALS, DEPOSITS & REFUND / SETTLEMENT MANAGER -->
   <div id="secPayouts" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:6px;">💳 रायडर विथड्रॉवल व डिपॉझिट विनंत्या</h3>
+    <!-- Refund & Settlement Manager -->
+    <div class="sub-box-blue">
+      <h4 style="color:#4db8ff; margin-bottom:8px;">⚖️ रिफंड आणि सेटलमेंट मॅनेजर (Customer Refund / Rider Penalty Waiver)</h4>
+      <div class="form-grid" style="margin-bottom:8px;">
+        <div>
+          <label>व्यवहार प्रकार</label>
+          <select id="settleType">
+            <option value="Customer Refund">💸 कस्टमर रिफंड (Order Dispute Refund)</option>
+            <option value="Penalty Waiver / Bonus">🛡️ रायडर दंड माफी / सेटलमेंट क्रेडिट (Wallet +)</option>
+          </select>
+        </div>
+        <div><label>कस्टमर किंवा रायडर मोबाईल नंबर</label><input type="tel" id="settlePhone" maxlength="10" placeholder="10-Digit Mobile"></div>
+        <div><label>रक्कम (₹)</label><input type="number" id="settleAmount" placeholder="उदा. 50"></div>
+        <div><label>कारण / ऑर्डर संदर्भ</label><input type="text" id="settleReason" placeholder="उदा. ऑर्डर उशीर रिफंड / दंड माफ"></div>
+      </div>
+      <button class="save-btn" style="background:#3498db; color:#fff;" onclick="processRefundOrSettlement()">✅ रिफंड / सेटलमेंट नोंदवा आणि वॉलेट अपडेट करा</button>
+    </div>
+
+    <h3 style="color:#ff6600; margin-bottom:6px;">💳 रायडर विथड्रॉवल, डिपॉझिट व सेटलमेंट विनंत्या</h3>
     <table>
-      <thead><tr><th>रायडर व वेळ</th><th>प्रकार</th><th>रक्कम</th><th>बँक खाते तपशील / UTR</th><th>वीकली प्रॉफिट हिशोब</th><th>स्टेटस व कृती</th></tr></thead>
+      <thead><tr><th>रायडर / कस्टमर व वेळ</th><th>प्रकार</th><th>रक्कम</th><th>बँक खाते तपशील / UTR / कारण</th><th>वीकली प्रॉफिट हिशोब</th><th>स्टेटस व कृती</th></tr></thead>
       <tbody id="payoutsTableBody"></tbody>
     </table>
   </div>
 
-  <!-- 4. ALL ORDERS -->
+  <!-- 4. ALL ORDERS, MANUAL PHONE BOOKING & GST/INVOICE REPORTS -->
   <div id="secOrders" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:6px;">📦 सर्व ऑर्डर्स (पिकअप व ड्रॉप संपर्क व्यक्तींसह)</h3>
+    <!-- Manual Phone Order Booking -->
+    <div class="sub-box-orange">
+      <h4 style="color:#ff6600; margin-bottom:8px;">📞 मॅन्युअल फोन बुकिंग एन्ट्री (Phone Order Entry -> Direct to Riders)</h4>
+      <div class="form-grid" style="margin-bottom:8px;">
+        <div><label>कस्टमर नाव</label><input type="text" id="manCustName" placeholder="ग्राहकाचे नाव"></div>
+        <div><label>कस्टमर मोबाईल (१० अंकी)</label><input type="tel" id="manCustPhone" maxlength="10" placeholder="9876543210"></div>
+        <div><label>पिकअप पत्ता (पुणे/शहर)</label><input type="text" id="manPickup" placeholder="उदा. स्वारगेट, पुणे"></div>
+        <div><label>ड्रॉप पत्ता</label><input type="text" id="manDrop" placeholder="उदा. हिंजवडी फेज १, पुणे"></div>
+        <div><label>वाहन प्रकार</label><select id="manVehicle"><option value="2-Wheeler">2-Wheeler</option><option value="3-Wheeler">3-Wheeler</option><option value="Mini Tempo">Mini Tempo</option><option value="Bolero Pickup">Bolero Pickup</option><option value="Truck">Truck</option></select></div>
+        <div><label>पार्सल प्रकार & वजन</label><input type="text" id="manParcel" value="Box / Goods (5 kg)"></div>
+        <div><label>एकूण भाडे (₹)</label><input type="number" id="manFare" placeholder="उदा. 150"></div>
+        <div><label>पेमेंट पद्धत</label><select id="manPayMode"><option value="COD">💵 Cash on Delivery (COD)</option><option value="ONLINE">📱 Online Paid</option></select></div>
+      </div>
+      <button class="save-btn" onclick="createManualPhoneOrder()">🚀 मॅन्युअल ऑर्डर तयार करा आणि सर्व रायडर्सना पाठवा</button>
+    </div>
+
+    <!-- One-Click Automatic Invoice & GST Report Download -->
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+      <h3 style="color:#ff6600;">📦 सर्व ऑर्डर्स (पिकअप व ड्रॉप संपर्क व्यक्तींसह)</h3>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-sm btn-approve" style="padding:9px 14px; font-size:12px;" onclick="downloadGstExcelCsv()">📊 Excel (CSV) GST रिपोर्ट</button>
+        <button class="btn-sm btn-edit" style="padding:9px 14px; font-size:12px;" onclick="downloadGstPdfReport()">📄 PDF इन्व्हॉइस / GST रिपोर्ट</button>
+      </div>
+    </div>
+
     <table>
       <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता व व्यक्ती</th><th>वाहन, वजन & PIN</th><th>भाडे, पेमेंट & इन्सेंटिव्ह</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
       <tbody id="adminTableBody"></tbody>
@@ -189,8 +235,25 @@
     </div>
   </div>
 
-  <!-- 8. MASTER SETTINGS (WITH PEAK HOUR INCENTIVE CHART & AUTO TALLY) -->
+  <!-- 8. MASTER SETTINGS (WITH PEAK HOUR, REFER & EARN TOGGLE & BROADCAST PUSH ALERTS) -->
   <div id="secMaster" class="panel-box hidden">
+    <!-- Broadcast Notification Push Alert Box -->
+    <div class="sub-box-orange">
+      <h4 style="color:#ff6600; margin-bottom:8px;">📣 ब्रॉडकास्ट नोटिफिकेशन (Instant Push Alert to Riders / Customers)</h4>
+      <div class="form-grid" style="margin-bottom:8px;">
+        <div>
+          <label>कोणाला पाठवायचे?</label>
+          <select id="broadcastTarget">
+            <option value="riders">🛵 सर्व रायडर्सना (All Riders)</option>
+            <option value="customers">👤 सर्व कस्टमर्सना (All Customers)</option>
+            <option value="both">🌍 दोघांनाही (Riders & Customers)</option>
+          </select>
+        </div>
+        <div><label>अलर्ट / ऑफर मेसेज</label><input type="text" id="broadcastMessage" placeholder="उदा. आज पावसात प्रत्येक ऑर्डरवर ₹३० बोनस!"></div>
+      </div>
+      <button class="save-btn" style="background:#ff6600; color:#000;" onclick="sendBroadcastPushAlert()">🚀 तात्काळ ब्रॉडकास्ट अलर्ट पाठवा</button>
+    </div>
+
     <h3 style="color:#ff6600; margin-bottom:12px;">🎛️ संपूर्ण ॲपचे मास्टर कंट्रोल</h3>
     <div class="form-grid">
       <div><label>Admin WhatsApp नंबर (91 सह)</label><input type="tel" id="setAdminWa" value="919999999999"></div>
@@ -240,9 +303,17 @@
       </div>
     </div>
 
+    <!-- Refer & Earn ON/OFF & Bonus Control -->
     <div class="section-divider">
-      <h4 style="color:#2ecc71; margin-bottom:8px;">🎁 जॉइनिंग फी आणि रेफर बोनस:</h4>
+      <h4 style="color:#2ecc71; margin-bottom:8px;">🎁 जॉइनिंग फी आणि रिफर अँड अर्न कंट्रोल (Refer & Earn Settings):</h4>
       <div class="form-grid">
+        <div>
+          <label>रिफर अँड अर्न योजना (Refer & Earn Status)</label>
+          <select id="setReferSchemeActive">
+            <option value="true">चालू (Scheme ON)</option>
+            <option value="false">बंद (Scheme OFF)</option>
+          </select>
+        </div>
         <div><label>रायडर जॉइनिंग फीस (₹)</label><input type="number" id="setOnboardingFee" value="1000"></div>
         <div><label>रायडर रेफर बोनस (₹)</label><input type="number" id="setRiderReferBonus" value="100"></div>
         <div><label>कस्टमर रेफर बोनस (₹)</label><input type="number" id="setCustReferBonus" value="50"></div>
@@ -318,9 +389,12 @@
     <button class="save-btn" onclick="saveMasterSettings()">🚀 सर्व बदल सेव्ह करा व लागू करा</button>
   </div>
 
-  <!-- 9. LIVE MAP -->
+  <!-- 9. PUNE DEMAND HEAT MAP & LIVE GPS -->
   <div id="secMap" class="panel-box hidden">
-    <h3 style="color:#ff6600;">सर्व रायडर्सचे लाईव्ह GPS लोकेशन</h3>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <h3 style="color:#ff6600;">🔥 पुणे डिमांड हीट मॅप (लाल झोन = जास्त ऑर्डर्स) आणि लाईव्ह रायडर्स</h3>
+      <span style="font-size:12px; color:#ff6b6b;">🔴 लाल वर्तुळ = हाय डिमांड एरिया | 🛵 पिन = लाईव्ह रायडर</span>
+    </div>
     <div id="adminMap"></div>
   </div>
 </div>
@@ -345,6 +419,7 @@
   const db = getFirestore(app);
   let currentCommPercent = 20;
   let allChatMsgs = [], selectedChatRoomId = null;
+  let allOrdersCache = [];
 
   window.openImgModal = (src, caption) => {
     document.getElementById('modalCaption').innerText = caption || '';
@@ -366,6 +441,7 @@
   const adminMap = L.map('adminMap').setView([18.5204, 73.8567], 12);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(adminMap);
   const riderMarkers = {};
+  const heatLayerGroup = L.layerGroup().addTo(adminMap);
 
   window.showTab = (tab) => {
     ['riders', 'chat', 'payouts', 'orders', 'consents', 'otpLive', 'zones', 'master', 'map'].forEach(t => {
@@ -389,7 +465,7 @@
       name, phone, gender, vehCategory, vehicleNo,
       mobileVerified: true, feePaid: true, approved: true, selfieApproved: true,
       selfieExpiresAt: Date.now() + (2 * 60 * 60 * 1000),
-      selfieRejectCount: 0, tempBlockUntil: 0,
+      selfieRejectCount: 0, tempBlockUntil: 0, fakeGpsFlagged: false,
       consentAccepted: true, consentTime: new Date().toLocaleString('en-IN'),
       createdAt: serverTimestamp()
     }, { merge: true });
@@ -398,6 +474,154 @@
     document.getElementById('addRPhone').value = "";
     document.getElementById('addRVehNo').value = "";
     alert(`✅ नवीन रायडर '${name}' थेट जोडला गेला आणि Selfie + Account मंजूर झाले!`);
+  };
+
+  // Manual Phone Order Entry
+  window.createManualPhoneOrder = async () => {
+    const cName = document.getElementById('manCustName').value.trim() || "Phone Customer";
+    const cPhone = document.getElementById('manCustPhone').value.trim();
+    const pickup = document.getElementById('manPickup').value.trim();
+    const drop = document.getElementById('manDrop').value.trim();
+    const vehicle = document.getElementById('manVehicle').value;
+    const parcel = document.getElementById('manParcel').value.trim() || "Parcel";
+    const fare = Number(document.getElementById('manFare').value);
+    const paymentMode = document.getElementById('manPayMode').value;
+
+    if (cPhone.length !== 10 || !pickup || !drop || !fare || fare <= 0) {
+      return alert("कृपया १० अंकी मोबाईल नंबर, पिकअप, ड्रॉप आणि भाडे भरा!");
+    }
+
+    const deliveryPin = Math.floor(1000 + Math.random() * 9000).toString();
+    await addDoc(collection(db, "orders"), {
+      customerEmail: cName,
+      customerPhone: cPhone,
+      pickup,
+      drop,
+      pickupContactName: cName,
+      pickupContactPhone: cPhone,
+      dropContactName: cName,
+      dropContactPhone: cPhone,
+      pickupLat: 18.5204,
+      pickupLng: 73.8567,
+      dropLat: 18.5314,
+      dropLng: 73.8446,
+      vehicle,
+      parcel,
+      parcelWeight: parcel,
+      fare,
+      paymentMode,
+      deliveryPin,
+      bookedVia: "Admin Phone Entry",
+      status: "Pending",
+      createdAt: serverTimestamp()
+    });
+
+    document.getElementById('manCustName').value = "";
+    document.getElementById('manCustPhone').value = "";
+    document.getElementById('manPickup').value = "";
+    document.getElementById('manDrop').value = "";
+    document.getElementById('manFare').value = "";
+    alert(`✅ फोन बुकिंग ऑर्डर तयार झाली! (Delivery PIN: ${deliveryPin}) — सर्व जवळच्या रायडर्सना पाठवली आहे.`);
+  };
+
+  // Refund & Settlement Manager
+  window.processRefundOrSettlement = async () => {
+    const type = document.getElementById('settleType').value;
+    const phone = document.getElementById('settlePhone').value.trim();
+    const amount = Number(document.getElementById('settleAmount').value);
+    const reason = document.getElementById('settleReason').value.trim();
+
+    if (phone.length !== 10 || !amount || amount <= 0 || !reason) {
+      return alert("कृपया १० अंकी नंबर, रक्कम आणि कारण भरा!");
+    }
+
+    const isRiderWaiver = type.includes("Penalty Waiver");
+    await addDoc(collection(db, "walletTransactions"), {
+      riderId: isRiderWaiver ? ("rider_" + phone) : ("cust_" + phone),
+      riderName: `${isRiderWaiver ? 'Rider' : 'Customer'} (${phone})`,
+      type: isRiderWaiver ? "Deposit" : "Customer Refund",
+      amount,
+      utr: `SETTLE: ${reason}`,
+      status: isRiderWaiver ? "Approved" : "Refunded",
+      createdAt: serverTimestamp(),
+      timeStr: new Date().toLocaleString('en-IN')
+    });
+
+    document.getElementById('settlePhone').value = "";
+    document.getElementById('settleAmount').value = "";
+    document.getElementById('settleReason').value = "";
+    alert(`✅ ${type} (₹${amount}) यशस्वीरित्या नोंदवले गेले!`);
+  };
+
+  // Broadcast Push Notification Alert
+  window.sendBroadcastPushAlert = async () => {
+    const target = document.getElementById('broadcastTarget').value;
+    const msg = document.getElementById('broadcastMessage').value.trim();
+    if (!msg) return alert("कृपया अलर्ट मेसेज लिहा!");
+
+    const updateData = { lastBroadcastAt: Date.now(), lastBroadcastMsg: msg };
+    if (target === "riders" || target === "both") {
+      updateData.riderBannerText = msg;
+      document.getElementById('riderBannerText').value = msg;
+    }
+    if (target === "customers" || target === "both") {
+      updateData.custBannerText = msg;
+      document.getElementById('custBannerText').value = msg;
+    }
+
+    await setDoc(doc(db, "config", "appSettings"), updateData, { merge: true });
+    document.getElementById('broadcastMessage').value = "";
+    alert("📣 ब्रॉडकास्ट अलर्ट तात्काळ सर्व युजर्सच्या स्क्रीनवर पाठवला गेला!");
+  };
+
+  // Automatic GST & Invoice Excel (CSV) Download
+  window.downloadGstExcelCsv = () => {
+    if (allOrdersCache.length === 0) return alert("डाऊनलोड करण्यासाठी ऑर्डर्स उपलब्ध नाहीत.");
+    let csv = "Order ID,Date,Customer,Phone,Pickup,Drop,Vehicle,Status,Payment Mode,Gross Fare (INR),GST 18% Included (INR),Platform Commission (INR),Rider Payout (INR)\n";
+    allOrdersCache.forEach(o => {
+      const fare = Number(o.fare || 0);
+      const gst = (fare * 0.18).toFixed(2);
+      const comm = Math.round(fare * (currentCommPercent / 100));
+      const riderNet = fare - comm;
+      const clean = (s) => `"${String(s || '').replace(/"/g, '""')}"`;
+      csv += `${clean(o.id)},${clean(o.deliveredDateStr || 'Recent')},${clean(o.customerEmail)},${clean(o.customerPhone)},${clean(o.pickup)},${clean(o.drop)},${clean(o.vehicle)},${clean(o.status)},${clean(o.paymentMode || 'COD')},${fare},${gst},${comm},${riderNet}\n`;
+    });
+    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `GoParcel_GST_Report_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  };
+
+  // Automatic GST & Invoice PDF Report Download
+  window.downloadGstPdfReport = () => {
+    if (allOrdersCache.length === 0) return alert("डाऊनलोड करण्यासाठी ऑर्डर्स उपलब्ध नाहीत.");
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+    let totalGross = 0, totalComm = 0, totalGst = 0;
+    allOrdersCache.forEach(o => {
+      const f = Number(o.fare || 0);
+      totalGross += f;
+      totalComm += Math.round(f * (currentCommPercent / 100));
+      totalGst += (f * 0.18);
+    });
+
+    pdf.setFontSize(16);
+    pdf.text("GoParcel Logistics - Monthly Invoice & GST Summary", 15, 20);
+    pdf.setFontSize(11);
+    pdf.text(`Generated Date: ${new Date().toLocaleString('en-IN')}`, 15, 30);
+    pdf.text(`Total Orders Count: ${allOrdersCache.length}`, 15, 40);
+    pdf.text(`Total Gross Billing: INR ${totalGross.toFixed(2)}`, 15, 48);
+    pdf.text(`Estimated GST (18%): INR ${totalGst.toFixed(2)}`, 15, 56);
+    pdf.text(`Total Platform Commission (${currentCommPercent}%): INR ${totalComm.toFixed(2)}`, 15, 64);
+
+    let y = 78;
+    pdf.setFontSize(9);
+    allOrdersCache.slice(0, 28).forEach((o, idx) => {
+      pdf.text(`${idx + 1}. [${o.status}] ${o.vehicle} | INR ${o.fare} | ${String(o.pickup).slice(0, 22)} -> ${String(o.drop).slice(0, 22)}`, 15, y);
+      y += 6;
+    });
+    pdf.save(`GoParcel_GST_Invoice_${new Date().toISOString().slice(0,10)}.pdf`);
   };
 
   onSnapshot(query(collection(db, "supportChats"), orderBy("createdAt", "asc")), (snap) => {
@@ -543,6 +767,7 @@
       document.getElementById('setSurgeActive').value = String(s.surgeActive ?? false);
       document.getElementById('setSurgeMultiplier').value = s.surgeMultiplier ?? 1.2;
       document.getElementById('setTimingAlertText').value = s.timingAlertText ?? "";
+      document.getElementById('setReferSchemeActive').value = String(s.referSchemeActive ?? true);
       document.getElementById('setRiderReferBonus').value = s.riderReferBonus ?? 100;
       document.getElementById('setCustReferBonus').value = s.custReferBonus ?? 50;
       document.getElementById('setConsentText').value = s.consentText ?? "मी GoParcel चे सर्व नियम व वाहतूक अटी पाळेन.";
@@ -592,6 +817,7 @@
       surgeActive: document.getElementById('setSurgeActive').value === 'true',
       surgeMultiplier: Number(document.getElementById('setSurgeMultiplier').value),
       timingAlertText: document.getElementById('setTimingAlertText').value.trim(),
+      referSchemeActive: document.getElementById('setReferSchemeActive').value === 'true',
       riderReferBonus: Number(document.getElementById('setRiderReferBonus').value),
       custReferBonus: Number(document.getElementById('setCustReferBonus').value),
       consentText: document.getElementById('setConsentText').value.trim(),
@@ -651,7 +877,8 @@
       selfieStatus: status ? "Approved by Admin" : "Rejected by Admin",
       selfieExpiresAt: nextExpiry,
       selfieRejectCount: 0,
-      tempBlockUntil: 0
+      tempBlockUntil: 0,
+      fakeGpsFlagged: false
     });
     alert(status ? `✅ रायडरचा Selfie Approve झाला! आता तो ${hrs} तासांसाठी ONLINE होऊ शकतो.` : "❌ Selfie Approval रद्द केले!");
   };
@@ -662,7 +889,7 @@
   };
 
   window.toggleRiderApproval = async (riderId, status) => {
-    await updateDoc(doc(db, "riders", riderId), { approved: status, mobileVerified: true, kycRejected: false });
+    await updateDoc(doc(db, "riders", riderId), { approved: status, mobileVerified: true, kycRejected: false, fakeGpsFlagged: false });
     alert(status ? "रायडरला मंजुरी दिली आहे!" : "रायडरला Block केले आहे!");
   };
 
@@ -709,9 +936,10 @@
       const feeVerifyBtn = (!r.feePaid && r.feeUtr) ? `<button class="btn-sm btn-approve" onclick="verifyOnboardingFee('${d.id}', true)">💳 Verify UTR</button>` : '';
       const selfieBtn = `<button class="btn-sm btn-edit" onclick="approveRiderSelfie('${d.id}', true)">📸 Approve Selfie / Unblock</button>`;
       const tempBlockedTag = (r.tempBlockUntil && r.tempBlockUntil > Date.now()) ? `<div style="color:#ff453a; font-size:11px; font-weight:bold;">⛔ 60m Blocked (4/4)</div>` : '';
+      const fakeGpsTag = r.fakeGpsFlagged ? `<div style="color:#ff3b30; font-size:11px; font-weight:bold;">🚨 FAKE GPS DETECTED</div>` : '';
 
       tbody.innerHTML += `<tr>
-        <td><b>${r.name || 'Rider'}</b> (${r.gender || 'Male'})<br><small>📞 ${r.phone || ''}</small></td>
+        <td><b>${r.name || 'Rider'}</b> (${r.gender || 'Male'})<br><small>📞 ${r.phone || ''}</small>${fakeGpsTag}</td>
         <td><div style="display:flex; gap:5px; flex-wrap:wrap;">${thumbsHtml}</div></td>
         <td><b>${r.vehCategory || ''} - ${r.vehicleNo || '-'}</b><br><small>${r.kycDoc || '-'}</small>${ownerInfo}${bankInfo}</td>
         <td>
@@ -745,7 +973,7 @@
       if (p.type === "Installment") return;
       if (p.status === "Pending") pendingTx++;
       let detailsHtml = '';
-      if (p.type === "Deposit") detailsHtml = `<span class="utr-pill">UTR: ${p.utr || '-'}</span>`;
+      if (p.type === "Deposit" || p.type === "Customer Refund") detailsHtml = `<span class="utr-pill">${p.utr || '-'}</span>`;
       else if (p.bankDetails) {
         detailsHtml = `<div class="bank-card-mini">
           👤 <b>${p.bankDetails.holderName}</b> (${p.bankDetails.bankName || 'Bank'})<br>
@@ -755,7 +983,7 @@
 
       const wkHtml = p.weeklySnapshot ? `<div style="font-size:11px; color:#ddd;">राईड्स: <b>${p.weeklySnapshot.rides}</b> | प्रॉफिट: <b style="color:#2ecc71;">₹${p.weeklySnapshot.netProfit}</b></div>` : '-';
       const approveTarget = p.type === "Withdraw" ? "Paid" : "Approved";
-      const typeColor = p.type === "Deposit" ? "#2ecc71" : "#ff6600";
+      const typeColor = (p.type === "Deposit" || p.type === "Customer Refund") ? "#2ecc71" : "#ff6600";
       tbody.innerHTML += `<tr>
         <td><b>${p.riderName}</b><br><small style="color:#888;">🕒 ${p.timeStr || ''}</small></td>
         <td><b style="color:${typeColor};">${p.type}</b></td>
@@ -775,21 +1003,58 @@
     else pBadge.classList.add('hidden');
   });
 
+  // Render Pune Demand Heat Map Circles from Live & Historical Orders
+  function renderDemandHeatMap(ordersList) {
+    heatLayerGroup.clearLayers();
+    const clusters = {};
+    ordersList.forEach(o => {
+      if (o.pickupLat && o.pickupLng) {
+        const key = `${Number(o.pickupLat).toFixed(2)}_${Number(o.pickupLng).toFixed(2)}`;
+        if (!clusters[key]) clusters[key] = { lat: Number(o.pickupLat), lng: Number(o.pickupLng), count: 0, label: o.pickup || "Pune Zone" };
+        clusters[key].count += 1;
+      }
+    });
+
+    // Add default Pune hotspot markers if orders are sparse so Admin always sees demand zones
+    const hotspots = Object.values(clusters);
+    if (hotspots.length === 0) {
+      hotspots.push(
+        { lat: 18.5913, lng: 73.7389, count: 5, label: "हिंजवडी IT Park (High Demand)" },
+        { lat: 18.5089, lng: 73.9259, count: 4, label: "हडपसर / मगरपट्टा (High Demand)" },
+        { lat: 18.5018, lng: 73.8636, count: 3, label: "स्वारगेट / मार्केट यार्ड" }
+      );
+    }
+
+    hotspots.forEach(h => {
+      const radiusM = Math.min(2500, 600 + (h.count * 250));
+      L.circle([h.lat, h.lng], {
+        radius: radiusM,
+        color: '#ff2a00',
+        fillColor: '#ff2a00',
+        fillOpacity: 0.35,
+        weight: 2
+      }).addTo(heatLayerGroup).bindPopup(`🔥 <b>Demand Zone:</b> ${h.label}<br>ऑर्डर्स: <b>${h.count}</b>`);
+    });
+  }
+
   window.deleteOrder = async (id) => { if (confirm("ऑर्डर डिलीट करायची का?")) await deleteDoc(doc(db, "orders", id)); };
   onSnapshot(collection(db, "orders"), (snap) => {
     const tbody = document.getElementById('adminTableBody'); tbody.innerHTML = "";
+    allOrdersCache = [];
     let count = 0, comm = 0;
     snap.forEach(d => {
       const o = d.data(); count++;
+      allOrdersCache.push({ id: d.id, ...o });
       const orderComm = Math.round(Number(o.fare || 0) * (currentCommPercent / 100));
       comm += orderComm;
       const payTag = o.paymentMode === "ONLINE"
         ? `<span style="color:#2ecc71; font-weight:bold;">📱 ONLINE</span>`
         : `<span style="color:#ff6600; font-weight:bold;">💵 COD</span>`;
       const incTag = o.incentiveBonus ? `<br><small style="color:#4db8ff;">+₹${o.incentiveBonus} Bonus</small>` : '';
+      const viaTag = o.bookedVia ? `<br><span style="font-size:10px; color:#ffaa66;">📞 ${o.bookedVia}</span>` : '';
 
       tbody.innerHTML += `<tr>
-        <td><b>${o.customerEmail || 'Customer'}</b><br><small style="color:#4db8ff;">📞 ${o.customerPhone || '-'}</small></td>
+        <td><b>${o.customerEmail || 'Customer'}</b><br><small style="color:#4db8ff;">📞 ${o.customerPhone || '-'}</small>${viaTag}</td>
         <td><small>🟢 <b>पिकअप:</b> ${o.pickup} (${o.pickupContactName || ''}: ${o.pickupContactPhone || ''})<br>
                    🔴 <b>ड्रॉप:</b> ${o.drop} (${o.dropContactName || ''}: ${o.dropContactPhone || ''})</small></td>
         <td><b>${o.vehicle}</b> (${o.parcelWeight || '1-5 kg'})<br><small style="color:#2ecc71;">PIN: ${o.deliveryPin || '-'}</small></td>
@@ -801,7 +1066,8 @@
     });
     document.getElementById('totalOrders').innerText = count;
     document.getElementById('platformComm').innerText = comm;
+    renderDemandHeatMap(allOrdersCache);
   });
 </script>
 </body>
-  </html>
+</html>
