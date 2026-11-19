@@ -88,11 +88,11 @@
     <button id="tConsents" class="nav-btn" onclick="showTab('consents')">📜 कन्सेन्ट & ॲग्रीमेंट PDF</button>
     <button id="tOtpLive" class="nav-btn" onclick="showTab('otpLive')">🔔 ताज्या OTP विनंत्या <span id="otpBadge" class="badge-req hidden">0</span></button>
     <button id="tZones" class="nav-btn" onclick="showTab('zones')">🗺️ सर्विस सिटी व एरिया</button>
-    <button id="tMaster" class="nav-btn" onclick="showTab('master')">🎛️ दर, ड्रायव्हर/मालक डॉक्युमेंट्स व संमती</button>
+    <button id="tMaster" class="nav-btn" onclick="showTab('master')">🎛️ दर, पीक अवर इन्सेंटिव्ह व डॉक्युमेंट्स</button>
     <button id="tMap" class="nav-btn" onclick="showTab('map')">📍 लाईव्ह मॅप</button>
   </div>
 
-  <!-- 1. RIDERS KYC, SELFIE APPROVAL & DIRECT ADD RIDER -->
+  <!-- 1. RIDERS KYC, SELFIE & DIRECT ADD -->
   <div id="secRiders" class="panel-box" style="overflow-x:auto;">
     <div style="background:#111; border:1px solid #2ecc71; border-radius:10px; padding:12px; margin-bottom:16px;">
       <h4 style="color:#2ecc71; margin-bottom:8px;">➕ ॲडमिनमधून थेट नवीन रायडर जोडा (Direct Add Rider)</h4>
@@ -106,9 +106,9 @@
       <button class="save-btn" onclick="adminDirectAddRider()">✅ थेट रायडर जोडा आणि Selfie + Account Approve करा</button>
     </div>
 
-    <h3 style="color:#ff6600; margin-bottom:6px;">रायडर कागदपत्रे (Driver + Vehicle Owner), Selfie Approval व UTR पडताळणी</h3>
+    <h3 style="color:#ff6600; margin-bottom:6px;">रायडर कागदपत्रे, Selfie Approval व UTR पडताळणी</h3>
     <table>
-      <thead><tr><th>रायडर व मोबाईल</th><th>सर्व अपलोड केलेले फोटो (Selfie + Duty + Driver + Owner)</th><th>वाहन, मालक व बँक खाते</th><th>Selfie / Fee / Status</th><th>अधिकार (Actions)</th></tr></thead>
+      <thead><tr><th>रायडर व मोबाईल</th><th>सर्व अपलोड केलेले फोटो</th><th>वाहन, मालक व बँक खाते</th><th>Selfie / Fee / Status</th><th>अधिकार (Actions)</th></tr></thead>
       <tbody id="ridersTableBody"></tbody>
     </table>
   </div>
@@ -144,9 +144,9 @@
 
   <!-- 4. ALL ORDERS -->
   <div id="secOrders" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:6px;">📦 सर्व ऑर्डर्स (COD / Online पेमेंट प्रकार, वजन व कस्टमर तपशील)</h3>
+    <h3 style="color:#ff6600; margin-bottom:6px;">📦 सर्व ऑर्डर्स (पिकअप व ड्रॉप संपर्क व्यक्तींसह)</h3>
     <table>
-      <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता</th><th>वाहन, वजन & PIN</th><th>भाडे, पेमेंट & कमिशन</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
+      <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता व व्यक्ती</th><th>वाहन, वजन & PIN</th><th>भाडे, पेमेंट & इन्सेंटिव्ह</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
       <tbody id="adminTableBody"></tbody>
     </table>
   </div>
@@ -162,7 +162,7 @@
 
   <!-- 6. LIVE OTP REQUESTS -->
   <div id="secOtpLive" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:10px;">ताज्या OTP विनंत्या (भाषेनुसार WhatsApp मेसेज)</h3>
+    <h3 style="color:#ff6600; margin-bottom:10px;">ताज्या OTP विनंत्या</h3>
     <table>
       <thead><tr><th>वेळ (Time)</th><th>प्रकार व भाषा</th><th>नाव व मोबाईल</th><th>नवीन OTP</th><th>स्टेटस</th><th>कृती</th></tr></thead>
       <tbody id="otpLiveTableBody"></tbody>
@@ -189,14 +189,14 @@
     </div>
   </div>
 
-  <!-- 8. MASTER SETTINGS -->
+  <!-- 8. MASTER SETTINGS (WITH PEAK HOUR INCENTIVE CHART & AUTO TALLY) -->
   <div id="secMaster" class="panel-box hidden">
     <h3 style="color:#ff6600; margin-bottom:12px;">🎛️ संपूर्ण ॲपचे मास्टर कंट्रोल</h3>
     <div class="form-grid">
       <div><label>Admin WhatsApp नंबर (91 सह)</label><input type="tel" id="setAdminWa" value="919999999999"></div>
       <div><label>Admin UPI ID</label><input type="text" id="setAdminUpi" value="Techesupp-2@okhdfcbank"></div>
       <div><label>रायडर पिकअप रेंज (km)</label><input type="number" id="setPickupRadius" value="10"></div>
-      <div><label>डिलिव्हरी अनलॉक रेंज (मीटर)</label><input type="number" id="setDeliveryRangeMeters" value="150"></div>
+      <div><label>ऑटो-रीच व डिलिव्हरी अनलॉक रेंज (मीटर)</label><input type="number" id="setDeliveryRangeMeters" value="150"></div>
       <div><label>किमान बेस भाडे (Min Fare ₹)</label><input type="number" id="setMinFare" value="30"></div>
       <div><label>प्लॅटफॉर्म कमिशन (%)</label><input type="number" id="setCommission" value="20"></div>
       <div><label>2-Wheeler दर (₹/km)</label><input type="number" id="setRate2W" value="10"></div>
@@ -206,13 +206,30 @@
       <div><label>Truck दर (₹/km)</label><input type="number" id="setRateTruck" value="50"></div>
     </div>
 
+    <!-- Peak Hour Incentive Chart Control -->
     <div class="section-divider">
-      <h4 style="color:#4db8ff; margin-bottom:8px;">⏰ सेल्फी तपासणी वेळ, ६०-मिनिट ब्लॉक व टायमिंग रेट अलर्ट:</h4>
+      <h4 style="color:#2ecc71; margin-bottom:8px;">🎁 रायडर पीक अवर्स इन्सेंटिव्ह चार्ट (Peak Hour Incentive Control):</h4>
+      <div class="form-grid">
+        <div>
+          <label>पीक अवर इन्सेंटिव्ह स्थिती</label>
+          <select id="setPeakIncentiveActive">
+            <option value="true">चालू (Active)</option>
+            <option value="false">बंद (Inactive)</option>
+          </select>
+        </div>
+        <div><label>सुरू होण्याची वेळ (0 ते 23 तास - उदा. 18 = संध्याकाळी ६)</label><input type="number" id="setPeakStartHour" value="18" min="0" max="23"></div>
+        <div><label>संपण्याची वेळ (0 ते 23 तास - उदा. 22 = रात्री १०)</label><input type="number" id="setPeakEndHour" value="22" min="0" max="23"></div>
+        <div><label>प्रति राईड इन्सेंटिव्ह बोनस रक्कम (₹)</label><input type="number" id="setPeakIncentiveAmount" value="25"></div>
+      </div>
+    </div>
+
+    <div class="section-divider">
+      <h4 style="color:#4db8ff; margin-bottom:8px;">⏰ सेल्फी तपासणी वेळ, ६०-मिनिट ब्लॉक व कस्टमर पीक अवर दर:</h4>
       <div class="form-grid">
         <div><label>ऑटो सेल्फी तपासणी कालावधी (तासांत)</label><input type="number" id="setSelfieIntervalHours" value="2" min="1" max="12"></div>
         <div><label>४ सेल्फी रिजेक्टनंतर ब्लॉक वेळ (मिनिटांत)</label><input type="number" id="setTempBlockMinutes" value="60" min="5" max="1440"></div>
         <div>
-          <label>टायमिंग रेट अलर्ट स्थिती</label>
+          <label>कस्टमर पीक अवर दर वाढ (Surge)</label>
           <select id="setSurgeActive">
             <option value="false">बंद (Normal Rates)</option>
             <option value="true">चालू (Peak Hour Alert Active)</option>
@@ -233,7 +250,7 @@
     </div>
 
     <div class="section-divider">
-      <h4 style="color:#4db8ff; margin-bottom:8px;">🛡️ १. ड्रायव्हर डॉक्युमेंट लिस्ट (Driver Documents & Upload Mode):</h4>
+      <h4 style="color:#4db8ff; margin-bottom:8px;">🛡️ १. ड्रायव्हर डॉक्युमेंट लिस्ट:</h4>
       <div class="form-grid">
         <div class="doc-rule-card">
           <label class="chk-row"><input type="checkbox" id="docAadhaar" checked> ड्रायव्हर आधार कार्ड (Front)</label>
@@ -278,22 +295,16 @@
     </div>
 
     <div class="section-divider">
-      <h4 style="color:#2ecc71; margin-bottom:8px;">🏢 २. गाडी मालकाचे डॉक्युमेंट्स (मोठ्या वाहनांसाठी - 3-Wheeler, Mini Tempo, Bolero, Truck):</h4>
+      <h4 style="color:#2ecc71; margin-bottom:8px;">🏢 २. गाडी मालकाचे डॉक्युमेंट्स (मोठ्या वाहनांसाठी):</h4>
       <div class="form-grid">
-        <div class="doc-rule-card">
-          <label class="chk-row"><input type="checkbox" id="ownerAadhaar" checked> मालकाचे आधार कार्ड फोटो अनिवार्य</label>
-        </div>
-        <div class="doc-rule-card">
-          <label class="chk-row"><input type="checkbox" id="ownerRc" checked> मालकाचे RC Book / Permit फोटो अनिवार्य</label>
-        </div>
-        <div class="doc-rule-card">
-          <label class="chk-row"><input type="checkbox" id="ownerNoc" checked> मालकाचे संमती पत्र / NOC फोटो अनिवार्य</label>
-        </div>
+        <div class="doc-rule-card"><label class="chk-row"><input type="checkbox" id="ownerAadhaar" checked> मालकाचे आधार कार्ड फोटो अनिवार्य</label></div>
+        <div class="doc-rule-card"><label class="chk-row"><input type="checkbox" id="ownerRc" checked> मालकाचे RC Book / Permit फोटो अनिवार्य</label></div>
+        <div class="doc-rule-card"><label class="chk-row"><input type="checkbox" id="ownerNoc" checked> मालकाचे संमती पत्र / NOC फोटो अनिवार्य</label></div>
       </div>
     </div>
 
     <div class="section-divider">
-      <h4 style="color:#ff6600; margin-bottom:8px;">📢 होम स्क्रीन बॅनर आणि सहमती पत्र (Consent Agreement):</h4>
+      <h4 style="color:#ff6600; margin-bottom:8px;">📢 होम स्क्रीन बॅनर आणि सहमती पत्र:</h4>
       <div class="form-grid">
         <div><label>कस्टमर ॲप ऑफर बॅनर</label><input type="text" id="custBannerText"></div>
         <div><label>रायडर ॲप बोनस बॅनर</label><input type="text" id="riderBannerText"></div>
@@ -521,6 +532,12 @@
       document.getElementById('setRateTempo').value = s.rateTempo ?? 25;
       document.getElementById('setRateBolero').value = s.rateBolero ?? 35;
       document.getElementById('setRateTruck').value = s.rateTruck ?? 50;
+
+      document.getElementById('setPeakIncentiveActive').value = String(s.peakIncentiveActive ?? true);
+      document.getElementById('setPeakStartHour').value = s.peakStartHour ?? 18;
+      document.getElementById('setPeakEndHour').value = s.peakEndHour ?? 22;
+      document.getElementById('setPeakIncentiveAmount').value = s.peakIncentiveAmount ?? 25;
+
       document.getElementById('setSelfieIntervalHours').value = s.selfieIntervalHours ?? 2;
       document.getElementById('setTempBlockMinutes').value = s.tempBlockMinutes ?? 60;
       document.getElementById('setSurgeActive').value = String(s.surgeActive ?? false);
@@ -566,6 +583,10 @@
       rateTempo: Number(document.getElementById('setRateTempo').value),
       rateBolero: Number(document.getElementById('setRateBolero').value),
       rateTruck: Number(document.getElementById('setRateTruck').value),
+      peakIncentiveActive: document.getElementById('setPeakIncentiveActive').value === 'true',
+      peakStartHour: Number(document.getElementById('setPeakStartHour').value),
+      peakEndHour: Number(document.getElementById('setPeakEndHour').value),
+      peakIncentiveAmount: Number(document.getElementById('setPeakIncentiveAmount').value),
       selfieIntervalHours: Number(document.getElementById('setSelfieIntervalHours').value),
       tempBlockMinutes: Number(document.getElementById('setTempBlockMinutes').value),
       surgeActive: document.getElementById('setSurgeActive').value === 'true',
@@ -765,12 +786,14 @@
       const payTag = o.paymentMode === "ONLINE"
         ? `<span style="color:#2ecc71; font-weight:bold;">📱 ONLINE</span>`
         : `<span style="color:#ff6600; font-weight:bold;">💵 COD</span>`;
+      const incTag = o.incentiveBonus ? `<br><small style="color:#4db8ff;">+₹${o.incentiveBonus} Bonus</small>` : '';
 
       tbody.innerHTML += `<tr>
         <td><b>${o.customerEmail || 'Customer'}</b><br><small style="color:#4db8ff;">📞 ${o.customerPhone || '-'}</small></td>
-        <td><small>🟢 <b>पिकअप:</b> ${o.pickup}<br>🔴 <b>ड्रॉप:</b> ${o.drop}</small></td>
+        <td><small>🟢 <b>पिकअप:</b> ${o.pickup} (${o.pickupContactName || ''}: ${o.pickupContactPhone || ''})<br>
+                   🔴 <b>ड्रॉप:</b> ${o.drop} (${o.dropContactName || ''}: ${o.dropContactPhone || ''})</small></td>
         <td><b>${o.vehicle}</b> (${o.parcelWeight || '1-5 kg'})<br><small style="color:#2ecc71;">PIN: ${o.deliveryPin || '-'}</small></td>
-        <td><b>₹${o.fare}</b> (${payTag})<br><small style="color:#ff6600;">कमिशन: ₹${orderComm}</small></td>
+        <td><b>₹${o.fare}</b> (${payTag})<br><small style="color:#ff6600;">कमिशन: ₹${orderComm}</small>${incTag}</td>
         <td><b>${o.riderEmail || 'प्रलंबित'}</b><br><small style="color:#888;">${o.deliveredDateStr || ''}</small></td>
         <td><b style="color:${o.status === 'Delivered' ? '#2ecc71' : '#ff6600'};">${o.status}</b></td>
         <td><button class="btn-sm btn-block" onclick="deleteOrder('${d.id}')">Delete</button></td>
