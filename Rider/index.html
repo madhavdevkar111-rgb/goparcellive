@@ -26,7 +26,32 @@
     button:disabled { background: #444 !important; color: #888 !important; cursor: not-allowed; }
     a.wa-btn { background: #25D366; color: #000; font-weight: bold; border: none; }
     a.nav-map-btn { background: #1c2e3d; color: #4db8ff; border: 1px solid #4db8ff; font-size: 13px; padding: 9px; font-weight: bold; }
-    #riderActiveMap { height: 240px; width: 100%; border-radius: 10px; margin: 8px 0; border: 2px solid #ff6600; z-index: 1; }
+    
+    /* Porter-Style In-App Navigation HUD & Map */
+    #riderActiveMap { height: 270px; width: 100%; border-radius: 0 0 10px 10px; margin: 0 0 8px 0; border: 2px solid #ff6600; border-top: none; z-index: 1; }
+    .nav-hud-banner { background: linear-gradient(135deg, #0b2e1b, #081c11); border: 2px solid #2ecc71; border-radius: 10px 10px 0 0; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .nav-arrow-box { background: #2ecc71; color: #000; font-size: 24px; font-weight: 900; width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .nav-eta-strip { background: #000; border-left: 2px solid #ff6600; border-right: 2px solid #ff6600; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #ffaa66; font-weight: bold; }
+    .dark-tiles .leaflet-tile-pane { filter: invert(100%) hue-rotate(180deg) brightness(92%) contrast(90%); }
+
+    /* Waiting Timer & Breakdown UI */
+    .waiting-box { background: #261808; border: 1px dashed #ff9800; border-radius: 8px; padding: 8px 10px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+    .breakdown-btn { background: #3b0d0d !important; color: #ff6b6b !important; border: 1px solid #e74c3c !important; font-size: 12px !important; padding: 8px !important; margin-top: 6px !important; }
+
+    /* Go Home & Next Order Queue */
+    .go-home-strip { background: #142230; border: 1px solid #4db8ff; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
+    .next-queue-card { background: linear-gradient(135deg, #1f160a, #121212); border: 1px solid #ff9800; border-radius: 10px; padding: 10px; margin-top: 8px; }
+
+    /* Floating GoParcel Bubble Widget */
+    .floating-gp-bubble { position: fixed; bottom: 82px; right: 14px; width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #ff6600, #e65c00); color: #000; font-weight: 900; font-size: 11px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(255,102,0,0.7); border: 2px solid #fff; z-index: 1000; cursor: pointer; animation: floatBob 2.5s ease-in-out infinite; }
+    @keyframes floatBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+    /* System Health Alerts (Offline, Low Battery, Fake GPS) */
+    .sys-alert-bar { padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 10px; }
+    .offline-bar { background: #4a3500; border: 1px solid #f1c40f; color: #f1c40f; }
+    .battery-bar { background: #4a1500; border: 1px solid #ff6600; color: #ffaa66; }
+    .fake-gps-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.94); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+
     .contact-card-box { background: #111; border: 1px solid #4db8ff; border-radius: 10px; padding: 10px; margin: 8px 0; }
     .incentive-chart { background: linear-gradient(135deg, #16261a, #111); border: 1px solid #2ecc71; border-radius: 10px; padding: 10px; margin-bottom: 12px; }
     .otp-timer-pill { background: #2b180a; border: 1px solid #ff6600; color: #ffaa66; padding: 6px; border-radius: 6px; text-align: center; font-size: 13px; font-weight: bold; margin: 6px 0; }
@@ -99,7 +124,30 @@
   </div>
 </header>
 
+<!-- Fake GPS / Mock Location Fraud Protection Blocker -->
+<div id="fakeGpsBlockModal" class="fake-gps-modal hidden">
+  <div style="font-size:48px; margin-bottom:10px;">🚨🚫</div>
+  <h2 style="color:#ff3b30; margin-bottom:8px;">बनावट GPS आढळले! (Fake GPS Detected)</h2>
+  <p style="font-size:14px; color:#ddd; line-height:1.5; max-width:360px;">
+    तुमच्या फोनमध्ये Mock Location / Fake GPS सुरू असल्याचे आढळले आहे. कंपनीच्या नियमांनुसार तुमचे ॲप तात्पुरते ब्लॉक केले आहे. कृपया Fake GPS बंद करून ॲप रीस्टार्ट करा.
+  </p>
+</div>
+
+<!-- Floating GoParcel Bubble Widget -->
+<div id="floatingGpWidget" class="floating-gp-bubble hidden" onclick="quickJumpToActiveOrder()" title="GoParcel Quick Overlay">
+  <span style="font-size:15px;">🛵</span>
+  <span>GP</span>
+</div>
+
 <div class="container">
+  <!-- Offline / Low Network & Low Battery System Alerts -->
+  <div id="offlineNetworkBar" class="sys-alert-bar offline-bar hidden">
+    📡 नेटवर्क नाही (Offline Mode) — बेसमेंट/लो नेटवर्कमध्ये डेटा सेव्ह होत आहे, नेटवर्क येताच आपोआप सिंक होईल.
+  </div>
+  <div id="lowBatteryBar" class="sys-alert-bar battery-bar hidden">
+    🔋 बॅटरी अलर्ट: फोनची चार्जिंग <span id="batteryPctLabel">15</span>% पेक्षा कमी आहे! कृपया चार्जर/पॉवरबँक जोडा.
+  </div>
+
   <!-- Auth & Registration Screen -->
   <div id="authScreen" class="card">
     <h2 id="rTxtPortalTitle" style="color:#ff6600; margin-bottom:12px; text-align:center;">रायडर पार्टनर पोर्टल</h2>
@@ -243,7 +291,7 @@
       <button id="rTxtBtnSound" onclick="enableAudioAndTest()" style="width:auto; padding:6px 10px; background:#222; color:#2ecc71; border:1px solid #2ecc71; font-size:11px; margin:0;">🔊 रिंगटोन चालू</button>
     </div>
 
-    <!-- Temporary Block Card (Fully Translated) -->
+    <!-- Temporary Block Card -->
     <div id="tempBlockCard" class="temp-block-card hidden">
       <h3 id="txtTempBlockTitle" style="color:#ff453a;">⛔ तुमचे खाते ६० मिनिटांसाठी तात्पुरते ब्लॉक केले आहे!</h3>
       <p id="txtTempBlockSub" style="font-size:12px; color:#ddd; margin:8px 0;">सलग ४ वेळा सेल्फी चेहरा न जुळल्यामुळे हा तात्पुरता ब्लॉक लागू झाला आहे.</p>
@@ -252,13 +300,13 @@
       </div>
     </div>
 
-    <!-- Account Approval Pending (Fully Translated) -->
+    <!-- Account Approval Pending -->
     <div id="accountPendingCard" class="card hidden" style="background:#1c252c; border:2px solid #3498db; text-align:center;">
       <h4 id="txtAccPendTitle" style="color:#3498db;">⏳ प्रोफाईल अप्रूव्हल प्रलंबित (Profile Approval Pending)</h4>
       <p id="txtAccPendSub" style="font-size:12px; color:#ddd; margin-top:5px;">Admin ने तुमचे प्रोफाईल Approve केल्याशिवाय तुम्हाला ऑर्डर पडणार नाहीत.</p>
     </div>
 
-    <!-- Face-Match Duty Selfie Card (Fully Translated) -->
+    <!-- Face-Match Duty Selfie Card -->
     <div id="dutyFaceMatchCard" class="card hidden" style="border:2px solid #ff6600; background:#24180e; text-align:center;">
       <h3 id="txtFaceCardTitle" style="color:#ff6600;">📸 फेस मॅच सेल्फी अनिवार्य (Face Verification)</h3>
       <p id="facePromptReason" style="font-size:12px; color:#ffd2b3; margin:6px 0;">
@@ -270,12 +318,24 @@
       <button type="button" id="btnSnapDuty" onclick="verifyFaceAndGoOnline()" class="hidden" style="background:#2ecc71;">✅ सेल्फी तपासा व ONLINE व्हा</button>
     </div>
 
-    <!-- Online Searching Radar (Fully Translated) -->
+    <!-- Online Searching Radar -->
     <div id="searchingRadarBox" class="searching-radar hidden">
       <div class="radar-dot"></div>
       <strong id="txtSearchingRadar" style="color:#2ecc71; font-size:15px;">🔍 नवीन ऑर्डर शोधत आहे...</strong>
       <div style="font-size:11px; color:#aaa; margin-top:4px;">
         GPS Active • <span id="txtNextSelfieLbl">पुढील सेल्फी तपासणी:</span> <strong id="nextSelfieTimerTxt" style="color:#ffaa66;">02:00:00</strong>
+      </div>
+    </div>
+
+    <!-- Go-To-Home Mode Strip (Max 2 Uses/Day) -->
+    <div class="go-home-strip">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong style="color:#4db8ff; font-size:13px;">🏠 गो-टू-होम मोड (Go Home Filter)</strong>
+        <span id="goHomeUsageBadge" style="font-size:11px; color:#aaa;">वापर: 0 / 2 आज</span>
+      </div>
+      <div style="display:flex; gap:6px; margin-top:6px;">
+        <input type="text" id="riderHomeAreaInput" placeholder="घराचा एरिया (उदा. हडपसर, कोथरूड)" style="margin:0; padding:8px; font-size:13px;">
+        <button id="btnToggleGoHome" onclick="toggleGoHomeMode()" style="width:auto; padding:0 12px; margin:0; background:#1c2e3d; color:#4db8ff; border:1px solid #4db8ff; font-size:12px;">ON करा</button>
       </div>
     </div>
 
@@ -286,7 +346,7 @@
 
     <div id="riderNoticeBanner" class="banner-strip hidden"></div>
 
-    <!-- Peak Hour Incentive Chart Card (Synced Live from Admin Panel) -->
+    <!-- Peak Hour Incentive Chart Card -->
     <div id="peakIncentiveBanner" class="incentive-chart">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <strong id="txtIncChartTitle" style="color:#2ecc71; font-size:13px;">🎁 पीक अवर इन्सेंटिव्ह चार्ट (Peak Hour Bonus)</strong>
@@ -329,15 +389,41 @@
       <button onclick="submitOnboardingUtr()" style="background:#2ecc71;">✅ Submit UTR</button>
     </div>
 
-    <!-- SECTION 1: ACTIVE DELIVERY (WITH IN-APP LIVE MAP, GOOGLE MAPS DIRECTIONS, STAGE-WISE PICKUP/DROP PERSON & 150m AUTO-REACH) + AVAILABLE ORDERS + CHAT -->
+    <!-- SECTION 1: ACTIVE DELIVERY (PORTER-STYLE IN-APP TURN-BY-TURN NAV, ROUTE POLYLINE, NIGHT MODE, WAITING TIMER, BREAKDOWN & NEXT ORDER QUEUE) -->
     <div id="secOrders">
-      <div class="card">
-        <h3 id="rTxtActiveDeliv" style="color:#ff6600; margin-bottom:10px;">🚚 माझ्या चालू डिलिव्हरी</h3>
-        <!-- In-App Live Rider Navigation Map -->
+      <div class="card" id="activeDeliverySectionCard">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <h3 id="rTxtActiveDeliv" style="color:#ff6600; margin:0;">🚚 माझ्या चालू डिलिव्हरी</h3>
+          <button id="btnToggleMapTheme" onclick="toggleManualMapTheme()" style="width:auto; padding:4px 8px; margin:0; font-size:11px; background:#222; color:#ffaa66; border:1px solid #444;">🌙 Night Map</button>
+        </div>
+
+        <!-- Porter-Style Turn-by-Turn HUD + Live Route Map -->
         <div id="riderLiveMapWrapper" class="hidden">
+          <div class="nav-hud-banner">
+            <div class="nav-arrow-box" id="navTurnArrow">⬆️</div>
+            <div style="flex:1;">
+              <div id="navTurnStepText" style="font-size:14px; font-weight:bold; color:#fff;">सरळ पुढे जा (Head straight)</div>
+              <div id="navTurnDistText" style="font-size:12px; color:#2ecc71; font-weight:bold;">पुढील वळण: 200 मी.</div>
+            </div>
+            <div style="text-align:right; background:#000; padding:6px 8px; border-radius:8px; border:1px solid #2ecc71;">
+              <div id="navLiveSpeed" style="font-size:16px; font-weight:bold; color:#2ecc71;">0</div>
+              <div style="font-size:9px; color:#aaa;">km/h</div>
+            </div>
+          </div>
+          <div class="nav-eta-strip">
+            <span>⏱️ ETA: <strong id="navDynamicEta">-- मिनिटे</strong></span>
+            <span>📏 उरलेले अंतर: <strong id="navRemainingKm">-- km</strong></span>
+          </div>
           <div id="riderActiveMap"></div>
         </div>
+
         <div id="myDeliveries">...</div>
+
+        <!-- Back-to-Back Next Order Queue (Shows near drop location) -->
+        <div id="nextOrderQueueBox" class="next-queue-card hidden">
+          <div style="font-size:12px; color:#ff9800; font-weight:bold; margin-bottom:4px;">⚡ बॅक-टू-बॅक पुढची ऑर्डर (ड्रॉप जवळ उपलब्ध):</div>
+          <div id="nextOrderQueueContent"></div>
+        </div>
       </div>
 
       <div class="card">
@@ -356,7 +442,7 @@
       </div>
     </div>
 
-    <!-- SECTION 2: WALLET, COD, INCENTIVE TALLY & WEEKLY PROFIT -->
+    <!-- SECTION 2: WALLET, COD, 100% TIPS, INCENTIVE TALLY & WEEKLY PROFIT -->
     <div id="secWallet" class="hidden">
       <div class="card">
         <h3 id="rTxtWalletTitle" style="color:#ff6600; margin-bottom:10px;">💰 वॉलेट, इन्सेंटिव्ह व साप्ताहिक नफा</h3>
@@ -376,6 +462,7 @@
           <div class="weekly-row"><span id="rTxtWkRides">पूर्ण राईड्स:</span><strong id="wkRidesCount">0</strong></div>
           <div class="weekly-row"><span id="rTxtWkGross">एकूण भाडे:</span><strong>₹<span id="wkGrossFare">0</span></strong></div>
           <div class="weekly-row"><span id="rTxtWkInc">पीक अवर इन्सेंटिव्ह बोनस:</span><strong style="color:#4db8ff;">+₹<span id="wkIncentiveEarned">0</span></strong></div>
+          <div class="weekly-row"><span>🎁 १००% कस्टमर टीप (No Commission):</span><strong style="color:#2ecc71;">+₹<span id="wkTipsEarned">0</span></strong></div>
           <div class="weekly-row"><span id="rTxtWkComm">कमिशन कपात:</span><span style="color:#e74c3c;">-₹<span id="wkCommission">0</span></span></div>
           <div class="weekly-row" style="font-size:15px; padding-top:6px;">
             <span id="rTxtWkProfit" style="color:#2ecc71; font-weight:bold;">साप्ताहिक एकूण नफा:</span>
@@ -551,11 +638,23 @@
     ownerAadhaar: true, ownerRc: true, ownerNoc: true
   };
   let ringLoopInterval = null, audioCtx = null, currentRiderProfile = null;
-  let latestWeeklySummary = { rides: 0, gross: 0, comm: 0, incentive: 0, netProfit: 0 };
-  let riderMapObj = null, rSelfMarker = null, rPickMarker = null, rDropMarker = null;
-  let currentActiveOrderCache = null;
+  let latestWeeklySummary = { rides: 0, gross: 0, comm: 0, incentive: 0, tips: 0, netProfit: 0 };
+  let riderMapObj = null, rSelfMarker = null, rPickMarker = null, rDropMarker = null, rStopMarkers = [], rRoutePolyline = null;
+  let currentActiveOrderCache = null, lastRouteFetchKey = "", lastRouteSteps = [];
+  let manualMapDarkOverride = null;
 
-  // संपूर्ण ३ भाषांची डिक्शनरी (Selfie Verification, Searching Radar, Block, Incentive सर्व समाविष्ट)
+  // Go-To-Home Mode State (Max 2 uses/day)
+  let goHomeActive = false, goHomeTargetArea = "";
+  const todayStrKey = new Date().toISOString().slice(0, 10);
+  let goHomeData = JSON.parse(localStorage.getItem("gp_go_home") || `{"date":"${todayStrKey}","count":0,"area":""}`);
+  if (goHomeData.date !== todayStrKey) {
+    goHomeData = { date: todayStrKey, count: 0, area: "" };
+    localStorage.setItem("gp_go_home", JSON.stringify(goHomeData));
+  }
+
+  // Fake GPS Fraud Detection State
+  let prevGpsSample = null, isFakeGpsBlocked = false;
+
   const rDict = {
     mr: {
       pTitle: "रायडर पार्टनर पोर्टल", tLog: "🔑 जुना रायडर लॉगिन", tReg: "📝 नवीन रायडर नोंदणी",
@@ -689,6 +788,93 @@
   };
   changeRiderLang(riderLang);
 
+  // Offline / Low Network Monitor
+  function updateOnlineNetworkStatus() {
+    const bar = document.getElementById('offlineNetworkBar');
+    if (bar) bar.classList.toggle('hidden', navigator.onLine);
+  }
+  window.addEventListener('online', updateOnlineNetworkStatus);
+  window.addEventListener('offline', updateOnlineNetworkStatus);
+  updateOnlineNetworkStatus();
+
+  // Battery Level Optimization Alert (< 15%)
+  if ('getBattery' in navigator) {
+    navigator.getBattery().then(bat => {
+      const checkBat = () => {
+        const pct = Math.round(bat.level * 100);
+        const bar = document.getElementById('lowBatteryBar');
+        if (bar) {
+          document.getElementById('batteryPctLabel').innerText = pct;
+          bar.classList.toggle('hidden', !(pct <= 15 && !bat.charging));
+        }
+      };
+      checkBat();
+      bat.addEventListener('levelchange', checkBat);
+      bat.addEventListener('chargingchange', checkBat);
+    }).catch(() => {});
+  }
+
+  // Floating Bubble Quick Jump
+  window.quickJumpToActiveOrder = () => {
+    switchBottomTab('Orders', document.querySelectorAll('.b-nav-item')[0]);
+    const el = document.getElementById('activeDeliverySectionCard');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Go-To-Home Mode Toggle (Max 2 uses per day)
+  function refreshGoHomeUi() {
+    document.getElementById('goHomeUsageBadge').innerText = `वापर: ${goHomeData.count} / 2 आज`;
+    document.getElementById('riderHomeAreaInput').value = goHomeData.area || "";
+    const btn = document.getElementById('btnToggleGoHome');
+    if (goHomeActive) {
+      btn.innerText = "✅ ACTIVE (बंद करा)";
+      btn.style.background = "#2ecc71";
+      btn.style.color = "#000";
+    } else {
+      btn.innerText = "ON करा";
+      btn.style.background = "#1c2e3d";
+      btn.style.color = "#4db8ff";
+    }
+  }
+  refreshGoHomeUi();
+
+  window.toggleGoHomeMode = () => {
+    if (goHomeActive) {
+      goHomeActive = false;
+      refreshGoHomeUi();
+      return;
+    }
+    const area = document.getElementById('riderHomeAreaInput').value.trim();
+    if (!area) return alert("कृपया आधी तुमच्या घराचा एरिया टाका (उदा. हडपसर, स्वारगेट)!");
+    if (goHomeData.count >= 2) return alert("⚠️ गो-टू-होम मोड दिवसातून फक्त २ वेळाच वापरता येतो!");
+    goHomeData.count += 1;
+    goHomeData.area = area;
+    localStorage.setItem("gp_go_home", JSON.stringify(goHomeData));
+    goHomeActive = true;
+    goHomeTargetArea = area.toLowerCase();
+    refreshGoHomeUi();
+    alert(`🏠 Go-Home Mode ON! आता फक्त "${area}" च्या दिशेने जाणाऱ्या ऑर्डर्स दिसतील.`);
+  };
+
+  // Night Map Theme Auto & Manual Control
+  function applyAutoMapNightTheme() {
+    const mapEl = document.getElementById('riderActiveMap');
+    const btn = document.getElementById('btnToggleMapTheme');
+    if (!mapEl) return;
+    const hr = new Date().getHours();
+    const isNightHour = (hr >= 18 || hr < 6);
+    const useDark = manualMapDarkOverride !== null ? manualMapDarkOverride : isNightHour;
+    mapEl.classList.toggle('dark-tiles', useDark);
+    if (btn) btn.innerText = useDark ? "☀️ Light Map" : "🌙 Night Map";
+  }
+
+  window.toggleManualMapTheme = () => {
+    const mapEl = document.getElementById('riderActiveMap');
+    const currentlyDark = mapEl.classList.contains('dark-tiles');
+    manualMapDarkOverride = !currentlyDark;
+    applyAutoMapNightTheme();
+  };
+
   window.handleVehicleCategoryChange = () => {
     const veh = document.getElementById('rVehCategory').value;
     const role = document.getElementById('rOwnerRole').value;
@@ -706,9 +892,31 @@
     return hr >= peakStartHour || hr < peakEndHour;
   }
 
+  // Live 1-Second Tick: Clock, Block Timer, Selfie Timer & Free 10-Min Waiting Timer
   setInterval(async () => {
     const clockEl = document.getElementById('regConsentClock');
     if (clockEl) clockEl.innerText = new Date().toLocaleTimeString('en-IN');
+
+    // Update Free 10-Min Waiting Timer UI if active
+    const waitEl = document.getElementById('liveWaitingTimerText');
+    if (waitEl && currentActiveOrderCache) {
+      const o = currentActiveOrderCache;
+      const reachedMs = Number(o.reachedPickupMs || o.reachedDropMs || 0);
+      if (reachedMs > 0 && (o.status === "ReachedPickup" || o.status === "ReachedDrop")) {
+        const elapsedSec = Math.max(0, Math.floor((Date.now() - reachedMs) / 1000));
+        const freeLimitSec = 10 * 60;
+        if (elapsedSec <= freeLimitSec) {
+          const rem = freeLimitSec - elapsedSec;
+          const m = String(Math.floor(rem / 60)).padStart(2, '0');
+          const s = String(rem % 60).padStart(2, '0');
+          waitEl.innerHTML = `<span style="color:#2ecc71;">मोफत वेटिंग: ${m}:${s} बाकी</span>`;
+        } else {
+          const extraMins = Math.ceil((elapsedSec - freeLimitSec) / 60);
+          const extraCharge = extraMins * 2;
+          waitEl.innerHTML = `<span style="color:#ff6b6b;">+${extraMins} मिनिटे जादा • वेटिंग चार्ज: +₹${extraCharge}</span>`;
+        }
+      }
+    }
 
     if (!activeRiderId) return;
     const now = Date.now();
@@ -885,7 +1093,6 @@
       selfieIntervalHours = Number(s.selfieIntervalHours ?? 2);
       tempBlockMinutes = Number(s.tempBlockMinutes ?? 60);
 
-      // Peak Hour Incentive Settings
       peakIncentiveActive = s.peakIncentiveActive ?? true;
       peakStartHour = Number(s.peakStartHour ?? 18);
       peakEndHour = Number(s.peakEndHour ?? 22);
@@ -1336,6 +1543,7 @@
 
   window.acceptOrder = async (orderId) => {
     stopOrderRingtone();
+    if (isFakeGpsBlocked) return alert("🚨 Fake GPS Detected! Disable Mock Location first.");
     if (tempBlockUntil > Date.now()) return alert("⛔ Account Temporarily Blocked!");
     if (!isSelfieApproved || selfieExpiresAt <= Date.now()) return alert("📸 Please complete Face Selfie verification first!");
     if (!isRiderOnline) return alert("⚠️ Please switch to ONLINE first!");
@@ -1365,14 +1573,30 @@
   };
 
   window.markReachedPickup = async (orderId) => {
-    await updateDoc(doc(db, "orders", orderId), { status: "ReachedPickup", reachedPickupAt: serverTimestamp() });
+    await updateDoc(doc(db, "orders", orderId), { status: "ReachedPickup", reachedPickupAt: serverTimestamp(), reachedPickupMs: Date.now() });
   };
 
   window.markPickedUp = async (orderId) => {
     await updateDoc(doc(db, "orders", orderId), { status: "PickedUp", pickedUpAt: serverTimestamp() });
   };
 
+  // Vehicle Breakdown / Emergency Order Transfer to Another Nearby Rider
+  window.reportVehicleBreakdown = async (orderId) => {
+    const confirmTransfer = confirm("🚨 गाडी बिघडली/पंक्चर झाली आहे का? ही ऑर्डर तात्काळ दुसऱ्या जवळच्या रायडरकडे ट्रान्सफर करायची का?");
+    if (!confirmTransfer) return;
+    await updateDoc(doc(db, "orders", orderId), {
+      status: "Pending",
+      riderId: "",
+      riderEmail: "",
+      breakdownTransferredFrom: activeRiderName,
+      breakdownNote: "Vehicle Breakdown - Reassigned to nearby rider",
+      breakdownAt: serverTimestamp()
+    });
+    alert("✅ ऑर्डर दुसऱ्या जवळच्या रायडरसाठी ट्रान्सफर केली आहे! सुरक्षित रहा.");
+  };
+
   window.completeOrderWithPin = async (orderId, expectedPin, dropLat, dropLng) => {
+    if (isFakeGpsBlocked) return alert("🚨 Fake GPS Detected! Delivery blocked.");
     if (dropLat && dropLng && riderLat && riderLng) {
       const distMeters = Math.round(getDistanceKm(riderLat, riderLng, dropLat, dropLng) * 1000);
       if (distMeters > deliveryRangeMeters) {
@@ -1384,10 +1608,25 @@
       if (!enteredPin) return;
       if (enteredPin.trim() !== expectedPin) return alert("❌ Wrong PIN!");
     }
+
+    // Calculate Final Waiting Charge (> 10 min free, ₹2/min after)
+    let waitingCharge = 0;
+    if (currentActiveOrderCache) {
+      const reachedMs = Number(currentActiveOrderCache.reachedDropMs || currentActiveOrderCache.reachedPickupMs || 0);
+      if (reachedMs > 0) {
+        const elapsedMin = Math.floor((Date.now() - reachedMs) / 60000);
+        if (elapsedMin > 10) waitingCharge = (elapsedMin - 10) * 2;
+      }
+    }
+
     await updateDoc(doc(db, "orders", orderId), {
-      status: "Delivered", deliveredAt: serverTimestamp(), deliveredTimestampMs: Date.now(), deliveredDateStr: new Date().toLocaleString('en-IN')
+      status: "Delivered",
+      waitingCharge: waitingCharge,
+      deliveredAt: serverTimestamp(),
+      deliveredTimestampMs: Date.now(),
+      deliveredDateStr: new Date().toLocaleString('en-IN')
     });
-    alert("🎉 Delivered!");
+    alert(`🎉 Delivered! ${waitingCharge > 0 ? `(Waiting Charge +₹${waitingCharge} added)` : ''}`);
   };
 
   window.saveBankDetails = async () => {
@@ -1427,14 +1666,67 @@
     alert("✅ Deposit Submitted!");
   };
 
-  // इन-बिल्ट रायडर लाईव्ह मॅप अपडेट करणे
+  // Fetch Real Road Route Polyline & Turn-by-Turn Steps via OSRM
+  async function fetchInAppTurnByTurnRoute(startLat, startLng, endLat, endLng) {
+    const routeKey = `${startLat.toFixed(4)},${startLng.toFixed(4)}->${endLat.toFixed(4)},${endLng.toFixed(4)}`;
+    if (routeKey === lastRouteFetchKey) return;
+    lastRouteFetchKey = routeKey;
+
+    try {
+      const url = `https://router.project-osrm.org/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=full&geometries=geojson&steps=true`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.routes && data.routes.length > 0) {
+        const route = data.routes[0];
+        const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
+        if (rRoutePolyline) rRoutePolyline.setLatLngs(coords);
+        else {
+          rRoutePolyline = L.polyline(coords, { color: '#ff6600', weight: 6, opacity: 0.9 }).addTo(riderMapObj);
+        }
+
+        const remKm = (route.distance / 1000).toFixed(1);
+        const etaMin = Math.max(1, Math.round(route.duration / 60));
+        document.getElementById('navRemainingKm').innerText = `${remKm} km`;
+        document.getElementById('navDynamicEta').innerText = `${etaMin} मिनिटे`;
+
+        const legs = route.legs || [];
+        if (legs.length > 0 && legs[0].steps && legs[0].steps.length > 0) {
+          lastRouteSteps = legs[0].steps;
+          const nextStep = lastRouteSteps.length > 1 ? lastRouteSteps[1] : lastRouteSteps[0];
+          const mod = nextStep.maneuver?.modifier || "";
+          let arrow = "⬆️";
+          let dirMr = "सरळ पुढे जा";
+          if (mod.includes("left")) { arrow = "⬅️"; dirMr = "पुढे डावीकडे वळा"; }
+          else if (mod.includes("right")) { arrow = "➡️"; dirMr = "पुढे उजवीकडे वळा"; }
+          else if (mod.includes("uturn")) { arrow = "↩️"; dirMr = "पुढे यू-टर्न घ्या"; }
+
+          const stepDist = Math.round(nextStep.distance || 0);
+          const roadName = nextStep.name ? ` (${nextStep.name})` : "";
+          document.getElementById('navTurnArrow').innerText = arrow;
+          document.getElementById('navTurnStepText').innerText = `${dirMr}${roadName}`;
+          document.getElementById('navTurnDistText').innerText = `पुढील वळण: ${stepDist} मी. पुढे`;
+        }
+      }
+    } catch (e) {
+      // Fallback straight line if offline
+      if (rRoutePolyline) rRoutePolyline.setLatLngs([[startLat, startLng], [endLat, endLng]]);
+      else rRoutePolyline = L.polyline([[startLat, startLng], [endLat, endLng]], { color: '#ff6600', weight: 5, dashArray: '8, 8' }).addTo(riderMapObj);
+    }
+  }
+
+  // इन-ॲप Porter-Style लाईव्ह नेव्हिगेशन मॅप अपडेट करणे
   function updateRiderInAppMap(order) {
     const wrap = document.getElementById('riderLiveMapWrapper');
     if (!order) {
       wrap.classList.add('hidden');
+      if (rRoutePolyline && riderMapObj) { riderMapObj.removeLayer(rRoutePolyline); rRoutePolyline = null; }
+      rStopMarkers.forEach(m => riderMapObj && riderMapObj.removeLayer(m));
+      rStopMarkers = [];
+      lastRouteFetchKey = "";
       return;
     }
     wrap.classList.remove('hidden');
+    applyAutoMapNightTheme();
 
     const pLat = Number(order.pickupLat || 18.5204);
     const pLng = Number(order.pickupLng || 73.8567);
@@ -1443,8 +1735,12 @@
     const rLat = Number(riderLat || pLat);
     const rLng = Number(riderLng || pLng);
 
+    const goingToPickup = (order.status === "Accepted" || order.status === "ReachedPickup");
+    const targetLat = goingToPickup ? pLat : dLat;
+    const targetLng = goingToPickup ? pLng : dLng;
+
     if (!riderMapObj) {
-      riderMapObj = L.map('riderActiveMap').setView([rLat, rLng], 14);
+      riderMapObj = L.map('riderActiveMap').setView([rLat, rLng], 15);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(riderMapObj);
       const greenPin = L.divIcon({ html: '<div style="font-size:24px;">🟢</div>', className: '', iconSize: [26, 26], iconAnchor: [13, 13] });
       const redPin = L.divIcon({ html: '<div style="font-size:24px;">🔴</div>', className: '', iconSize: [26, 26], iconAnchor: [13, 13] });
@@ -1459,10 +1755,25 @@
       rSelfMarker.setLatLng([rLat, rLng]);
       riderMapObj.panTo([rLat, rLng]);
     }
+
+    // Render Multi-Stops if present
+    rStopMarkers.forEach(m => riderMapObj.removeLayer(m));
+    rStopMarkers = [];
+    if (Array.isArray(order.extraStops)) {
+      order.extraStops.forEach((st, idx) => {
+        if (st.lat && st.lng) {
+          const stopIcon = L.divIcon({ html: `<div style="background:#ff9800; color:#000; font-weight:bold; border-radius:50%; width:22px; height:22px; text-align:center; font-size:12px;">${idx + 1}</div>`, className: '' });
+          const sm = L.marker([st.lat, st.lng], { icon: stopIcon }).addTo(riderMapObj).bindPopup(`Stop ${idx + 1}: ${st.address || ''}`);
+          rStopMarkers.push(sm);
+        }
+      });
+    }
+
+    fetchInAppTurnByTurnRoute(rLat, rLng, targetLat, targetLng);
     setTimeout(() => riderMapObj.invalidateSize(), 200);
   }
 
-  // १५० मीटर रेंजमध्ये आल्यावर ऑटो-रीच (Auto-Reach) तपासणी
+  // १५० मीटर रेंजमध्ये आल्यावर ऑटो-रीच (Auto-Reach) व वेटिंग टायमर सुरू करणे
   async function checkAutoReachMilestones() {
     if (!currentActiveOrderCache || !riderLat || !riderLng) return;
     const o = currentActiveOrderCache;
@@ -1470,20 +1781,46 @@
     if (o.status === "Accepted" && o.pickupLat && o.pickupLng) {
       const distPickM = Math.round(getDistanceKm(riderLat, riderLng, o.pickupLat, o.pickupLng) * 1000);
       if (distPickM <= deliveryRangeMeters) {
-        await updateDoc(doc(db, "orders", o.id), { status: "ReachedPickup", reachedPickupAt: serverTimestamp() });
+        await updateDoc(doc(db, "orders", o.id), { status: "ReachedPickup", reachedPickupAt: serverTimestamp(), reachedPickupMs: Date.now() });
       }
     } else if (o.status === "PickedUp" && o.dropLat && o.dropLng) {
       const distDropM = Math.round(getDistanceKm(riderLat, riderLng, o.dropLat, o.dropLng) * 1000);
       if (distDropM <= deliveryRangeMeters) {
-        await updateDoc(doc(db, "orders", o.id), { status: "ReachedDrop", reachedDropAt: serverTimestamp() });
+        await updateDoc(doc(db, "orders", o.id), { status: "ReachedDrop", reachedDropAt: serverTimestamp(), reachedDropMs: Date.now() });
       }
     }
   }
 
+  // GPS Tracking + Live Speedometer + Fake GPS Fraud Protection
   function startGpsTracking(rid) {
     if ("geolocation" in navigator) {
       navigator.geolocation.watchPosition(async (pos) => {
-        riderLat = pos.coords.latitude; riderLng = pos.coords.longitude;
+        const newLat = pos.coords.latitude;
+        const newLng = pos.coords.longitude;
+        const nowMs = Date.now();
+
+        // Fake GPS / Impossible Teleportation Check (> 160 km/h instant jump)
+        if (prevGpsSample) {
+          const dtHours = (nowMs - prevGpsSample.time) / 3600000;
+          if (dtHours > 0.0005) {
+            const jumpKm = getDistanceKm(prevGpsSample.lat, prevGpsSample.lng, newLat, newLng);
+            const calcSpeedKmh = jumpKm / dtHours;
+            if (calcSpeedKmh > 165 && jumpKm > 1.5) {
+              isFakeGpsBlocked = true;
+              document.getElementById('fakeGpsBlockModal').classList.remove('hidden');
+              await updateDoc(doc(db, "riders", rid), { isOnline: false, fakeGpsFlagged: true });
+              return;
+            }
+          }
+        }
+        prevGpsSample = { lat: newLat, lng: newLng, time: nowMs };
+
+        // Live Speedometer HUD Update
+        const speedKmh = pos.coords.speed ? Math.max(0, Math.round(pos.coords.speed * 3.6)) : 0;
+        const speedEl = document.getElementById('navLiveSpeed');
+        if (speedEl) speedEl.innerText = speedKmh;
+
+        riderLat = newLat; riderLng = newLng;
         await updateDoc(doc(db, "riders", rid), { lat: riderLat, lng: riderLng, lastSeen: serverTimestamp() });
         if (rSelfMarker) rSelfMarker.setLatLng([riderLat, riderLng]);
         checkAutoReachMilestones();
@@ -1497,6 +1834,7 @@
     document.getElementById('riderScreen').classList.remove('hidden');
     document.getElementById('bottomNav').classList.remove('hidden');
     document.getElementById('dutyToggleBtn').classList.remove('hidden');
+    document.getElementById('floatingGpWidget').classList.remove('hidden');
     document.getElementById('riderLabel').innerText = label;
 
     if ("Notification" in window && Notification.permission !== "granted") Notification.requestPermission();
@@ -1546,17 +1884,23 @@
 
     onSnapshot(query(collection(db, "orders"), where("status", "==", "Pending")), (snap) => {
       const div = document.getElementById('availableOrders');
+      const queueBox = document.getElementById('nextOrderQueueBox');
+      const queueContent = document.getElementById('nextOrderQueueContent');
       div.innerHTML = "";
+      queueContent.innerHTML = "";
+      let queuedCount = 0;
 
       const selfieValid = isSelfieApproved && (selfieExpiresAt > Date.now());
       if (!isRiderOnline || !selfieValid || !isApproved || tempBlockUntil > Date.now()) {
         stopOrderRingtone();
+        queueBox.classList.add('hidden');
         div.innerHTML = `<div style="color:#aaa; font-size:13px; padding:8px;">⚠️ Please verify Face Selfie & go <b>ONLINE</b> to see orders.</div>`;
         return;
       }
 
       if (currentWalletBalance < 0) {
         stopOrderRingtone();
+        queueBox.classList.add('hidden');
         div.innerHTML = `<div style="color:#ff8a8a; font-size:13px; padding:8px;">🚫 Negative Wallet Balance (₹${currentWalletBalance})</div>`;
         return;
       }
@@ -1567,6 +1911,12 @@
 
       snap.forEach(d => {
         const o = d.data();
+        // Go-To-Home Mode Filter Check
+        if (goHomeActive && goHomeTargetArea) {
+          const dropText = (o.drop || "").toLowerCase();
+          if (!dropText.includes(goHomeTargetArea)) return;
+        }
+
         const awayKm = (riderLat && riderLng && o.pickupLat && o.pickupLng) ? getDistanceKm(riderLat, riderLng, o.pickupLat, o.pickupLng) : 0;
         if (!riderLat || !riderLng || awayKm <= maxRadiusKm) {
           foundOrders++;
@@ -1577,64 +1927,87 @@
           }
 
           const net = Math.round(Number(o.fare || 0) * ((100 - currentCommPct) / 100));
+          const tipAmt = Number(o.tipAmount || 0);
           const distLabel = (riderLat && riderLng && o.pickupLat) ? `📍 ${awayKm.toFixed(1)} km` : `📍 New`;
           const payBadge = (o.paymentMode === "ONLINE")
             ? `<span class="pay-badge-onl">📱 ONLINE PAID</span>`
             : `<span class="pay-badge-cod">💵 COD (₹${o.fare})</span>`;
           const incTag = incBonusNow > 0 ? `<span style="color:#4db8ff; font-size:11px;"> + ₹${incBonusNow} Peak Bonus</span>` : '';
+          const tipTag = tipAmt > 0 ? `<span style="color:#2ecc71; font-size:11px;"> + ₹${tipAmt} 100% Tip</span>` : '';
+          const floorInfo = (o.pickupFloor || o.dropFloor) ? `<div style="font-size:11px; color:#ffaa66;">🏢 Floor: Pickup ${o.pickupFloor || 'Ground'} ➔ Drop ${o.dropFloor || 'Ground'}</div>` : '';
+          const pkgPhotoHtml = o.packagePhoto ? `<img src="${o.packagePhoto}" style="width:65px; height:65px; border-radius:6px; object-fit:cover; margin-top:5px; border:1px solid #ff6600;">` : '';
 
           div.innerHTML += `<div class="order-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
               <b>${o.vehicle} • ${o.parcel} (${o.parcelWeight || '1-5 kg'})</b>
               ${payBadge}
             </div>
-            <div style="font-size:11px; color:#4db8ff; margin-bottom:4px;">${distLabel}</div>
-            <small>🟢 Pickup: ${o.pickup}<br>🔴 Drop: ${o.drop}</small><br>
-            <div style="margin:6px 0; color:#2ecc71;">Profit: <b>₹${net}</b>${incTag} (Fare: ₹${o.fare})</div>
+            <div style="font-size:11px; color:#4db8ff; margin-bottom:4px;">${distLabel} ${o.scheduledTime ? `• ⏰ Scheduled: ${o.scheduledTime}` : ''}</div>
+            <small>🟢 Pickup: ${o.pickup}<br>🔴 Drop: ${o.drop}</small>
+            ${floorInfo}
+            ${pkgPhotoHtml}
+            <div style="margin:6px 0; color:#2ecc71;">Profit: <b>₹${net}</b>${incTag}${tipTag} (Fare: ₹${o.fare})</div>
             <button onclick="acceptOrder('${d.id}')" style="background:#2ecc71;">⚡ Accept Order</button>
           </div>`;
+
+          // Back-to-Back Next Order Queue Check (Within 2.5 km of Active Drop Location)
+          if (currentActiveOrderCache && currentActiveOrderCache.dropLat && o.pickupLat) {
+            const distFromDropKm = getDistanceKm(currentActiveOrderCache.dropLat, currentActiveOrderCache.dropLng, o.pickupLat, o.pickupLng);
+            if (distFromDropKm <= 2.5 && queuedCount < 2) {
+              queuedCount++;
+              queueContent.innerHTML += `<div style="background:#111; padding:8px; border-radius:8px; margin-top:5px; border-left:3px solid #2ecc71; font-size:12px;">
+                <strong>${o.vehicle} • ₹${net} Profit</strong> (${distFromDropKm.toFixed(1)} km from your drop)<br>
+                <span style="color:#ccc;">🟢 ${o.pickup} ➔ 🔴 ${o.drop}</span>
+                <button onclick="acceptOrder('${d.id}')" style="padding:6px; margin-top:5px; font-size:12px; background:#ff9800;">⚡ Queue Next Order</button>
+              </div>`;
+            }
+          }
         }
       });
 
+      queueBox.classList.toggle('hidden', queuedCount === 0);
       if (hasBrandNewOrder) startContinuousOrderRingtone(newestOrderSummary);
-      if (foundOrders === 0) { stopOrderRingtone(); div.innerHTML = `No orders within ${maxRadiusKm} km.`; }
+      if (foundOrders === 0) { stopOrderRingtone(); div.innerHTML = goHomeActive ? `🏠 "${goHomeTargetArea}" च्या दिशेने सध्या ऑर्डर नाही.` : `No orders within ${maxRadiusKm} km.`; }
       lastKnownOrderIds = currentIds;
       isFirstOrderLoad = false;
     });
 
-    let onlineNetTotal = 0, codCommOwedTotal = 0, totalCodCashCollected = 0, totalIncentiveEarnedAll = 0;
+    let onlineNetTotal = 0, codCommOwedTotal = 0, totalCodCashCollected = 0, totalIncentiveEarnedAll = 0, totalTipsEarnedAll = 0;
     const sevenDaysAgoMs = Date.now() - (7 * 24 * 60 * 60 * 1000);
 
     onSnapshot(query(collection(db, "orders"), where("riderId", "==", rid)), (snap) => {
       const div = document.getElementById('myDeliveries'), histDiv = document.getElementById('orderHistoryList');
       div.innerHTML = ""; histDiv.innerHTML = "";
-      onlineNetTotal = 0; codCommOwedTotal = 0; totalCodCashCollected = 0; totalIncentiveEarnedAll = 0;
-      let wkRides = 0, wkGross = 0, wkComm = 0, wkInc = 0, wkNet = 0;
+      onlineNetTotal = 0; codCommOwedTotal = 0; totalCodCashCollected = 0; totalIncentiveEarnedAll = 0; totalTipsEarnedAll = 0;
+      let wkRides = 0, wkGross = 0, wkComm = 0, wkInc = 0, wkTips = 0, wkNet = 0;
       let activeOrderFound = null;
 
       snap.forEach(d => {
         const o = d.data();
         const fareNum = Number(o.fare || 0);
         const incBonus = Number(o.incentiveBonus || 0);
-        const net = Math.round(fareNum * ((100 - currentCommPct) / 100));
-        const comm = fareNum - net;
+        const tipAmt = Number(o.tipAmount || 0); // 100% Tip without commission
+        const waitAmt = Number(o.waitingCharge || 0);
+        const net = Math.round(fareNum * ((100 - currentCommPct) / 100)) + waitAmt;
+        const comm = fareNum - Math.round(fareNum * ((100 - currentCommPct) / 100));
         const isCod = (o.paymentMode !== "ONLINE");
 
         if (o.status === "Delivered") {
           totalIncentiveEarnedAll += incBonus;
-          if (isCod) { totalCodCashCollected += fareNum; codCommOwedTotal += comm; }
+          totalTipsEarnedAll += tipAmt;
+          if (isCod) { totalCodCashCollected += (fareNum + waitAmt); codCommOwedTotal += comm; }
           else { onlineNetTotal += net; }
 
           const delivMs = o.deliveredTimestampMs || Date.now();
           if (delivMs >= sevenDaysAgoMs) {
-            wkRides++; wkGross += fareNum; wkComm += comm; wkInc += incBonus;
-            wkNet += (net + incBonus);
+            wkRides++; wkGross += fareNum; wkComm += comm; wkInc += incBonus; wkTips += tipAmt;
+            wkNet += (net + incBonus + tipAmt);
           }
 
           histDiv.innerHTML += `<div class="hist-item">
             <div style="display:flex; justify-content:space-between;">
               <strong>📦 ${o.vehicle} • ${o.parcel} (${o.parcelWeight || '1-5 kg'})</strong>
-              <span style="color:${isCod ? '#4db8ff' : '#2ecc71'}; font-weight:bold;">${isCod ? `COD ₹${fareNum}` : `+₹${net}`} ${incBonus > 0 ? `(+₹${incBonus} Bonus)` : ''}</span>
+              <span style="color:${isCod ? '#4db8ff' : '#2ecc71'}; font-weight:bold;">${isCod ? `COD ₹${fareNum}` : `+₹${net}`} ${incBonus > 0 ? `(+₹${incBonus} Bonus)` : ''} ${tipAmt > 0 ? `(+₹${tipAmt} Tip)` : ''}</span>
             </div>
             <div style="font-size:12px; color:#ddd; margin-top:4px;">🟢 ${o.pickup}<br>🔴 ${o.drop}</div>
           </div>`;
@@ -1642,11 +2015,13 @@
           activeOrderFound = { id: d.id, ...o };
 
           const payAlert = isCod
-            ? `<div style="background:#3b0d0d; color:#ff8a8a; padding:6px; border-radius:6px; font-size:12px; margin:5px 0; font-weight:bold;">💵 COD: Collect ₹${fareNum} Cash!</div>`
-            : `<div style="background:#0d3b1e; color:#2ecc71; padding:6px; border-radius:6px; font-size:12px; margin:5px 0; font-weight:bold;">📱 ONLINE PAID</div>`;
+            ? `<div style="background:#3b0d0d; color:#ff8a8a; padding:6px; border-radius:6px; font-size:12px; margin:5px 0; font-weight:bold;">💵 COD: Collect ₹${fareNum} Cash! ${tipAmt > 0 ? `(Includes ₹${tipAmt} Tip)` : ''}</div>`
+            : `<div style="background:#0d3b1e; color:#2ecc71; padding:6px; border-radius:6px; font-size:12px; margin:5px 0; font-weight:bold;">📱 ONLINE PAID ${tipAmt > 0 ? `(+₹${tipAmt} 100% Tip Added)` : ''}</div>`;
 
-          // स्टेज १ (Accepted / ReachedPickup): फक्त पिकअप व्यक्तीचे नाव, कॉल बटन आणि Google Maps Pickup Direction
-          // स्टेज २ (PickedUp / ReachedDrop): फक्त ड्रॉप व्यक्तीचे नाव, कॉल बटन आणि Google Maps Drop Direction
+          const waitingBanner = (o.status === "ReachedPickup" || o.status === "ReachedDrop")
+            ? `<div class="waiting-box"><span>⏱️ वेटिंग टायमर (10m Free, ₹2/m):</span><strong id="liveWaitingTimerText">मोजत आहे...</strong></div>`
+            : '';
+
           let stageHtml = '';
           if (o.status === "Accepted" || o.status === "ReachedPickup") {
             const pickNavUrl = o.pickupLat
@@ -1659,12 +2034,14 @@
                 <div style="font-size:11px; color:#2ecc71; font-weight:bold;">🟢 PICKUP CONTACT (पिकअप व्यक्ती):</div>
                 <div style="font-size:14px; font-weight:bold; margin:3px 0;">👤 ${o.pickupContactName || 'Customer'}</div>
                 <div style="font-size:12px; color:#ccc;">📍 ${o.pickup}</div>
+                ${o.pickupFloor ? `<div style="font-size:11px; color:#ffaa66;">🏢 मजला: ${o.pickupFloor}</div>` : ''}
                 <div style="font-size:11px; color:#4db8ff; margin-top:4px;">अंतर: ${distPickM}m (150m आत आल्यावर ऑटो-रीच होईल)</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
                   <a href="tel:${o.pickupContactPhone || o.customerPhone}" class="wa-btn" style="margin:0; padding:9px; font-size:13px;">📞 Call Pickup</a>
-                  <a href="${pickNavUrl}" target="_blank" class="nav-map-btn" style="margin:0; padding:9px;">🧭 Pickup Direction</a>
+                  <a href="${pickNavUrl}" target="_blank" class="nav-map-btn" style="margin:0; padding:9px;">🧭 External Maps</a>
                 </div>
               </div>
+              ${waitingBanner}
               ${o.status === "Accepted" ? `<button onclick="markReachedPickup('${d.id}')" style="background:#3498db; color:#fff;">📍 Reached Pickup (पोहोचलो)</button>` : ''}
               <button onclick="markPickedUp('${d.id}')" style="background:#ff9800; color:#000;">📦 Confirm Parcel Pickup (पार्सल घेतले)</button>
             `;
@@ -1680,12 +2057,14 @@
                 <div style="font-size:11px; color:#ff6b6b; font-weight:bold;">🔴 DROP CONTACT (डिलिव्हरी व्यक्ती):</div>
                 <div style="font-size:14px; font-weight:bold; margin:3px 0;">👤 ${o.dropContactName || 'Receiver'}</div>
                 <div style="font-size:12px; color:#ccc;">📍 ${o.drop}</div>
+                ${o.dropFloor ? `<div style="font-size:11px; color:#ffaa66;">🏢 मजला: ${o.dropFloor}</div>` : ''}
                 <div style="font-size:11px; color:#4db8ff; margin-top:4px;">अंतर: ${distDropM}m (150m आत आल्यावर ऑटो-रीच होईल)</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px;">
                   <a href="tel:${o.dropContactPhone || ''}" class="wa-btn" style="margin:0; padding:9px; font-size:13px;">📞 Call Drop</a>
-                  <a href="${dropNavUrl}" target="_blank" class="nav-map-btn" style="margin:0; padding:9px;">🧭 Drop Direction</a>
+                  <a href="${dropNavUrl}" target="_blank" class="nav-map-btn" style="margin:0; padding:9px;">🧭 External Maps</a>
                 </div>
               </div>
+              ${waitingBanner}
               <button ${inRange ? '' : 'disabled'} onclick="completeOrderWithPin('${d.id}', '${o.deliveryPin || ''}', ${o.dropLat || 0}, ${o.dropLng || 0})" style="background:#2ecc71;">
                 ${inRange ? '🔐 Enter PIN & Deliver (डिलिव्हर करा)' : `🔒 Move within ${deliveryRangeMeters}m to Deliver`}
               </button>
@@ -1696,6 +2075,7 @@
             <b>${o.vehicle} (${o.status}) • ${o.parcelWeight || '1-5 kg'}</b>
             ${payAlert}
             ${stageHtml}
+            <button onclick="reportVehicleBreakdown('${d.id}')" class="breakdown-btn">🚨 गाडी बिघडली / पंक्चर (Transfer Order)</button>
           </div>`;
         }
       });
@@ -1703,21 +2083,22 @@
       currentActiveOrderCache = activeOrderFound;
       updateRiderInAppMap(activeOrderFound);
 
-      latestWeeklySummary = { rides: wkRides, gross: wkGross, comm: wkComm, incentive: wkInc, netProfit: wkNet };
+      latestWeeklySummary = { rides: wkRides, gross: wkGross, comm: wkComm, incentive: wkInc, tips: wkTips, netProfit: wkNet };
       document.getElementById('wkRidesCount').innerText = wkRides;
       document.getElementById('wkGrossFare').innerText = wkGross;
       document.getElementById('wkIncentiveEarned').innerText = wkInc;
+      document.getElementById('wkTipsEarned').innerText = wkTips;
       document.getElementById('wkCommission').innerText = wkComm;
       document.getElementById('wkNetProfit').innerText = wkNet;
       document.getElementById('totalCodCollected').innerText = totalCodCashCollected;
 
       if (!div.innerHTML) div.innerHTML = "No active deliveries.";
       if (!histDiv.innerHTML) histDiv.innerHTML = "No order history.";
-      recalcWalletBalance(onlineNetTotal + totalIncentiveEarnedAll, codCommOwedTotal, rid);
+      recalcWalletBalance(onlineNetTotal + totalIncentiveEarnedAll + totalTipsEarnedAll, codCommOwedTotal, rid);
     });
   }
 
-  function recalcWalletBalance(onlinePlusIncentive, codCommOwed, rid) {
+  function recalcWalletBalance(onlinePlusIncentiveAndTips, codCommOwed, rid) {
     onSnapshot(query(collection(db, "walletTransactions"), where("riderId", "==", rid)), (snap) => {
       const payDiv = document.getElementById('paymentHistoryList');
       payDiv.innerHTML = "";
@@ -1737,7 +2118,7 @@
       });
 
       if (!payDiv.innerHTML) payDiv.innerHTML = "No transactions.";
-      currentWalletBalance = (onlinePlusIncentive + approvedDeposits) - (codCommOwed + deductedWithdrawals);
+      currentWalletBalance = (onlinePlusIncentiveAndTips + approvedDeposits) - (codCommOwed + deductedWithdrawals);
 
       const balEl = document.getElementById('netEarnings');
       balEl.innerText = (currentWalletBalance < 0 ? "-₹" + Math.abs(currentWalletBalance) : "₹" + currentWalletBalance);
@@ -1755,4 +2136,4 @@
   if (savedRid) startRiderSession(savedRid, localStorage.getItem("gp_verified_rider_name"));
 </script>
 </body>
-  </html>
+</html>
