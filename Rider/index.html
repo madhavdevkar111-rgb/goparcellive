@@ -610,7 +610,7 @@
   let peakIncentiveActive = true, peakStartHour = 18, peakEndHour = 22, peakIncentiveAmount = 25;
   let freePickupKm = 1.0, longPickupRatePerKm = 5;
   let freeWaitingMins = 10, waitingRatePerMin = 2;
-  let featRiderGoHome = true, featRiderNextQueue = true, featRiderBreakdown = true, featRiderStrictVehMatch = true, featRiderPickupPhoto = true;
+  let featRiderGoHome = true, featRiderNextQueue = false, featRiderBreakdown = true, featRiderStrictVehMatch = true, featRiderPickupPhoto = true;
   let consentTextGlobal = "मी GoParcel चे सर्व नियम व वाहतूक अटी पाळेन.";
   let isFeePaid = false, isApproved = false, isSelfieApproved = false, isRiderOnline = false;
   let selfieExpiresAt = 0, selfieRejectCount = 0, tempBlockUntil = 0;
@@ -1087,15 +1087,16 @@
       freeWaitingMins = Number(s.freeWaitingMins ?? 10);
       waitingRatePerMin = Number(s.waitingRatePerMin ?? 2);
 
-      // Admin Master Feature Toggles Sync
+      // Admin Master Feature Toggles Sync (Single-Order Lock Enforced)
       featRiderGoHome = s.featRiderGoHome ?? true;
-      featRiderNextQueue = s.featRiderNextQueue ?? true;
+      featRiderNextQueue = false; // Strictly disabled so 1 rider handles 1 parcel at a time
       featRiderBreakdown = s.featRiderBreakdown ?? true;
       featRiderStrictVehMatch = s.featRiderStrictVehMatch ?? true;
       featRiderPickupPhoto = s.featRiderPickupPhoto ?? true;
 
       document.getElementById('goHomeStripBox').classList.toggle('hidden', !featRiderGoHome);
       document.getElementById('navWalletTabItem').classList.toggle('hidden', s.featRiderWalletTab === false);
+      document.getElementById('nextOrderQueueBox').classList.add('hidden');
 
       // Sync Custom Fleet Vehicle in Registration Dropdown
       const vehSel = document.getElementById('rVehCategory');
@@ -1638,6 +1639,9 @@
 
   window.acceptOrder = async (orderId) => {
     stopOrderRingtone();
+    if (currentActiveOrderCache) {
+      return alert("🚫 तुमची एक डिलिव्हरी आधीच चालू आहे! ती पूर्ण (Delivered) केल्याशिवाय दुसरी ऑर्डर स्वीकारता येणार नाही.");
+    }
     if (isFakeGpsBlocked) return alert("🚨 Fake GPS Detected! Disable Mock Location first.");
     if (tempBlockUntil > Date.now()) return alert("⛔ Account Temporarily Blocked!");
     if (!isSelfieApproved || selfieExpiresAt <= Date.now()) return alert("📸 Please complete Face Selfie verification first!");
@@ -1668,7 +1672,7 @@
         });
       });
     } catch (err) {
-      if (err === "ALREADY_TAKEN") alert("⚠️ Order already accepted by another rider!");
+      if (err === "ALREADY_TAKEN") alert("⚠️ ही ऑर्डर दुसऱ्या रायडरने आधीच स्वीकारली आहे!");
       else alert("Error: " + err);
     }
   };
@@ -1994,20 +1998,27 @@
       const queueContent = document.getElementById('nextOrderQueueContent');
       div.innerHTML = "";
       queueContent.innerHTML = "";
-      let queuedCount = 0;
+      queueBox.classList.add('hidden');
 
       const selfieValid = isSelfieApproved && (selfieExpiresAt > Date.now());
       if (!isRiderOnline || !selfieValid || !isApproved || tempBlockUntil > Date.now()) {
         stopOrderRingtone();
-        queueBox.classList.add('hidden');
         div.innerHTML = `<div style="color:#aaa; font-size:13px; padding:8px;">⚠️ Please verify Face Selfie & go <b>ONLINE</b> to see orders.</div>`;
         return;
       }
 
       if (currentWalletBalance < 0) {
         stopOrderRingtone();
-        queueBox.classList.add('hidden');
         div.innerHTML = `<div style="color:#ff8a8a; font-size:13px; padding:8px;">🚫 Negative Wallet Balance (₹${currentWalletBalance})</div>`;
+        return;
+      }
+
+      // Single-Parcel Lock: Do not show or ring new orders while rider has an active delivery
+      if (currentActiveOrderCache) {
+        stopOrderRingtone();
+        div.innerHTML = `<div style="color:#ffaa66; font-size:13px; padding:10px; background:#24180e; border-radius:8px; border:1px solid #ff6600;">
+          🚚 तुमची सध्या एक डिलिव्हरी चालू आहे. ती पूर्ण (Delivered) झाल्यावरच नवीन ऑर्डर्स दिसतील!
+        </div>`;
         return;
       }
 
@@ -2077,22 +2088,9 @@
             </div>
             <button onclick="acceptOrder('${d.id}')" style="background:#2ecc71;">⚡ Accept Order (₹${totalRiderPayout})</button>
           </div>`;
-
-          if (featRiderNextQueue && currentActiveOrderCache && currentActiveOrderCache.dropLat && o.pickupLat) {
-            const distFromDropKm = getDistanceKm(currentActiveOrderCache.dropLat, currentActiveOrderCache.dropLng, o.pickupLat, o.pickupLng);
-            if (distFromDropKm <= 2.5 && queuedCount < 2) {
-              queuedCount++;
-              queueContent.innerHTML += `<div style="background:#111; padding:8px; border-radius:8px; margin-top:5px; border-left:3px solid #2ecc71; font-size:12px;">
-                <strong>${o.vehicle} • ₹${totalRiderPayout} Profit</strong> (${distFromDropKm.toFixed(1)} km from your drop)<br>
-                <span style="color:#ccc;">🟢 ${o.pickup} ➔ 🔴 ${o.drop}</span>
-                <button onclick="acceptOrder('${d.id}')" style="padding:6px; margin-top:5px; font-size:12px; background:#ff9800;">⚡ Queue Next Order</button>
-              </div>`;
-            }
-          }
         }
       });
 
-      queueBox.classList.toggle('hidden', !featRiderNextQueue || queuedCount === 0);
       if (hasBrandNewOrder) startContinuousOrderRingtone(newestOrderSummary);
       if (foundOrders === 0) { stopOrderRingtone(); div.innerHTML = goHomeActive ? `🏠 "${goHomeTargetArea}" च्या दिशेने सध्या ऑर्डर नाही.` : `No ${currentRiderProfile?.vehCategory || ''} orders within ${maxRadiusKm} km.`; }
       lastKnownOrderIds = currentIds;
