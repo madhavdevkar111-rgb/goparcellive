@@ -8,76 +8,94 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-    body { background: #0f0f0f; color: #fff; padding-bottom: 85px; }
-    header { background: #000; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; }
-    header h1 { color: #ff6600; font-size: 20px; }
-    .lang-sel { background: #1a1a1a; color: #ff6600; border: 1px solid #ff6600; padding: 5px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; width: auto; margin: 0; }
+    body { background: #f4f6f9; color: #1a1a1a; padding-bottom: 85px; }
+    header { background: #ffffff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff6600; position: sticky; top: 0; z-index: 999; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    header h1 { color: #ff6600; font-size: 20px; font-weight: 800; }
+    .lang-sel { background: #fff8f2; color: #e65c00; border: 1px solid #ff6600; padding: 5px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; width: auto; margin: 0; }
     .container { max-width: 540px; margin: auto; padding: 14px; }
-    .card { background: #1a1a1a; padding: 15px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #2c2c2c; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-    input, select, button, a.btn-link { width: 100%; padding: 12px; margin: 6px 0; border-radius: 8px; border: 1px solid #333; background: #111; color: #fff; font-size: 14px; display: block; text-decoration: none; }
-    button, a.btn-link { background: #ff6600; color: #000; font-weight: bold; border: none; cursor: pointer; text-align: center; }
-    .btn-gps { background: #1c2e3d; color: #4db8ff; border: 1px solid #4db8ff; font-size: 13px; padding: 9px; margin: 4px 0; }
-    .contact-group { background: #121212; border: 1px solid #2e2e2e; border-radius: 10px; padding: 10px; margin: 8px 0; }
+    .card { background: #ffffff; padding: 15px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #e2e8f0; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
+    input, select, button, a.btn-link { width: 100%; padding: 12px; margin: 6px 0; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: #1e293b; font-size: 14px; display: block; text-decoration: none; }
+    input:focus, select:focus { outline: none; border-color: #ff6600; box-shadow: 0 0 0 2px rgba(255,102,0,0.15); }
+    button, a.btn-link { background: #ff6600; color: #ffffff; font-weight: bold; border: none; cursor: pointer; text-align: center; }
+    .btn-gps { background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; font-size: 13px; padding: 9px; margin: 4px 0; }
+    .contact-group { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; margin: 8px 0; position: relative; }
     .contact-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
     #custMap { height: 350px; width: 100%; border-radius: 12px; margin: 10px 0; border: 2px solid #ff6600; z-index: 1; transition: height 0.3s; }
     #custMap.expanded { height: 480px; }
-    #liveTrackMap { height: 340px; width: 100%; border-radius: 12px; margin: 10px 0; border: 2px solid #2ecc71; z-index: 1; }
+    #liveTrackMap { height: 340px; width: 100%; border-radius: 12px; margin: 10px 0; border: 2px solid #16a34a; z-index: 1; }
     .veh-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
     .pay-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 10px 0; }
-    .veh-box, .pay-box { background: #111; border: 2px solid #333; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; }
-    .veh-box.active, .pay-box.active { border-color: #ff6600; background: #2b180a; }
-    .qr-card { background: #fff; color: #000; border-radius: 12px; padding: 14px; text-align: center; margin: 10px 0; border: 3px solid #2ecc71; }
+    .veh-box, .pay-box { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; color: #1e293b; transition: all 0.2s; }
+    .veh-box.active, .pay-box.active { border-color: #ff6600; background: #fff5eb; box-shadow: 0 2px 8px rgba(255,102,0,0.15); }
+    .qr-card { background: #ffffff; color: #000; border-radius: 12px; padding: 14px; text-align: center; margin: 10px 0; border: 2px solid #16a34a; box-shadow: 0 4px 12px rgba(22,163,74,0.12); }
     .qr-card img { width: 185px; height: 185px; margin: 8px auto; display: block; }
     .upi-apps-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 8px; }
     .upi-app-btn { padding: 9px 6px; border-radius: 8px; font-size: 12px; font-weight: bold; text-decoration: none; display: block; text-align: center; color: #fff; }
-    .otp-timer-pill { background: #2b180a; border: 1px solid #ff6600; color: #ffaa66; padding: 6px; border-radius: 6px; text-align: center; font-size: 13px; font-weight: bold; margin: 6px 0; }
-    .banner-strip { background: #2b1d12; border: 1px solid #ff6600; color: #ffd2b3; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; text-align: center; font-weight: bold; }
-    .pin-badge { background: #ff6600; color: #000; padding: 3px 9px; border-radius: 6px; font-weight: bold; font-size: 16px; letter-spacing: 2px; }
-    .sos-row { display: flex; justify-content: space-between; align-items: center; background: #111; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #e74c3c; }
-    .consent-box { background: #111; border: 1px solid #ff6600; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 12px; color: #ddd; }
+    .otp-timer-pill { background: #fff7ed; border: 1px solid #ff6600; color: #c2410c; padding: 6px; border-radius: 6px; text-align: center; font-size: 13px; font-weight: bold; margin: 6px 0; }
+    .banner-strip { background: #fff7ed; border: 1px solid #fdba74; color: #9a3412; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; text-align: center; font-weight: bold; }
+    .pin-badge { background: #ff6600; color: #fff; padding: 3px 9px; border-radius: 6px; font-weight: bold; font-size: 16px; letter-spacing: 2px; }
+    .sos-row { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #dc2626; border: 1px solid #e2e8f0; border-left-width: 4px; }
+    .consent-box { background: #fffaf5; border: 1px solid #fdba74; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 12px; color: #334155; }
     table.order-tbl { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
-    table.order-tbl th, table.order-tbl td { border: 1px solid #333; padding: 8px; text-align: left; }
-    table.order-tbl th { background: #222; color: #ff6600; }
+    table.order-tbl th, table.order-tbl td { border: 1px solid #e2e8f0; padding: 8px; text-align: left; }
+    table.order-tbl th { background: #fff7ed; color: #e65c00; }
+
+    /* Live Address Autocomplete Dropdown (Porter / Google Style) */
+    .addr-autocomplete-wrap { position: relative; width: 100%; }
+    .addr-suggestions-list {
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: #ffffff; border: 1.5px solid #ff6600; border-top: none;
+      border-radius: 0 0 10px 10px; max-height: 220px; overflow-y: auto;
+      z-index: 1500; box-shadow: 0 10px 25px rgba(0,0,0,0.16);
+    }
+    .addr-sugg-item {
+      padding: 10px 12px; border-bottom: 1px solid #f1f5f9; cursor: pointer;
+      display: flex; align-items: flex-start; gap: 8px; transition: background 0.15s;
+    }
+    .addr-sugg-item:last-child { border-bottom: none; }
+    .addr-sugg-item:hover { background: #fff7ed; }
+    .addr-sugg-title { font-size: 13px; font-weight: 700; color: #0f172a; }
+    .addr-sugg-sub { font-size: 11px; color: #64748b; margin-top: 1px; }
 
     .saved-places-bar { display: flex; gap: 5px; flex-wrap: wrap; margin: 4px 0 6px; }
-    .place-chip { background: #1e1e1e; border: 1px solid #444; color: #ddd; padding: 5px 9px; border-radius: 14px; font-size: 11px; font-weight: bold; cursor: pointer; width: auto; margin: 0; }
+    .place-chip { background: #ffffff; border: 1px solid #cbd5e1; color: #334155; padding: 5px 9px; border-radius: 14px; font-size: 11px; font-weight: bold; cursor: pointer; width: auto; margin: 0; }
     .place-chip:hover { border-color: #ff6600; color: #ff6600; }
-    .place-chip.save-btn-chip { background: #16291d; border-color: #2ecc71; color: #2ecc71; }
+    .place-chip.save-btn-chip { background: #f0fdf4; border-color: #16a34a; color: #15803d; }
     .addr-input-row { display: flex; gap: 5px; align-items: center; }
-    .addr-search-btn { width: auto; padding: 11px 12px; margin: 6px 0; background: #262626; color: #ffaa66; border: 1px solid #444; font-size: 13px; white-space: nowrap; }
-    .addons-summary-box { background: #0c0c0c; border: 1px dashed #333; border-radius: 8px; padding: 8px 10px; margin-top: 8px; font-size: 11px; color: #bbb; line-height: 1.6; }
+    .addr-search-btn { width: auto; padding: 11px 12px; margin: 6px 0; background: #fff7ed; color: #e65c00; border: 1px solid #fdba74; font-size: 13px; white-space: nowrap; }
+    .addons-summary-box { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 8px 10px; margin-top: 8px; font-size: 11px; color: #475569; line-height: 1.6; }
 
-    .extra-stop-item { background: #18140e; border: 1px dashed #ff9800; border-radius: 8px; padding: 8px; margin: 6px 0; display: flex; gap: 6px; align-items: center; }
-    .addon-card { background: #111; border: 1px solid #333; border-radius: 10px; padding: 10px; margin: 8px 0; }
+    .extra-stop-item { background: #fffbeb; border: 1px dashed #f59e0b; border-radius: 8px; padding: 8px; margin: 6px 0; display: flex; gap: 6px; align-items: center; position: relative; }
+    .addon-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; margin: 8px 0; }
     .tip-pills { display: flex; gap: 6px; margin-top: 6px; }
-    .tip-pill { flex: 1; padding: 7px 4px; background: #1e1e1e; border: 1px solid #444; border-radius: 8px; text-align: center; font-size: 12px; font-weight: bold; cursor: pointer; color: #ccc; }
-    .tip-pill.active { background: #2ecc71; color: #000; border-color: #2ecc71; }
-    .offline-bar { background: #4a3500; border: 1px solid #f1c40f; color: #f1c40f; padding: 8px; border-radius: 8px; font-size: 12px; text-align: center; margin-bottom: 10px; font-weight: bold; }
-    .eta-pill { background: #0d2b18; border: 1px solid #2ecc71; color: #2ecc71; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; margin-top: 6px; display: flex; justify-content: space-between; }
+    .tip-pill { flex: 1; padding: 7px 4px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; text-align: center; font-size: 12px; font-weight: bold; cursor: pointer; color: #334155; }
+    .tip-pill.active { background: #16a34a; color: #ffffff; border-color: #16a34a; }
+    .offline-bar { background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; padding: 8px; border-radius: 8px; font-size: 12px; text-align: center; margin-bottom: 10px; font-weight: bold; }
+    .eta-pill { background: #f0fdf4; border: 1px solid #16a34a; color: #15803d; padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: bold; margin-top: 6px; display: flex; justify-content: space-between; }
 
-    .chat-messages { max-height: 210px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 8px; background: #0a0a0a; border-radius: 8px; margin: 8px 0; }
-    .msg-user { align-self: flex-end; background: #ff6600; color: #000; padding: 7px 11px; border-radius: 12px 12px 2px 12px; font-size: 13px; max-width: 80%; font-weight: 500; }
-    .msg-admin { align-self: flex-start; background: #222; color: #2ecc71; border: 1px solid #2ecc71; padding: 7px 11px; border-radius: 12px 12px 12px 2px; font-size: 13px; max-width: 80%; }
+    .chat-messages { max-height: 210px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 8px; background: #f1f5f9; border-radius: 8px; margin: 8px 0; border: 1px solid #e2e8f0; }
+    .msg-user { align-self: flex-end; background: #ff6600; color: #ffffff; padding: 7px 11px; border-radius: 12px 12px 2px 12px; font-size: 13px; max-width: 80%; font-weight: 500; }
+    .msg-admin { align-self: flex-start; background: #ffffff; color: #15803d; border: 1px solid #16a34a; padding: 7px 11px; border-radius: 12px 12px 12px 2px; font-size: 13px; max-width: 80%; }
     .msg-time { font-size: 9px; opacity: 0.75; display: block; margin-top: 2px; }
 
     .bottom-nav {
       position: fixed; bottom: 8px; left: 10px; right: 10px; max-width: 520px; margin: auto;
-      background: rgba(18, 18, 18, 0.96); backdrop-filter: blur(10px);
-      border: 1px solid #333; border-radius: 18px; display: flex; padding: 6px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85); z-index: 999;
+      background: rgba(255, 255, 255, 0.97); backdrop-filter: blur(10px);
+      border: 1px solid #e2e8f0; border-radius: 18px; display: flex; padding: 6px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12); z-index: 999;
     }
     .b-nav {
-      flex: 1; padding: 7px 4px; text-align: center; color: #888; font-size: 11px;
+      flex: 1; padding: 7px 4px; text-align: center; color: #64748b; font-size: 11px;
       cursor: pointer; border-radius: 12px; transition: all 0.25s ease;
       display: flex; flex-direction: column; align-items: center; gap: 3px;
     }
     .b-nav svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
     .b-nav.active {
-      background: linear-gradient(135deg, #ff6600, #e65c00); color: #000; font-weight: bold;
-      box-shadow: 0 4px 12px rgba(255, 102, 0, 0.4); transform: translateY(-2px);
+      background: linear-gradient(135deg, #ff6600, #e65c00); color: #ffffff; font-weight: bold;
+      box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3); transform: translateY(-2px);
     }
-    .b-nav.active svg { stroke: #000; }
-    .live-pulse { display: inline-block; width: 9px; height: 9px; background: #2ecc71; border-radius: 50%; margin-right: 5px; box-shadow: 0 0 8px #2ecc71; }
+    .b-nav.active svg { stroke: #ffffff; }
+    .live-pulse { display: inline-block; width: 9px; height: 9px; background: #16a34a; border-radius: 50%; margin-right: 5px; box-shadow: 0 0 8px #16a34a; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -86,7 +104,7 @@
 <header>
   <h1>GoParcel</h1>
   <div style="display:flex; align-items:center; gap:8px;">
-    <select id="activeCitySelect" class="lang-sel" style="color:#2ecc71; border-color:#2ecc71;">
+    <select id="activeCitySelect" class="lang-sel" style="color:#15803d; border-color:#16a34a; background:#f0fdf4;">
       <option value="Pune">Pune</option>
     </select>
     <select id="custLangSelect" class="lang-sel" onchange="changeCustLang(this.value)">
@@ -108,46 +126,49 @@
     <input type="text" id="cName" placeholder="तुमचे पूर्ण नाव">
     <input type="tel" id="cPhone" maxlength="10" placeholder="१० अंकी मोबाईल नंबर">
     <button id="txtBtnReqOtp" onclick="startCustOtp()">OTP मागवा</button>
-    <div id="cOtpBox" class="hidden" style="margin-top:8px; border-top:1px solid #333; padding-top:8px;">
+    <div id="cOtpBox" class="hidden" style="margin-top:8px; border-top:1px solid #e2e8f0; padding-top:8px;">
       <div id="custOtpTimerDisplay" class="otp-timer-pill">⏳ OTP वैधता वेळ: 10:00</div>
-      <a id="cWaOtpLink" href="#" target="_blank" class="btn-link" style="background:#25D366;">📲 WhatsApp वर OTP मागवा</a>
+      <a id="cWaOtpLink" href="#" target="_blank" class="btn-link" style="background:#25D366; color:#000;">📲 WhatsApp वर OTP मागवा</a>
       <input type="number" id="cOtpInput" placeholder="६ अंकी OTP टाका">
-      <button id="txtBtnVerifyOtp" onclick="verifyCustOtp()" style="background:#2ecc71;">लॉगिन पूर्ण करा</button>
-      <button id="btnCustResendOtp" class="hidden" onclick="startCustOtp()" style="background:#3498db; color:#fff; margin-top:6px;">🔄 पुन्हा OTP मागवा (Resend OTP)</button>
+      <button id="txtBtnVerifyOtp" onclick="verifyCustOtp()" style="background:#16a34a; color:#fff;">लॉगिन पूर्ण करा</button>
+      <button id="btnCustResendOtp" class="hidden" onclick="startCustOtp()" style="background:#2563eb; color:#fff; margin-top:6px;">🔄 पुन्हा OTP मागवा (Resend OTP)</button>
     </div>
   </div>
 
   <!-- Main Customer App -->
   <div id="custMain" class="hidden">
     <div id="custBanner" class="banner-strip hidden"></div>
-    <div id="custSurgeBanner" class="banner-strip hidden" style="background:#331100; color:#ffaa66;"></div>
-    <a id="custCustomShortcutBtn" href="#" target="_blank" class="btn-link hidden" style="background:#1c2e3d; color:#4db8ff; border:1px solid #4db8ff; margin-bottom:10px;">🔗 Quick Shortcut</a>
+    <div id="custSurgeBanner" class="banner-strip hidden" style="background:#fef2f2; border-color:#fca5a5; color:#b91c1c;"></div>
+    <a id="custCustomShortcutBtn" href="#" target="_blank" class="btn-link hidden" style="background:#eff6ff; color:#1d4ed8; border:1px solid #93c5fd; margin-bottom:10px;">🔗 Quick Shortcut</a>
 
     <!-- TAB 1: BOOK PARCEL -->
     <div id="cTabBook">
       <div class="card">
         <div style="display:flex; gap:6px;">
           <button type="button" id="txtBtnCurrLoc" class="btn-gps" onclick="useCurrentGpsLocation('pickup')">📍 Use My Current Location (ऑटो पत्ता)</button>
-          <button type="button" id="txtBtnBigMap" class="btn-gps" style="width:auto; white-space:nowrap; border-color:#ff6600; color:#ff6600;" onclick="toggleMapSize()">🔍 मोठा नकाशा</button>
+          <button type="button" id="txtBtnBigMap" class="btn-gps" style="width:auto; white-space:nowrap; border-color:#ff6600; color:#e65c00; background:#fff7ed;" onclick="toggleMapSize()">🔍 मोठा नकाशा</button>
         </div>
 
-        <!-- Pickup Location + Saved Home/Office + Contact Person + Floor Selection -->
-        <div class="contact-group" style="border-left: 3px solid #2ecc71;">
-          <label id="txtLblPickup" style="font-size:12px; color:#2ecc71; font-weight:bold;">🟢 पिकअप पत्ता, मजला व व्यक्तीची माहिती:</label>
+        <!-- Pickup Location + Live Autocomplete + Saved Home/Office + Contact Person + Floor Selection -->
+        <div class="contact-group" style="border-left: 4px solid #16a34a;">
+          <label id="txtLblPickup" style="font-size:12px; color:#15803d; font-weight:bold;">🟢 पिकअप पत्ता, मजला व व्यक्तीची माहिती:</label>
           <div class="saved-places-bar">
             <button type="button" class="place-chip" onclick="applySavedPlace('pickup', 'home')">🏠 Home</button>
             <button type="button" class="place-chip" onclick="applySavedPlace('pickup', 'office')">🏢 Office</button>
             <button type="button" class="place-chip save-btn-chip" onclick="promptSaveCurrentPlace('pickup')">💾 हा पत्ता Save करा</button>
           </div>
-          <div class="addr-input-row">
-            <input type="text" id="pickupInput" placeholder="पिकअप पत्ता टाका किंवा GPS दाबा" onchange="geocodeTypedAddress('pickup')">
-            <button type="button" class="addr-search-btn" onclick="geocodeTypedAddress('pickup')" title="मॅपवर पत्ता शोधा">🔍 शोधा</button>
+          <div class="addr-autocomplete-wrap">
+            <div class="addr-input-row">
+              <input type="text" id="pickupInput" autocomplete="off" placeholder="सोसायटी / एरियाचे २-३ अक्षर टाका..." oninput="onAddressTypeSuggest('pickup', this.value)" onchange="geocodeTypedAddress('pickup')">
+              <button type="button" class="addr-search-btn" onclick="geocodeTypedAddress('pickup')" title="मॅपवर पत्ता शोधा">🔍 शोधा</button>
+            </div>
+            <div id="pickupSuggestionsBox" class="addr-suggestions-list hidden"></div>
           </div>
           <div class="contact-row">
             <input type="text" id="pickupPersonName" placeholder="पिकअप व्यक्तीचे नाव">
             <input type="tel" id="pickupPersonPhone" maxlength="10" placeholder="पिकअप मोबाईल नंबर">
           </div>
-          <select id="pickupFloorSelect" onchange="recalcPrices()" style="margin-top:4px; border-color:#2ecc71; font-size:13px; padding:9px;">
+          <select id="pickupFloorSelect" onchange="recalcPrices()" style="margin-top:4px; border-color:#86efac; font-size:13px; padding:9px;">
             <option value="Ground Floor|0">🏢 पिकअप मजला: Ground Floor (₹0)</option>
             <option value="1st-2nd Floor (Lift Available)|0">🏢 1ला / 2रा मजला - लिफ्ट आहे (₹0)</option>
             <option value="1st Floor (No Lift)|15">🪜 1ला मजला - लिफ्ट नाही (+₹15)</option>
@@ -159,28 +180,31 @@
         <!-- Multi-Stop Delivery (+ Add Stop) -->
         <div id="multiStopWrapper">
           <div id="extraStopsContainer"></div>
-          <button type="button" onclick="addExtraDeliveryStop()" style="background:#1f160a; color:#ff9800; border:1px dashed #ff9800; padding:8px; font-size:13px; margin:4px 0;">
+          <button type="button" onclick="addExtraDeliveryStop()" style="background:#fffbeb; color:#b45309; border:1px dashed #f59e0b; padding:8px; font-size:13px; margin:4px 0;">
             ➕ मधला स्टॉप जोडा (Add Stop • +₹25/stop)
           </button>
         </div>
 
-        <!-- Drop Location + Saved Home/Office + Contact Person + Floor Selection -->
-        <div class="contact-group" style="border-left: 3px solid #e74c3c;">
-          <label id="txtLblDrop" style="font-size:12px; color:#e74c3c; font-weight:bold;">🔴 ड्रॉप पत्ता, मजला व व्यक्तीची माहिती:</label>
+        <!-- Drop Location + Live Autocomplete + Saved Home/Office + Contact Person + Floor Selection -->
+        <div class="contact-group" style="border-left: 4px solid #dc2626;">
+          <label id="txtLblDrop" style="font-size:12px; color:#b91c1c; font-weight:bold;">🔴 ड्रॉप पत्ता, मजला व व्यक्तीची माहिती:</label>
           <div class="saved-places-bar">
             <button type="button" class="place-chip" onclick="applySavedPlace('drop', 'home')">🏠 Home</button>
             <button type="button" class="place-chip" onclick="applySavedPlace('drop', 'office')">🏢 Office</button>
             <button type="button" class="place-chip save-btn-chip" onclick="promptSaveCurrentPlace('drop')">💾 हा पत्ता Save करा</button>
           </div>
-          <div class="addr-input-row">
-            <input type="text" id="dropInput" placeholder="ड्रॉप पत्ता टाका (उदा. स्वारगेट, पुणे)" onchange="geocodeTypedAddress('drop')">
-            <button type="button" class="addr-search-btn" onclick="geocodeTypedAddress('drop')" title="मॅपवर पत्ता शोधा">🔍 शोधा</button>
+          <div class="addr-autocomplete-wrap">
+            <div class="addr-input-row">
+              <input type="text" id="dropInput" autocomplete="off" placeholder="ड्रॉप सोसायटी / एरियाचे २-३ अक्षर टाका..." oninput="onAddressTypeSuggest('drop', this.value)" onchange="geocodeTypedAddress('drop')">
+              <button type="button" class="addr-search-btn" onclick="geocodeTypedAddress('drop')" title="मॅपवर पत्ता शोधा">🔍 शोधा</button>
+            </div>
+            <div id="dropSuggestionsBox" class="addr-suggestions-list hidden"></div>
           </div>
           <div class="contact-row">
             <input type="text" id="dropPersonName" placeholder="ड्रॉप व्यक्तीचे नाव">
             <input type="tel" id="dropPersonPhone" maxlength="10" placeholder="ड्रॉप मोबाईल नंबर">
           </div>
-          <select id="dropFloorSelect" onchange="recalcPrices()" style="margin-top:4px; border-color:#e74c3c; font-size:13px; padding:9px;">
+          <select id="dropFloorSelect" onchange="recalcPrices()" style="margin-top:4px; border-color:#fca5a5; font-size:13px; padding:9px;">
             <option value="Ground Floor|0">🏢 ड्रॉप मजला: Ground Floor (₹0)</option>
             <option value="1st-2nd Floor (Lift Available)|0">🏢 1ला / 2रा मजला - लिफ्ट आहे (₹0)</option>
             <option value="1st Floor (No Lift)|15">🪜 1ला मजला - लिफ्ट नाही (+₹15)</option>
@@ -190,17 +214,17 @@
         </div>
 
         <div id="custMap"></div>
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#aaa; background:#111; padding:8px 10px; border-radius:8px; border:1px solid #2b2b2b;">
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#475569; background:#f8fafc; padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0;">
           <div>
-            <span id="txtLblDist" style="color:#ffaa66; font-weight:bold;">🛣️ अंतर (KM):</span>
-            <div id="routeTimeEstTag" style="font-size:10px; color:#2ecc71;">रस्त्याचे अंदाजे अंतर</div>
+            <span id="txtLblDist" style="color:#e65c00; font-weight:bold;">🛣️ अंतर (KM):</span>
+            <div id="routeTimeEstTag" style="font-size:10px; color:#15803d;">रस्त्याचे अंदाजे अंतर</div>
           </div>
-          <input type="number" id="distKmInput" value="1.2" min="0.1" step="0.1" style="width:95px; padding:6px 8px; margin:0; text-align:center; font-weight:bold; color:#2ecc71; border-color:#2ecc71;" oninput="recalcPrices()">
+          <input type="number" id="distKmInput" value="1.2" min="0.1" step="0.1" style="width:95px; padding:6px 8px; margin:0; text-align:center; font-weight:bold; color:#15803d; border-color:#86efac; background:#f0fdf4;" oninput="recalcPrices()">
         </div>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:6px;">
           <div>
-            <label id="txtLblParcelType" style="font-size:11px; color:#aaa;">📦 पार्सल प्रकार:</label>
+            <label id="txtLblParcelType" style="font-size:11px; color:#64748b; font-weight:bold;">📦 पार्सल प्रकार:</label>
             <select id="parcelSelect" style="margin:3px 0;">
               <option value="Documents">Documents / कागदपत्रे</option>
               <option value="Tiffin / Food">Food / जेवण डबा</option>
@@ -210,8 +234,8 @@
             </select>
           </div>
           <div>
-            <label id="txtLblWeight" style="font-size:11px; color:#ff6600; font-weight:bold;">⚖️ पार्सल वजन:</label>
-            <select id="weightSelect" style="margin:3px 0; border-color:#ff6600;">
+            <label id="txtLblWeight" style="font-size:11px; color:#e65c00; font-weight:bold;">⚖️ पार्सल वजन:</label>
+            <select id="weightSelect" style="margin:3px 0; border-color:#fdba74;">
               <option value="1-5 kg">1 kg - 5 kg</option>
               <option value="5-15 kg">5 kg - 15 kg</option>
               <option value="15-50 kg">15 kg - 50 kg</option>
@@ -223,12 +247,12 @@
         <!-- Package Photo Upload & Schedule Later -->
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:6px;">
           <div class="addon-card" style="margin:0;">
-            <label style="font-size:11px; color:#4db8ff; font-weight:bold;">📸 पार्सल फोटो (ऐच्छिक):</label>
+            <label style="font-size:11px; color:#1d4ed8; font-weight:bold;">📸 पार्सल फोटो (ऐच्छिक):</label>
             <input type="file" id="pkgPhotoInput" accept="image/*" onchange="handlePackagePhotoUpload(this)" style="padding:6px; font-size:11px; margin:4px 0;">
             <img id="pkgPhotoPreview" class="hidden" style="width:100%; max-height:70px; object-fit:cover; border-radius:6px; margin-top:4px;">
           </div>
           <div id="scheduleWrapper" class="addon-card" style="margin:0;">
-            <label style="font-size:11px; color:#ffaa66; font-weight:bold;">⏰ बुकिंग वेळ (Schedule):</label>
+            <label style="font-size:11px; color:#c2410c; font-weight:bold;">⏰ बुकिंग वेळ (Schedule):</label>
             <select id="scheduleModeSelect" onchange="toggleScheduleInput()" style="padding:7px; font-size:12px; margin:4px 0;">
               <option value="now">⚡ आत्ताच (Book Now)</option>
               <option value="later">📅 नंतरसाठी (Schedule Later)</option>
@@ -238,8 +262,8 @@
         </div>
 
         <!-- Helper / Loader Add-on (Controlled by Admin) -->
-        <div id="helperWrapper" class="addon-card" style="border-color:#ff9800;">
-          <label style="font-size:12px; color:#ff9800; font-weight:bold;">👷 लोडिंग/अनलोडिंग मदतनीस (Helper / Loader):</label>
+        <div id="helperWrapper" class="addon-card" style="border-color:#fdba74;">
+          <label style="font-size:12px; color:#c2410c; font-weight:bold;">👷 लोडिंग/अनलोडिंग मदतनीस (Helper / Loader):</label>
           <select id="helperSelect" onchange="recalcPrices()" style="margin-top:4px; font-size:13px; padding:9px;">
             <option value="0">मदतनीस नको (Driver Only - ₹0)</option>
             <option value="1">👷 १ मदतनीस हवा (+₹<span id="dynHelperChargeLbl">150</span>)</option>
@@ -247,8 +271,8 @@
         </div>
 
         <!-- Goods Insurance / Protection Option -->
-        <div id="insuranceWrapper" class="addon-card" style="border-color:#2ecc71;">
-          <label style="font-size:12px; color:#2ecc71; font-weight:bold;">🛡️ वस्तूचा विमा (Goods Insurance / Protection):</label>
+        <div id="insuranceWrapper" class="addon-card" style="border-color:#86efac;">
+          <label style="font-size:12px; color:#15803d; font-weight:bold;">🛡️ वस्तूचा विमा (Goods Insurance / Protection):</label>
           <select id="goodsInsuranceSelect" onchange="recalcPrices()" style="margin-top:4px; font-size:13px; padding:9px;">
             <option value="0">विमा नको (No Insurance - ₹0)</option>
             <option value="5">🛡️ ₹5 अतिरिक्त — ₹2,000 पर्यंत नुकसान विमा कव्हर</option>
@@ -259,8 +283,8 @@
         <!-- Optional Rider Tip (100% Goes to Rider) -->
         <div id="tipWrapper" class="addon-card">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <label style="font-size:12px; color:#ffaa66; font-weight:bold;">🎁 रायडरसाठी टीप (100% थेट रायडरला मिळेल):</label>
-            <span id="selectedTipBadge" style="font-size:11px; color:#2ecc71; font-weight:bold;">₹0</span>
+            <label style="font-size:12px; color:#c2410c; font-weight:bold;">🎁 रायडरसाठी टीप (100% थेट रायडरला मिळेल):</label>
+            <span id="selectedTipBadge" style="font-size:11px; color:#15803d; font-weight:bold;">₹0</span>
           </div>
           <div class="tip-pills">
             <div class="tip-pill active" onclick="selectCustomerTip(0, this)">₹0</div>
@@ -276,51 +300,51 @@
             <div style="font-size:22px;">🏍️</div>
             <div style="font-size:12px; font-weight:bold; margin-top:2px;">2-Wheeler</div>
             <div id="fare2W" style="color:#ff6600; font-weight:bold; font-size:16px; margin-top:2px;">₹20</div>
-            <div style="font-size:9px; color:#888; margin-top:2px;">Up to 20 kg</div>
+            <div style="font-size:9px; color:#64748b; margin-top:2px;">Up to 20 kg</div>
           </div>
           <div id="vehCard3W" class="veh-box" onclick="pickVeh('3-Wheeler', this)">
             <div style="font-size:22px;">🛺</div>
             <div style="font-size:12px; font-weight:bold; margin-top:2px;">3-Wheeler</div>
             <div id="fare3W" style="color:#ff6600; font-weight:bold; font-size:16px; margin-top:2px;">₹92</div>
-            <div style="font-size:9px; color:#888; margin-top:2px;">Up to 500 kg</div>
+            <div style="font-size:9px; color:#64748b; margin-top:2px;">Up to 500 kg</div>
           </div>
           <div id="vehCardTempo" class="veh-box" onclick="pickVeh('Mini Tempo', this)">
             <div style="font-size:22px;">🚐</div>
             <div style="font-size:12px; font-weight:bold; margin-top:2px;">Mini Tempo</div>
             <div id="fareTempo" style="color:#ff6600; font-weight:bold; font-size:16px; margin-top:2px;">₹178</div>
-            <div style="font-size:9px; color:#888; margin-top:2px;">Up to 750 kg</div>
+            <div style="font-size:9px; color:#64748b; margin-top:2px;">Up to 750 kg</div>
           </div>
           <div id="vehCardBolero" class="veh-box" onclick="pickVeh('Bolero Pickup', this)">
             <div style="font-size:22px;">🛻</div>
             <div style="font-size:12px; font-weight:bold; margin-top:2px;">Bolero</div>
             <div id="fareBolero" style="color:#ff6600; font-weight:bold; font-size:16px; margin-top:2px;">₹238</div>
-            <div style="font-size:9px; color:#888; margin-top:2px;">Up to 1.2 Ton</div>
+            <div style="font-size:9px; color:#64748b; margin-top:2px;">Up to 1.2 Ton</div>
           </div>
           <div id="vehCardTruck" class="veh-box" onclick="pickVeh('Truck', this)">
             <div style="font-size:22px;">🚛</div>
             <div style="font-size:12px; font-weight:bold; margin-top:2px;">Truck</div>
             <div id="fareTruck" style="color:#ff6600; font-weight:bold; font-size:16px; margin-top:2px;">₹505</div>
-            <div style="font-size:9px; color:#888; margin-top:2px;">Heavy Load</div>
+            <div style="font-size:9px; color:#64748b; margin-top:2px;">Heavy Load</div>
           </div>
           <div id="vehCardCustom" class="veh-box hidden" onclick="pickVeh(appCfg.customVehName, this)">
             <div id="customVehIconDisplay" style="font-size:22px;">🛺</div>
             <div id="customVehNameDisplay" style="font-size:12px; font-weight:bold; margin-top:2px;">Custom</div>
             <div id="fareCustomVeh" style="color:#ff6600; font-weight:bold; font-size:16px; margin-top:2px;">₹50</div>
-            <div style="font-size:9px; color:#2ecc71; margin-top:2px;">Special Fleet</div>
+            <div style="font-size:9px; color:#15803d; margin-top:2px;">Special Fleet</div>
           </div>
         </div>
 
-        <label id="txtLblPayMethod" style="font-size:12px; color:#ff6600; font-weight:bold; margin-top:6px; display:block;">💳 पेमेंट पद्धत निवडा:</label>
+        <label id="txtLblPayMethod" style="font-size:12px; color:#e65c00; font-weight:bold; margin-top:6px; display:block;">💳 पेमेंट पद्धत निवडा:</label>
         <div class="pay-grid">
           <div id="payBoxCod" class="pay-box active" onclick="selectPayMode('COD', this)">
             <div style="font-size:20px;">💵</div>
             <div style="font-size:13px; font-weight:bold;">Cash on Delivery</div>
-            <div id="txtSubCod" style="font-size:10px; color:#aaa;">रोख पेमेंट (COD)</div>
+            <div id="txtSubCod" style="font-size:10px; color:#64748b;">रोख पेमेंट (COD)</div>
           </div>
           <div id="payBoxOnline" class="pay-box" onclick="selectPayMode('ONLINE', this)">
             <div style="font-size:20px;">📱</div>
             <div style="font-size:13px; font-weight:bold;">Online Payment</div>
-            <div id="txtSubOnl" style="font-size:10px; color:#2ecc71;">QR / GPay / PhonePe</div>
+            <div id="txtSubOnl" style="font-size:10px; color:#15803d;">QR / GPay / PhonePe</div>
           </div>
         </div>
 
@@ -332,21 +356,21 @@
           <div class="upi-apps-grid">
             <a id="payGpayLink" href="#" class="upi-app-btn" style="background:#1a73e8;">Google Pay</a>
             <a id="payPhonepeLink" href="#" class="upi-app-btn" style="background:#5f259f;">PhonePe</a>
-            <a id="payBhimLink" href="#" class="upi-app-btn" style="background:#ff6600; color:#000;">BHIM UPI</a>
-            <a id="payAnyUpiLink" href="#" class="upi-app-btn" style="background:#2ecc71; color:#000;">Any UPI App</a>
+            <a id="payBhimLink" href="#" class="upi-app-btn" style="background:#ff6600; color:#fff;">BHIM UPI</a>
+            <a id="payAnyUpiLink" href="#" class="upi-app-btn" style="background:#16a34a; color:#fff;">Any UPI App</a>
           </div>
-          <div id="txtQrNote" style="font-size:11px; color:#008000; font-weight:bold; margin-top:6px;">✅ पेमेंट पूर्ण झाल्यावर खालील बटन दाबा</div>
+          <div id="txtQrNote" style="font-size:11px; color:#15803d; font-weight:bold; margin-top:6px;">✅ पेमेंट पूर्ण झाल्यावर खालील बटन दाबा</div>
         </div>
 
         <div class="consent-box">
-          <strong id="txtConsentHead" style="color:#ff6600;">📜 ऑर्डर संमती पत्र:</strong>
-          <p id="orderConsentText" style="margin:5px 0; color:#ccc; line-height:1.4;">
+          <strong id="txtConsentHead" style="color:#e65c00;">📜 ऑर्डर संमती पत्र:</strong>
+          <p id="orderConsentText" style="margin:5px 0; color:#334155; line-height:1.4;">
             मी GoParcel च्या सर्व अटी व नियमांशी सहमत आहे.
           </p>
-          <div style="font-size:11px; color:#4db8ff; margin-bottom:6px;">
+          <div style="font-size:11px; color:#1d4ed8; margin-bottom:6px; font-weight:600;">
             ⏱️ <span id="liveOrderClock">--:--:--</span> | 📍 GPS Active
           </div>
-          <label style="display:flex; align-items:center; gap:8px; color:#fff; cursor:pointer;">
+          <label style="display:flex; align-items:center; gap:8px; color:#0f172a; cursor:pointer; font-weight:600;">
             <input type="checkbox" id="orderConsentChk" style="width:18px; height:18px; margin:0; accent-color:#ff6600;">
             <span id="txtConsentAgree">मला वरील अटी मान्य आहेत (I Agree)</span>
           </label>
@@ -355,9 +379,9 @@
         <!-- Optional Add-ons Summary (Only shows if customer added extra stops/floor/insurance/tip) -->
         <div id="addonsSummaryBox" class="addons-summary-box hidden"></div>
 
-        <div style="background:#111; padding:12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-top:8px; border:1px solid #2c2c2c;">
-          <span><span id="txtTotalFareLbl">एकूण भाडे</span> (<span id="selectedPayBadge" style="color:#ff6600;">COD</span>):</span>
-          <strong id="finalFareDisplay" style="font-size:22px; color:#2ecc71;">₹20</strong>
+        <div style="background:#f8fafc; padding:12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-top:8px; border:1px solid #cbd5e1;">
+          <span style="font-weight:bold;"><span id="txtTotalFareLbl">एकूण भाडे</span> (<span id="selectedPayBadge" style="color:#e65c00;">COD</span>):</span>
+          <strong id="finalFareDisplay" style="font-size:22px; color:#16a34a;">₹20</strong>
         </div>
 
         <button id="btnBookOrder" onclick="placeOrder()">📦 पार्सल बुक करा</button>
@@ -366,12 +390,12 @@
 
     <!-- TAB 2: MY ORDERS + LIVE TRACKING + CANCELLATION POLICY + ADMIN CHAT -->
     <div id="cTabOrders" class="hidden">
-      <div id="liveRiderTrackingCard" class="card hidden" style="border: 2px solid #2ecc71;">
+      <div id="liveRiderTrackingCard" class="card hidden" style="border: 2px solid #16a34a;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h3 id="txtLiveTrackTitle" style="color:#2ecc71; font-size:16px;"><span class="live-pulse"></span>रायडर लाईव्ह लोकेशन ट्रॅकिंग</h3>
-          <span id="liveRiderDistTag" style="font-size:11px; background:#1c2e3d; color:#4db8ff; padding:3px 8px; border-radius:6px;">GPS Active</span>
+          <h3 id="txtLiveTrackTitle" style="color:#15803d; font-size:16px;"><span class="live-pulse"></span>रायडर लाईव्ह लोकेशन ट्रॅकिंग</h3>
+          <span id="liveRiderDistTag" style="font-size:11px; background:#eff6ff; color:#1d4ed8; padding:3px 8px; border-radius:6px; font-weight:bold;">GPS Active</span>
         </div>
-        <p id="liveRiderStatusBanner" style="font-size:12px; color:#ddd; margin-top:4px;">...</p>
+        <p id="liveRiderStatusBanner" style="font-size:12px; color:#334155; margin-top:4px;">...</p>
         <div class="eta-pill">
           <span>⏱️ पोहोचण्याची अंदाजे वेळ: <strong id="custDynamicEta">~5 मिनिटे</strong></span>
           <span>🛣️ लाईव्ह मार्ग (Route)</span>
@@ -379,18 +403,18 @@
         <div id="liveTrackMap"></div>
       </div>
 
-      <div class="card" style="border:1px solid #ff6600;">
-        <h3 id="txtOrderChatTitle" style="color:#ff6600; font-size:15px;">💬 लाईव्ह ऑर्डर हेल्प चॅट (Company Customer Care)</h3>
-        <p id="txtOrderChatSub" style="font-size:11px; color:#aaa; margin-top:2px;">ऑर्डर संबंधित मदतीसाठी थेट कंपनी ॲडमिनशी बोला:</p>
+      <div class="card" style="border:1px solid #fdba74;">
+        <h3 id="txtOrderChatTitle" style="color:#e65c00; font-size:15px;">💬 लाईव्ह ऑर्डर हेल्प चॅट (Company Customer Care)</h3>
+        <p id="txtOrderChatSub" style="font-size:11px; color:#64748b; margin-top:2px;">ऑर्डर संबंधित मदतीसाठी थेट कंपनी ॲडमिनशी बोला:</p>
         <div id="custChatMessages" class="chat-messages"></div>
         <div style="display:flex; gap:6px;">
           <input type="text" id="custChatInput" placeholder="तुमचा मेसेज इथे लिहा..." style="margin:0;">
-          <button id="txtBtnSendChat" onclick="sendCustSupportMsg()" style="width:auto; padding:0 16px; margin:0; background:#2ecc71;">पाठवा</button>
+          <button id="txtBtnSendChat" onclick="sendCustSupportMsg()" style="width:auto; padding:0 16px; margin:0; background:#16a34a;">पाठवा</button>
         </div>
       </div>
 
       <div class="card" style="overflow-x:auto;">
-        <h3 id="txtMyOrdersHead" style="color:#ff6600; margin-bottom:8px;">🚚 माझ्या ऑर्डर्स व स्थिती</h3>
+        <h3 id="txtMyOrdersHead" style="color:#e65c00; margin-bottom:8px;">🚚 माझ्या ऑर्डर्स व स्थिती</h3>
         <table class="order-tbl">
           <thead>
             <tr>
@@ -401,7 +425,7 @@
             </tr>
           </thead>
           <tbody id="custOrdersTableBody">
-            <tr><td colspan="4" style="text-align:center; color:#888;">...</td></tr>
+            <tr><td colspan="4" style="text-align:center; color:#64748b;">...</td></tr>
           </tbody>
         </table>
       </div>
@@ -411,75 +435,75 @@
     <!-- TAB 3: PROFILE, SAVED HOME/OFFICE ADDRESSES & SETTINGS -->
     <div id="cTabProfile" class="hidden">
       <div class="card">
-        <h3 id="txtProfTitle" style="color:#ff6600; margin-bottom:10px;">👤 कस्टमर प्रोफाईल व सेव्ह केलेले पत्ते</h3>
-        <label id="txtLblProfName" style="font-size:12px; color:#aaa;">तुमचे नाव:</label>
+        <h3 id="txtProfTitle" style="color:#e65c00; margin-bottom:10px;">👤 कस्टमर प्रोफाईल व सेव्ह केलेले पत्ते</h3>
+        <label id="txtLblProfName" style="font-size:12px; color:#475569; font-weight:bold;">तुमचे नाव:</label>
         <input type="text" id="profCustName">
-        <label id="txtLblProfPhone" style="font-size:12px; color:#aaa;">मोबाईल नंबर:</label>
-        <input type="text" id="profCustPhone" disabled style="opacity:0.7;">
+        <label id="txtLblProfPhone" style="font-size:12px; color:#475569; font-weight:bold;">मोबाईल नंबर:</label>
+        <input type="text" id="profCustPhone" disabled style="background:#f1f5f9; color:#64748b;">
 
-        <div style="background:#111; border:1px solid #2ecc71; border-radius:8px; padding:8px; margin:8px 0;">
-          <label style="font-size:12px; color:#2ecc71; font-weight:bold;">🏠 घरचा पत्ता (Saved Home Address):</label>
+        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:8px; margin:8px 0;">
+          <label style="font-size:12px; color:#15803d; font-weight:bold;">🏠 घरचा पत्ता (Saved Home Address):</label>
           <input type="text" id="profHomeAddr" placeholder="घरचा पूर्ण पत्ता टाका">
-          <button type="button" onclick="useCurrentGpsForProfilePlace('home')" style="background:#1c2e3d; color:#4db8ff; border:1px solid #4db8ff; padding:7px; font-size:12px;">📍 सध्याचे GPS लोकेशन Home म्हणून सेव्ह करा</button>
+          <button type="button" onclick="useCurrentGpsForProfilePlace('home')" style="background:#eff6ff; color:#1d4ed8; border:1px solid #93c5fd; padding:7px; font-size:12px;">📍 सध्याचे GPS लोकेशन Home म्हणून सेव्ह करा</button>
         </div>
 
-        <div style="background:#111; border:1px solid #4db8ff; border-radius:8px; padding:8px; margin:8px 0;">
-          <label style="font-size:12px; color:#4db8ff; font-weight:bold;">🏢 ऑफिसचा पत्ता (Saved Office Address):</label>
+        <div style="background:#eff6ff; border:1px solid #93c5fd; border-radius:8px; padding:8px; margin:8px 0;">
+          <label style="font-size:12px; color:#1d4ed8; font-weight:bold;">🏢 ऑफिसचा पत्ता (Saved Office Address):</label>
           <input type="text" id="profOfficeAddr" placeholder="ऑफिस / दुकानाचा पत्ता टाका">
-          <button type="button" onclick="useCurrentGpsForProfilePlace('office')" style="background:#1c2e3d; color:#4db8ff; border:1px solid #4db8ff; padding:7px; font-size:12px;">📍 सध्याचे GPS लोकेशन Office म्हणून सेव्ह करा</button>
+          <button type="button" onclick="useCurrentGpsForProfilePlace('office')" style="background:#ffffff; color:#1d4ed8; border:1px solid #93c5fd; padding:7px; font-size:12px;">📍 सध्याचे GPS लोकेशन Office म्हणून सेव्ह करा</button>
         </div>
 
-        <label id="txtLblProfLang" style="font-size:12px; color:#aaa;">ॲप भाषा (Language):</label>
+        <label id="txtLblProfLang" style="font-size:12px; color:#475569; font-weight:bold;">ॲप भाषा (Language):</label>
         <select id="profLangSelect" onchange="changeCustLang(this.value)">
           <option value="mr">मराठी (Marathi)</option>
           <option value="hi">हिंदी (Hindi)</option>
           <option value="en">English</option>
         </select>
 
-        <div id="custReferBox" style="background:#000; border:1px dashed #ff6600; padding:10px; border-radius:8px; text-align:center; margin:10px 0;">
-          <div style="font-size:12px; color:#ffaa66;">🎁 मित्राला जोडा आणि बोनस मिळवा!</div>
+        <div id="custReferBox" style="background:#fff7ed; border:1px dashed #ff6600; padding:10px; border-radius:8px; text-align:center; margin:10px 0;">
+          <div style="font-size:12px; color:#c2410c; font-weight:bold;">🎁 मित्राला जोडा आणि बोनस मिळवा!</div>
           Refer Code: <strong style="color:#ff6600; font-size:17px;" id="myCustReferCode">GPC0000</strong><br>
-          <small style="color:#aaa;">प्रत्येक यशस्वी रेफरलवर ₹<span id="dynCustReferAmt">50</span> सूट</small>
+          <small style="color:#475569;">प्रत्येक यशस्वी रेफरलवर ₹<span id="dynCustReferAmt">50</span> सूट</small>
         </div>
 
-        <button id="txtBtnSaveProf" onclick="saveCustProfile()" style="background:#2ecc71;">💾 प्रोफाईल व पत्ते सेव्ह करा</button>
-        <button id="txtBtnDlPdf" onclick="downloadLastConsentPdf()" style="background:#3498db; color:#fff; margin-top:8px;">📄 संमती पत्र PDF डाउनलोड करा</button>
-        <button id="txtBtnLogout" onclick="logoutCust()" style="background:#e74c3c; color:#fff; margin-top:8px;">🚪 लॉगआउट</button>
+        <button id="txtBtnSaveProf" onclick="saveCustProfile()" style="background:#16a34a;">💾 प्रोफाईल व पत्ते सेव्ह करा</button>
+        <button id="txtBtnDlPdf" onclick="downloadLastConsentPdf()" style="background:#2563eb; color:#fff; margin-top:8px;">📄 संमती पत्र PDF डाउनलोड करा</button>
+        <button id="txtBtnLogout" onclick="logoutCust()" style="background:#dc2626; color:#fff; margin-top:8px;">🚪 लॉगआउट</button>
       </div>
     </div>
 
     <!-- TAB 4: HELP & SOS -->
     <div id="cTabHelp" class="hidden">
       <div class="card">
-        <h3 id="txtSosTitle" style="color:#ff6600; margin-bottom:10px;">🆘 हेल्प आणि इमर्जन्सी सपोर्ट</h3>
-        <div class="sos-row">
+        <h3 id="txtSosTitle" style="color:#e65c00; margin-bottom:10px;">🆘 हेल्प आणि इमर्जन्सी सपोर्ट</h3>
+        <div class="sos-row" style="border-left-color:#dc2626;">
           <div>
             <strong id="txtPoliceHead">👮 पोलीस हेल्पलाईन (Police)</strong>
-            <div id="txtPoliceSub" style="font-size:12px; color:#aaa;">आपत्कालीन पोलीस मदत - 112</div>
+            <div id="txtPoliceSub" style="font-size:12px; color:#64748b;">आपत्कालीन पोलीस मदत - 112</div>
           </div>
-          <a href="tel:112" class="btn-link" style="width:auto; padding:8px 14px; background:#e74c3c; color:#fff; margin:0;">📞 112</a>
+          <a href="tel:112" class="btn-link" style="width:auto; padding:8px 14px; background:#dc2626; color:#fff; margin:0;">📞 112</a>
         </div>
-        <div class="sos-row" style="border-left-color:#2ecc71;">
+        <div class="sos-row" style="border-left-color:#16a34a;">
           <div>
             <strong id="txtAmbHead">🚑 रुग्णवाहिका (Ambulance)</strong>
-            <div id="txtAmbSub" style="font-size:12px; color:#aaa;">आपत्कालीन वैद्यकीय मदत - 108</div>
+            <div id="txtAmbSub" style="font-size:12px; color:#64748b;">आपत्कालीन वैद्यकीय मदत - 108</div>
           </div>
-          <a href="tel:108" class="btn-link" style="width:auto; padding:8px 14px; background:#2ecc71; color:#000; margin:0;">📞 108</a>
+          <a href="tel:108" class="btn-link" style="width:auto; padding:8px 14px; background:#16a34a; color:#fff; margin:0;">📞 108</a>
         </div>
-        <div class="sos-row" style="border-left-color:#ff9800;">
+        <div class="sos-row" style="border-left-color:#f59e0b;">
           <div>
             <strong id="txtFireHead">🚒 फायर ब्रिगेड (Fire Brigade)</strong>
-            <div id="txtFireSub" style="font-size:12px; color:#aaa;">अग्निशमन दल आपत्कालीन सेवा - 101</div>
+            <div id="txtFireSub" style="font-size:12px; color:#64748b;">अग्निशमन दल आपत्कालीन सेवा - 101</div>
           </div>
-          <a href="tel:101" class="btn-link" style="width:auto; padding:8px 14px; background:#ff9800; color:#000; margin:0;">📞 101</a>
+          <a href="tel:101" class="btn-link" style="width:auto; padding:8px 14px; background:#f59e0b; color:#fff; margin:0;">📞 101</a>
         </div>
-        <div class="sos-row" style="border-left-color:#3498db;">
+        <div class="sos-row" style="border-left-color:#2563eb;">
           <div>
             <strong id="txtAdminHelpHead">👑 GoParcel Admin सपोर्ट</strong>
-            <div style="font-size:12px; color:#aaa;" id="adminSupportPhoneTxt">+91 9999999999</div>
+            <div style="font-size:12px; color:#64748b;" id="adminSupportPhoneTxt">+91 9999999999</div>
           </div>
           <div style="display:flex; gap:6px;">
-            <a id="adminCallBtn" href="tel:+919999999999" class="btn-link" style="width:auto; padding:8px 12px; background:#3498db; color:#fff; margin:0;">📞 Call</a>
+            <a id="adminCallBtn" href="tel:+919999999999" class="btn-link" style="width:auto; padding:8px 12px; background:#2563eb; color:#fff; margin:0;">📞 Call</a>
             <a id="adminWaBtn" href="https://wa.me/919999999999" target="_blank" class="btn-link" style="width:auto; padding:8px 12px; background:#25D366; color:#000; margin:0;">💬 WA</a>
           </div>
         </div>
@@ -534,13 +558,14 @@
   let extraStopsList = [];
   let packagePhotoBase64 = "";
   let selectedTipAmount = 0;
+  let suggestDebounceTimers = {};
 
   const dict = {
     mr: {
       loginTitle: "कस्टमर लॉगिन", namePh: "तुमचे पूर्ण नाव", phonePh: "१० अंकी मोबाईल नंबर", reqOtp: "OTP मागवा", verifyOtp: "लॉगिन पूर्ण करा",
       currLoc: "📍 Use My Current Location (ऑटो पत्ता)", bigMap: "🔍 मोठा नकाशा",
-      lblPickup: "🟢 पिकअप पत्ता, मजला व व्यक्तीची माहिती:", phPickup: "पिकअप पत्ता टाका किंवा GPS दाबा", phPickName: "पिकअप व्यक्तीचे नाव", phPickPhone: "पिकअप मोबाईल नंबर",
-      lblDrop: "🔴 ड्रॉप पत्ता, मजला व व्यक्तीची माहिती:", phDrop: "ड्रॉप पत्ता टाका (उदा. स्वारगेट, पुणे)", phDropName: "ड्रॉप व्यक्तीचे नाव", phDropPhone: "ड्रॉप मोबाईल नंबर",
+      lblPickup: "🟢 पिकअप पत्ता, मजला व व्यक्तीची माहिती:", phPickup: "सोसायटी / एरियाचे २-३ अक्षर टाका...", phPickName: "पिकअप व्यक्तीचे नाव", phPickPhone: "पिकअप मोबाईल नंबर",
+      lblDrop: "🔴 ड्रॉप पत्ता, मजला व व्यक्तीची माहिती:", phDrop: "ड्रॉप सोसायटी / एरियाचे २-३ अक्षर टाका...", phDropName: "ड्रॉप व्यक्तीचे नाव", phDropPhone: "ड्रॉप मोबाईल नंबर",
       lblDist: "🛣️ अंतर (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
       lblPay: "💳 पेमेंट पद्धत निवडा:", subCod: "रोख पेमेंट (COD)", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 QR स्कॅन करा किंवा थेट UPI ॲपने पेमेंट करा", qrAmt: "रक्कम:", qrNote: "✅ पेमेंट पूर्ण झाल्यावर खालील बटन दाबा",
@@ -559,8 +584,8 @@
     hi: {
       loginTitle: "कस्टमर लॉगिन", namePh: "आपका पूरा नाम", phonePh: "१० अंकों का मोबाइल नंबर", reqOtp: "OTP मंगवाएं", verifyOtp: "लॉगिन पूरा करें",
       currLoc: "📍 Use My Current Location (ऑटो पता)", bigMap: "🔍 बड़ा मैप",
-      lblPickup: "🟢 पिकअप पता, मंजिल और व्यक्ति की जानकारी:", phPickup: "पिकअप पता दर्ज करें", phPickName: "पिकअप व्यक्ति का नाम", phPickPhone: "पिकअप मोबाइल नंबर",
-      lblDrop: "🔴 ड्रॉप पता, मंजिल और व्यक्ति की जानकारी:", phDrop: "ड्रॉप पता दर्ज करें", phDropName: "ड्रॉप व्यक्ति का नाम", phDropPhone: "ड्रॉप मोबाइल नंबर",
+      lblPickup: "🟢 पिकअप पता, मंजिल और व्यक्ति की जानकारी:", phPickup: "पिकअप सोसायटी / एरिया के २-३ अक्षर लिखें...", phPickName: "पिकअप व्यक्ति का नाम", phPickPhone: "पिकअप मोबाइल नंबर",
+      lblDrop: "🔴 ड्रॉप पता, मंजिल और व्यक्ति की जानकारी:", phDrop: "ड्रॉप सोसायटी / एरिया के २-३ अक्षर लिखें...", phDropName: "ड्रॉप व्यक्ति का नाम", phDropPhone: "ड्रॉप मोबाइल नंबर",
       lblDist: "🛣️ दूरी (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
       lblPay: "💳 पेमेंट का तरीका चुनें:", subCod: "नकद भुगतान (COD)", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 QR स्कैन करें या सीधे UPI ऐप से पेमेंट करें", qrAmt: "राशि:", qrNote: "✅ पेमेंट पूरा होने के बाद नीचे बटन दबाएं",
@@ -579,8 +604,8 @@
     en: {
       loginTitle: "Customer Login", namePh: "Enter Your Full Name", phonePh: "10-Digit Mobile Number", reqOtp: "Request OTP", verifyOtp: "Verify & Login",
       currLoc: "📍 Use My Current Location (Auto Address)", bigMap: "🔍 Expand Map",
-      lblPickup: "🟢 Pickup Address, Floor & Contact Person:", phPickup: "Enter Pickup Address or Tap GPS", phPickName: "Pickup Person Name", phPickPhone: "Pickup Mobile Number",
-      lblDrop: "🔴 Drop Address, Floor & Contact Person:", phDrop: "Enter Drop Address", phDropName: "Drop Person Name", phDropPhone: "Drop Mobile Number",
+      lblPickup: "🟢 Pickup Address, Floor & Contact Person:", phPickup: "Type 2-3 letters of society / area...", phPickName: "Pickup Person Name", phPickPhone: "Pickup Mobile Number",
+      lblDrop: "🔴 Drop Address, Floor & Contact Person:", phDrop: "Type 2-3 letters of drop society / area...", phDropName: "Drop Person Name", phDropPhone: "Drop Mobile Number",
       lblDist: "🛣️ Distance (KM):", lblParcel: "📦 Parcel Type:", lblWeight: "⚖️ Parcel Weight:",
       lblPay: "💳 Select Payment Method:", subCod: "Cash on Delivery", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 Scan QR or Pay Directly via UPI App", qrAmt: "Amount:", qrNote: "✅ Click Book button below after completing payment",
@@ -709,6 +734,121 @@
     return Math.round(raw * surgeMult);
   }
 
+  // --- LIVE LOCATION / SOCIETY / LANDMARK AUTOCOMPLETE (2-3 LETTERS TYPED) ---
+  async function queryPlaceSuggestions(text) {
+    const cityContext = (document.getElementById('activeCitySelect')?.value || "Pune").split('(')[0].trim();
+    const searchStr = text.toLowerCase().includes(cityContext.toLowerCase()) ? text : `${text}, ${cityContext}, Maharashtra`;
+    const results = [];
+
+    try {
+      const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchStr)}&lat=${pLat}&lon=${pLng}&limit=6`);
+      const data = await res.json();
+      if (data && Array.isArray(data.features)) {
+        data.features.forEach(f => {
+          const props = f.properties || {};
+          const [lng, lat] = f.geometry.coordinates;
+          const title = props.name || props.street || props.district || props.suburb || text;
+          const subParts = [props.street, props.district || props.suburb, props.city || props.county, props.state].filter(Boolean);
+          const subtitle = [...new Set(subParts)].join(', ');
+          const fullAddress = subtitle && !subtitle.startsWith(title) ? `${title}, ${subtitle}` : (subtitle || title);
+          results.push({ title, subtitle: subtitle || cityContext, fullAddress, lat, lng });
+        });
+      }
+    } catch (e) {}
+
+    if (results.length === 0) {
+      try {
+        const res2 = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchStr)}&limit=5&addressdetails=1`);
+        const data2 = await res2.json();
+        if (Array.isArray(data2)) {
+          data2.forEach(item => {
+            const parts = item.display_name.split(',');
+            const title = parts[0].trim();
+            const subtitle = parts.slice(1, 4).join(',').trim();
+            results.push({
+              title,
+              subtitle,
+              fullAddress: parts.slice(0, 4).join(',').trim(),
+              lat: Number(item.lat),
+              lng: Number(item.lon)
+            });
+          });
+        }
+      } catch (e) {}
+    }
+    return results;
+  }
+
+  window.onAddressTypeSuggest = (targetKey, rawVal) => {
+    const val = rawVal.trim();
+    const boxId = targetKey === 'pickup'
+      ? 'pickupSuggestionsBox'
+      : (targetKey === 'drop' ? 'dropSuggestionsBox' : `stopSuggestionsBox_${targetKey}`);
+    const box = document.getElementById(boxId);
+    if (!box) return;
+
+    clearTimeout(suggestDebounceTimers[targetKey]);
+    if (val.length < 2) {
+      box.classList.add('hidden');
+      box.innerHTML = "";
+      return;
+    }
+
+    suggestDebounceTimers[targetKey] = setTimeout(async () => {
+      box.classList.remove('hidden');
+      box.innerHTML = `<div class="addr-sugg-item" style="color:#64748b; font-size:12px;">⏳ "${val}" साठी सोसायटी / एरिया शोधत आहे...</div>`;
+      const list = await queryPlaceSuggestions(val);
+      if (list.length === 0) {
+        box.innerHTML = `<div class="addr-sugg-item" style="color:#64748b; font-size:12px;">कोणतेही ठिकाण सापडले नाही, पूर्ण पत्ता टाका.</div>`;
+        return;
+      }
+      box.innerHTML = "";
+      list.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'addr-sugg-item';
+        row.innerHTML = `
+          <span style="font-size:16px; margin-top:2px;">📍</span>
+          <div style="flex:1;">
+            <div class="addr-sugg-title">${item.title}</div>
+            <div class="addr-sugg-sub">${item.subtitle}</div>
+          </div>
+        `;
+        row.onclick = async () => {
+          box.classList.add('hidden');
+          if (targetKey === 'pickup') {
+            document.getElementById('pickupInput').value = item.fullAddress;
+            pLat = Number(item.lat); pLng = Number(item.lng);
+            if (pMarker) pMarker.setLatLng([pLat, pLng]).openPopup();
+            if (map) map.fitBounds([[pLat, pLng], [dLat, dLng]], { padding: [45, 45] });
+            await updateDistanceAndLine();
+          } else if (targetKey === 'drop') {
+            document.getElementById('dropInput').value = item.fullAddress;
+            dLat = Number(item.lat); dLng = Number(item.lng);
+            if (dMarker) dMarker.setLatLng([dLat, dLng]).openPopup();
+            if (map) map.fitBounds([[pLat, pLng], [dLat, dLng]], { padding: [45, 45] });
+            await updateDistanceAndLine();
+          } else {
+            const idx = Number(targetKey);
+            if (extraStopsList[idx]) {
+              extraStopsList[idx].address = item.fullAddress;
+              extraStopsList[idx].lat = Number(item.lat);
+              extraStopsList[idx].lng = Number(item.lng);
+              renderExtraStopsUi();
+              await updateDistanceAndLine();
+            }
+          }
+        };
+        box.appendChild(row);
+      });
+    }, 320);
+  };
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.addr-autocomplete-wrap')) {
+      document.querySelectorAll('.addr-suggestions-list').forEach(el => el.classList.add('hidden'));
+    }
+  });
+
   window.promptSaveCurrentPlace = async (side) => {
     if (!custUser) return;
     const addr = document.getElementById(side === 'pickup' ? 'pickupInput' : 'dropInput').value.trim();
@@ -817,7 +957,7 @@
     const queryText = inp.value.trim();
     if (!queryText || queryText.startsWith("⏳")) return;
 
-    const cityContext = document.getElementById('activeCitySelect')?.value || "Pune";
+    const cityContext = (document.getElementById('activeCitySelect')?.value || "Pune").split('(')[0].trim();
     const fullQuery = queryText.toLowerCase().includes(cityContext.toLowerCase()) ? queryText : `${queryText}, ${cityContext}, Maharashtra`;
 
     try {
@@ -853,12 +993,13 @@
 
   window.updateExtraStopText = (idx, val) => {
     if (extraStopsList[idx]) extraStopsList[idx].address = val;
+    onAddressTypeSuggest(String(idx), val);
   };
 
   window.geocodeExtraStop = async (idx) => {
     const st = extraStopsList[idx];
     if (!st || !st.address.trim()) return;
-    const cityContext = document.getElementById('activeCitySelect')?.value || "Pune";
+    const cityContext = (document.getElementById('activeCitySelect')?.value || "Pune").split('(')[0].trim();
     const fullQuery = st.address.toLowerCase().includes(cityContext.toLowerCase()) ? st.address : `${st.address}, ${cityContext}, Maharashtra`;
     try {
       const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(fullQuery)}&limit=1`);
@@ -876,11 +1017,12 @@
     const box = document.getElementById('extraStopsContainer');
     box.innerHTML = "";
     extraStopsList.forEach((st, idx) => {
-      box.innerHTML += `<div class="extra-stop-item">
-        <span style="color:#ff9800; font-weight:bold; font-size:12px;">🛑 Stop ${idx + 1}:</span>
-        <input type="text" value="${st.address}" placeholder="मधल्या स्टॉपचा पत्ता टाका" oninput="updateExtraStopText(${idx}, this.value)" onchange="geocodeExtraStop(${idx})" style="margin:0; padding:8px; font-size:13px;">
-        <button type="button" onclick="geocodeExtraStop(${idx})" style="width:auto; padding:6px 8px; margin:0; background:#262626; color:#ffaa66; font-size:12px;">🔍</button>
-        <button type="button" onclick="removeExtraDeliveryStop(${idx})" style="width:auto; padding:6px 10px; margin:0; background:#e74c3c; color:#fff; font-size:12px;">✕</button>
+      box.innerHTML += `<div class="extra-stop-item addr-autocomplete-wrap">
+        <span style="color:#b45309; font-weight:bold; font-size:12px;">🛑 Stop ${idx + 1}:</span>
+        <input type="text" autocomplete="off" value="${st.address}" placeholder="स्टॉपचे २-३ अक्षर टाका..." oninput="updateExtraStopText(${idx}, this.value)" onchange="geocodeExtraStop(${idx})" style="margin:0; padding:8px; font-size:13px;">
+        <button type="button" onclick="geocodeExtraStop(${idx})" style="width:auto; padding:6px 8px; margin:0; background:#fff7ed; color:#e65c00; border:1px solid #fdba74; font-size:12px;">🔍</button>
+        <button type="button" onclick="removeExtraDeliveryStop(${idx})" style="width:auto; padding:6px 10px; margin:0; background:#dc2626; color:#fff; font-size:12px;">✕</button>
+        <div id="stopSuggestionsBox_${idx}" class="addr-suggestions-list hidden"></div>
       </div>`;
     });
   }
@@ -1060,14 +1202,14 @@
       if (remMs <= 0) {
         clearInterval(custOtpTimerInterval);
         disp.innerText = "⚠️ OTP Expired! Click Resend OTP.";
-        disp.style.color = "#e74c3c";
+        disp.style.color = "#dc2626";
         document.getElementById('btnCustResendOtp').classList.remove('hidden');
         document.getElementById('txtBtnVerifyOtp').disabled = true;
       } else {
         const mins = String(Math.floor(remMs / 60000)).padStart(2, '0');
         const secs = String(Math.floor((remMs % 60000) / 1000)).padStart(2, '0');
         disp.innerText = `⏳ OTP Valid: ${mins}:${secs}`;
-        disp.style.color = "#ffaa66";
+        disp.style.color = "#c2410c";
       }
     }, 1000);
   }
@@ -1173,7 +1315,7 @@
       snap.forEach(d => msgs.push(d.data()));
       msgs.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
       if (msgs.length === 0) {
-        box.innerHTML = `<div style="font-size:12px; color:#777; text-align:center;">Company Customer Care Live Support</div>`;
+        box.innerHTML = `<div style="font-size:12px; color:#64748b; text-align:center;">Company Customer Care Live Support</div>`;
         return;
       }
       box.innerHTML = "";
@@ -1355,11 +1497,11 @@
         addonsBox.classList.remove('hidden');
         addonsBox.innerHTML = `
           <div style="display:flex; justify-content:space-between;"><span>🚚 ${chosenVehicle} डिलिव्हरी शुल्क:</span><strong>₹${bd.activeTripFare}</strong></div>
-          ${bd.stopsFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#ff9800;"><span>🛑 एक्स्ट्रा स्टॉप्स (${extraStopsList.length}):</span><strong>+₹${bd.stopsFee}</strong></div>` : ''}
-          ${bd.floorFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#ffaa66;"><span>🪜 मजला हाताळणी शुल्क:</span><strong>+₹${bd.floorFee}</strong></div>` : ''}
-          ${bd.helperFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#ff9800;"><span>👷 मदतनीस शुल्क (Helper):</span><strong>+₹${bd.helperFee}</strong></div>` : ''}
-          ${bd.insuranceFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🛡️ पार्सल विमा संरक्षण:</span><strong>+₹${bd.insuranceFee}</strong></div>` : ''}
-          ${bd.tipAmount > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🎁 रायडर टीप (100% रायडरला):</span><strong>+₹${bd.tipAmount}</strong></div>` : ''}
+          ${bd.stopsFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#b45309;"><span>🛑 एक्स्ट्रा स्टॉप्स (${extraStopsList.length}):</span><strong>+₹${bd.stopsFee}</strong></div>` : ''}
+          ${bd.floorFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#c2410c;"><span>🪜 मजला हाताळणी शुल्क:</span><strong>+₹${bd.floorFee}</strong></div>` : ''}
+          ${bd.helperFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#b45309;"><span>👷 मदतनीस शुल्क (Helper):</span><strong>+₹${bd.helperFee}</strong></div>` : ''}
+          ${bd.insuranceFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#15803d;"><span>🛡️ पार्सल विमा संरक्षण:</span><strong>+₹${bd.insuranceFee}</strong></div>` : ''}
+          ${bd.tipAmount > 0 ? `<div style="display:flex; justify-content:space-between; color:#15803d;"><span>🎁 रायडर टीप (100% रायडरला):</span><strong>+₹${bd.tipAmount}</strong></div>` : ''}
         `;
       } else {
         addonsBox.classList.add('hidden');
@@ -1521,7 +1663,7 @@
       const tbody = document.getElementById('custOrdersTableBody');
       const cardsBox = document.getElementById('custOrdersCards');
       if (snap.empty) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">No Orders</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#64748b;">No Orders</td></tr>';
         cardsBox.innerHTML = "";
         document.getElementById('liveRiderTrackingCard').classList.add('hidden');
         return;
@@ -1537,7 +1679,7 @@
 
         const canCancel = (o.status === "Pending" || o.status === "Accepted" || o.status === "ReachedPickup");
         const cancelBtnHtml = canCancel
-          ? `<button onclick="cancelCustomerOrder('${d.id}', '${o.status}')" style="background:#3b0d0d; color:#ff6b6b; border:1px solid #e74c3c; padding:6px 10px; font-size:12px; margin-top:8px;">❌ ऑर्डर कॅन्सल करा</button>`
+          ? `<button onclick="cancelCustomerOrder('${d.id}', '${o.status}')" style="background:#fef2f2; color:#dc2626; border:1px solid #fca5a5; padding:6px 10px; font-size:12px; margin-top:8px;">❌ ऑर्डर कॅन्सल करा</button>`
           : '';
 
         const addonsInfo = [
@@ -1549,10 +1691,10 @@
         ].filter(Boolean).join(' • ');
 
         tbody.innerHTML += `<tr>
-          <td>🟢 ${o.pickup} <br><small style="color:#4db8ff;">(${o.pickupContactName || ''}: ${o.pickupContactPhone || ''})</small><br>
-              🔴 ${o.drop} <br><small style="color:#ffaa66;">(${o.dropContactName || ''}: ${o.dropContactPhone || ''})</small></td>
-          <td><b>${o.vehicle}</b> (${o.distanceKm || '-'} km)<br><span style="color:#2ecc71;">₹${o.fare}</span> • <small>${o.paymentMode || 'COD'}</small></td>
-          <td style="color:#ff6600; font-weight:bold;">${o.status}</td>
+          <td>🟢 ${o.pickup} <br><small style="color:#1d4ed8;">(${o.pickupContactName || ''}: ${o.pickupContactPhone || ''})</small><br>
+              🔴 ${o.drop} <br><small style="color:#c2410c;">(${o.dropContactName || ''}: ${o.dropContactPhone || ''})</small></td>
+          <td><b>${o.vehicle}</b> (${o.distanceKm || '-'} km)<br><span style="color:#15803d; font-weight:bold;">₹${o.fare}</span> • <small>${o.paymentMode || 'COD'}</small></td>
+          <td style="color:#e65c00; font-weight:bold;">${o.status}</td>
           <td><span class="pin-badge">${o.deliveryPin}</span></td>
         </tr>`;
 
@@ -1560,15 +1702,15 @@
         cardsBox.innerHTML += `<div class="card">
           <div style="display:flex; justify-content:space-between;">
             <strong>${o.vehicle} • ${o.parcel} (${o.parcelWeight || '1-5 kg'})</strong>
-            <span style="color:#2ecc71; font-weight:bold;">${o.status}</span>
+            <span style="color:#15803d; font-weight:bold;">${o.status}</span>
           </div>
-          ${addonsInfo ? `<div style="font-size:11px; color:#4db8ff; margin-top:3px;">${addonsInfo}</div>` : ''}
-          <p style="font-size:12px; color:#ccc; margin:6px 0;">
+          ${addonsInfo ? `<div style="font-size:11px; color:#1d4ed8; margin-top:3px;">${addonsInfo}</div>` : ''}
+          <p style="font-size:12px; color:#334155; margin:6px 0;">
             🟢 ${o.pickup} (${o.pickupContactName || ''} - ${o.pickupContactPhone || ''})<br>
             🔴 ${o.drop} (${o.dropContactName || ''} - ${o.dropContactPhone || ''})
           </p>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-            <span style="font-size:12px; color:#aaa;">Rider: <b>${riderCleanName}</b> | <b>₹${o.fare}</b> (${o.paymentMode || 'COD'})</span>
+            <span style="font-size:12px; color:#475569;">Rider: <b>${riderCleanName}</b> | <b>₹${o.fare}</b> (${o.paymentMode || 'COD'})</span>
             <span>PIN: <span class="pin-badge">${o.deliveryPin}</span></span>
           </div>
           ${cancelBtnHtml}
