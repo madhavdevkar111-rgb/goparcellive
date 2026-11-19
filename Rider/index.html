@@ -372,7 +372,7 @@
       <button onclick="submitOnboardingUtr()" style="background:#2ecc71;">✅ Submit UTR</button>
     </div>
 
-    <!-- SECTION 1: ACTIVE DELIVERY + AVAILABLE ORDERS (WITH PORTER LONG PICKUP PAYOUT) -->
+    <!-- SECTION 1: ACTIVE DELIVERY + AVAILABLE ORDERS -->
     <div id="secOrders">
       <div class="card" id="activeDeliverySectionCard">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -606,7 +606,7 @@
   let adminWaNumber = "919999999999", adminUpiId = "Techesupp-2@okhdfcbank", currentOnboardingFee = 1000, currentCommPct = 20, maxRadiusKm = 10;
   let currentReferBonus = 100, deliveryRangeMeters = 150, selfieIntervalHours = 2, tempBlockMinutes = 60;
   let peakIncentiveActive = true, peakStartHour = 18, peakEndHour = 22, peakIncentiveAmount = 25;
-  let freePickupKm = 1.0, longPickupRatePerKm = 5; // Porter Long Pickup Payout Config
+  let freePickupKm = 1.0, longPickupRatePerKm = 5;
   let consentTextGlobal = "मी GoParcel चे सर्व नियम व वाहतूक अटी पाळेन.";
   let isFeePaid = false, isApproved = false, isSelfieApproved = false, isRiderOnline = false;
   let selfieExpiresAt = 0, selfieRejectCount = 0, tempBlockUntil = 0;
@@ -769,13 +769,12 @@
   };
   changeRiderLang(riderLang);
 
-  // Porter Long Pickup Distance Bonus Calculator (After Free Pickup KM)
   function calculateLongPickupDetails(pickupLat, pickupLng) {
     if (!riderLat || !riderLng || !pickupLat || !pickupLng) {
       return { awayKm: 0, extraKm: 0, bonus: 0 };
     }
     const straightKm = getDistanceKm(riderLat, riderLng, pickupLat, pickupLng);
-    const roadAwayKm = Number((straightKm * 1.2).toFixed(1)); // Road factor 1.2x
+    const roadAwayKm = Number((straightKm * 1.2).toFixed(1));
     const extraKm = Math.max(0, Number((roadAwayKm - freePickupKm).toFixed(1)));
     const bonus = Math.round(extraKm * longPickupRatePerKm);
     return { awayKm: roadAwayKm, extraKm, bonus };
@@ -1079,7 +1078,6 @@
       selfieIntervalHours = Number(s.selfieIntervalHours ?? 2);
       tempBlockMinutes = Number(s.tempBlockMinutes ?? 60);
 
-      // Porter Long Pickup Distance Config
       freePickupKm = Number(s.freePickupKm ?? 1.0);
       longPickupRatePerKm = Number(s.longPickupRatePerKm ?? 5);
 
@@ -1531,7 +1529,6 @@
     });
   }
 
-  // ACCEPT ORDER: LOCK EXACT LONG PICKUP DISTANCE PAYOUT + INCENTIVE BONUS
   window.acceptOrder = async (orderId) => {
     stopOrderRingtone();
     if (isFakeGpsBlocked) return alert("🚨 Fake GPS Detected! Disable Mock Location first.");
@@ -1871,7 +1868,6 @@
       }
     });
 
-    // AVAILABLE ORDERS WITH EXACT PORTER PAYOUT BREAKDOWN (TRIP NET + LONG PICKUP BONUS + PEAK BONUS + 100% TIP)
     onSnapshot(query(collection(db, "orders"), where("status", "==", "Pending")), (snap) => {
       const div = document.getElementById('availableOrders');
       const queueBox = document.getElementById('nextOrderQueueBox');
@@ -1942,7 +1938,7 @@
             ${floorInfo}
             ${pkgPhotoHtml}
             <div class="payout-tally-card">
-              <div style="display:flex; justify-content:space-between;"><span>कस्टमर भाडे (कमिशन वजा):</span><span>₹${tripNet}</span></div>
+              <div style="display:flex; justify-content:space-between;"><span>कस्टमर भाडे ₹${fareNum} (कमिशन ${currentCommPct}% वजा):</span><span>₹${tripNet}</span></div>
               ${lp.bonus > 0 ? `<div style="display:flex; justify-content:space-between; color:#ffaa66;"><span>🛵 लांब पिकअप भत्ता (${lp.extraKm} km जादा × ₹${longPickupRatePerKm}):</span><strong>+₹${lp.bonus}</strong></div>` : ''}
               ${incBonusNow > 0 ? `<div style="display:flex; justify-content:space-between; color:#4db8ff;"><span>🔥 पीक अवर बोनस:</span><strong>+₹${incBonusNow}</strong></div>` : ''}
               ${tipAmt > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🎁 कस्टमर टीप (100%):</span><strong>+₹${tipAmt}</strong></div>` : ''}
