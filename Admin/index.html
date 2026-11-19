@@ -67,7 +67,7 @@
 <body>
 <header>
   <h1>👑 GoParcel Master Panel</h1>
-  <span style="color:#2ecc71; font-size:13px;">● Porter / Rapido Fare Engine</span>
+  <span style="color:#2ecc71; font-size:13px;">● Porter / Rapido No-Code Master Sync</span>
 </header>
 
 <div id="imgModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
@@ -87,7 +87,7 @@
   </div>
 
   <div class="nav-tabs">
-    <button id="tMaster" class="nav-btn active" onclick="showTab('master')">🎛️ दर तक्ता (Porter / Rapido Rate Card)</button>
+    <button id="tMaster" class="nav-btn active" onclick="showTab('master')">🎛️ दर तक्ता & No-Code Master Control</button>
     <button id="tRiders" class="nav-btn" onclick="showTab('riders')">🛵 रायडर्स KYC, Selfie & Direct Add</button>
     <button id="tOrders" class="nav-btn" onclick="showTab('orders')">📦 ऑर्डर्स, फोन बुकिंग & GST रिपोर्ट</button>
     <button id="tChat" class="nav-btn" onclick="showTab('chat')">💬 Live Support Chat <span id="chatBadge" class="badge-req hidden">0</span></button>
@@ -119,6 +119,7 @@
           <thead>
             <tr>
               <th>वाहन प्रकार (Vehicle)</th>
+              <th>स्टेटस (ON/OFF)</th>
               <th>Base Fare (बेस भाडे ₹)</th>
               <th>प्रति KM दर (₹/km)</th>
               <th>उदा. 1.2 KM चे भाडे</th>
@@ -128,6 +129,7 @@
           <tbody>
             <tr>
               <td><b>🏍️ 2-Wheeler (बाईक)</b></td>
+              <td><input type="checkbox" id="vehActive2W" checked style="width:18px; height:18px; accent-color:#2ecc71;"></td>
               <td><input type="number" id="setBase2W" value="15" oninput="previewRateSamples()"></td>
               <td><input type="number" id="setRate2W" value="15" oninput="previewRateSamples()"></td>
               <td id="sample1Km2W" style="color:#ffaa66; font-weight:bold;">₹33</td>
@@ -135,6 +137,7 @@
             </tr>
             <tr>
               <td><b>🛺 3-Wheeler (रिक्षा/अपे)</b></td>
+              <td><input type="checkbox" id="vehActive3W" checked style="width:18px; height:18px; accent-color:#2ecc71;"></td>
               <td><input type="number" id="setBase3W" value="50" oninput="previewRateSamples()"></td>
               <td><input type="number" id="setRate3W" value="20" oninput="previewRateSamples()"></td>
               <td id="sample1Km3W" style="color:#ffaa66; font-weight:bold;">₹74</td>
@@ -142,6 +145,7 @@
             </tr>
             <tr>
               <td><b>🚐 Mini Tempo (टाटा एस/छोटा हत्ती)</b></td>
+              <td><input type="checkbox" id="vehActiveTempo" checked style="width:18px; height:18px; accent-color:#2ecc71;"></td>
               <td><input type="number" id="setBaseTempo" value="120" oninput="previewRateSamples()"></td>
               <td><input type="number" id="setRateTempo" value="28" oninput="previewRateSamples()"></td>
               <td id="sample1KmTempo" style="color:#ffaa66; font-weight:bold;">₹154</td>
@@ -149,6 +153,7 @@
             </tr>
             <tr>
               <td><b>🛻 Bolero Pickup</b></td>
+              <td><input type="checkbox" id="vehActiveBolero" checked style="width:18px; height:18px; accent-color:#2ecc71;"></td>
               <td><input type="number" id="setBaseBolero" value="200" oninput="previewRateSamples()"></td>
               <td><input type="number" id="setRateBolero" value="38" oninput="previewRateSamples()"></td>
               <td id="sample1KmBolero" style="color:#ffaa66; font-weight:bold;">₹246</td>
@@ -156,6 +161,7 @@
             </tr>
             <tr>
               <td><b>🚛 Truck (मोठा ट्रक)</b></td>
+              <td><input type="checkbox" id="vehActiveTruck" checked style="width:18px; height:18px; accent-color:#2ecc71;"></td>
               <td><input type="number" id="setBaseTruck" value="450" oninput="previewRateSamples()"></td>
               <td><input type="number" id="setRateTruck" value="55" oninput="previewRateSamples()"></td>
               <td id="sample1KmTruck" style="color:#ffaa66; font-weight:bold;">₹516</td>
@@ -166,7 +172,7 @@
       </div>
 
       <div style="background:#0f1d14; border:1px dashed #2ecc71; border-radius:8px; padding:10px; margin-top:12px;">
-        <strong style="color:#4db8ff; font-size:13px;">🛵 रायडर लांबच्या पिकअप अंतराचा भत्ता (Long Pickup Distance Payout - Porter Model):</strong>
+        <strong style="color:#4db8ff; font-size:13px;">🛵 रायडर लांबच्या पिकअप अंतराचा भत्ता, हेल्पर व वेटिंग चार्ज (Porter / LoadShare Model):</strong>
         <p style="font-size:11px; color:#ccc; margin:3px 0 8px;">जर रायडर कस्टमरच्या पिकअप लोकेशनपासून लांब असेल, तर फ्री रेंज नंतर प्रत्येक जादा किलोमीटरसाठी रायडरला हा एक्स्ट्रा भत्ता मिळेल:</p>
         <div class="form-grid" style="margin-bottom:0;">
           <div>
@@ -177,10 +183,78 @@
             <label>१ किमी नंतर प्रति KM एक्स्ट्रा भत्ता (₹/km)</label>
             <input type="number" id="setLongPickupRatePerKm" value="5" min="0" max="50">
           </div>
+          <div>
+            <label>हेल्पर / लोडिंग-अनलोडिंग शुल्क (₹ per Helper)</label>
+            <input type="number" id="setHelperCharge" value="150" min="0" max="2000">
+          </div>
+          <div>
+            <label>मोफत वेटिंग वेळ (मिनिटे) & वेटिंग चार्ज (₹/min)</label>
+            <div style="display:flex; gap:6px;">
+              <input type="number" id="setFreeWaitingMins" value="10" min="1" max="60" title="Free Waiting Minutes">
+              <input type="number" id="setWaitingRatePerMin" value="2" min="0" max="50" title="Charge per Extra Minute">
+            </div>
+          </div>
         </div>
       </div>
 
       <button class="save-btn" style="margin-top:10px;" onclick="saveMasterSettings()">✅ दर तक्ता आणि पिकअप भत्ता सेव्ह करा</button>
+    </div>
+
+    <!-- NO-CODE UI, TABS, SHORTCUTS & FEATURE MASTER CONTROLLER -->
+    <div class="sub-box-blue">
+      <h3 style="color:#4db8ff; margin-bottom:6px;">🧩 No-Code UI, टॅब्स, आयकॉन्स व फीचर मास्टर कंट्रोल (Customer & Rider App Live Sync)</h3>
+      <p style="font-size:11px; color:#ccc; margin-bottom:10px;">कस्टमर किंवा रायडरच्या कोडमध्ये कोणताही बदल न करता येथून थेट त्यांचे फीचर्स, टॅब्स, पेमेंट मोड्स, नवीन वाहन किंवा शॉर्टकट आयकॉन्स चालू/बंद किंवा ॲड करा:</p>
+      
+      <div class="form-grid">
+        <div class="doc-rule-card">
+          <strong style="color:#ff6600; font-size:12px; display:block; margin-bottom:6px;">📱 कस्टमर पॅनल फीचर्स व टॅब्स:</strong>
+          <label class="chk-row"><input type="checkbox" id="featCustCod" checked> 💵 Cash on Delivery (COD) चालू ठेवा</label>
+          <label class="chk-row"><input type="checkbox" id="featCustOnline" checked> 📲 Online UPI / QR पेमेंट चालू ठेवा</label>
+          <label class="chk-row"><input type="checkbox" id="featCustMultiStop" checked> 📍 Multi-Stop (एकापेक्षा जास्त ड्रॉप) टॅब</label>
+          <label class="chk-row"><input type="checkbox" id="featCustInsurance" checked> 🛡️ Goods Insurance (माल विमा) पर्याय</label>
+          <label class="chk-row"><input type="checkbox" id="featCustHelper" checked> 👷 Helper / Loader पर्याय दाखवा</label>
+          <label class="chk-row"><input type="checkbox" id="featCustTip" checked> 🎁 Rider Tip (१००% बक्षीस) पर्याय</label>
+          <label class="chk-row"><input type="checkbox" id="featCustSchedule" checked> ⏰ Schedule Later (आगाऊ बुकिंग)</label>
+        </div>
+
+        <div class="doc-rule-card">
+          <strong style="color:#2ecc71; font-size:12px; display:block; margin-bottom:6px;">🛵 रायडर पॅनल फीचर्स व टॅब्स:</strong>
+          <label class="chk-row"><input type="checkbox" id="featRiderGoHome" checked> 🏠 Go-To-Home मोड फिल्टर चालू</label>
+          <label class="chk-row"><input type="checkbox" id="featRiderNextQueue" checked> ⚡ Back-to-Back Next Order Queue</label>
+          <label class="chk-row"><input type="checkbox" id="featRiderBreakdown" checked> 🚨 गाडी बिघडल्यास Instant Transfer</label>
+          <label class="chk-row"><input type="checkbox" id="featRiderStrictVehMatch" checked> 🎯 फक्त स्वतःच्या गाडीच्या कॅटेगरीच्याच ऑर्डर्स दाखवा</label>
+          <label class="chk-row"><input type="checkbox" id="featRiderPickupPhoto" checked> 📸 पार्सल उचलताना फोटो पुरावा अनिवार्य</label>
+          <label class="chk-row"><input type="checkbox" id="featRiderWalletTab" checked> 💰 वॉलेट व विथड्रॉवल टॅब दाखवा</label>
+        </div>
+      </div>
+
+      <div style="background:#0c1926; border:1px dashed #4db8ff; border-radius:8px; padding:10px; margin-top:8px;">
+        <strong style="color:#ffaa66; font-size:12px; display:block; margin-bottom:6px;">➕ नवीन कस्टम वाहन किंवा शॉर्टकट आयकॉन जोडा (Dynamic Custom Fleet / Shortcut):</strong>
+        <div class="form-grid" style="margin-bottom:6px;">
+          <div>
+            <label>कस्टम वाहन नाव (उदा. E-Rickshaw / Tata 407)</label>
+            <input type="text" id="customVehName" placeholder="उदा. E-Rickshaw (3W Electric)">
+          </div>
+          <div>
+            <label>आयकॉन (Emoji)</label>
+            <input type="text" id="customVehIcon" value="🛺" maxlength="4">
+          </div>
+          <div>
+            <label>कस्टम Base Fare (₹) & Per KM (₹)</label>
+            <div style="display:flex; gap:6px;">
+              <input type="number" id="customVehBase" placeholder="Base ₹ (उदा. 40)">
+              <input type="number" id="customVehRate" placeholder="₹/km (उदा. 18)">
+            </div>
+          </div>
+          <div>
+            <label>कस्टम शॉर्टकट बटण नाव व लिंक/मेसेज (App Shortcut)</label>
+            <div style="display:flex; gap:6px;">
+              <input type="text" id="customShortcutLabel" placeholder="उदा. 📞 Bulk Booking">
+              <input type="text" id="customShortcutUrl" placeholder="https://wa.me/91...">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Broadcast Notification Push Alert Box -->
@@ -431,14 +505,14 @@
     </div>
 
     <table>
-      <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता व व्यक्ती</th><th>वाहन, Trip KM & PIN</th><th>कस्टमर बिल vs रायडर कमाई</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
+      <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता व व्यक्ती</th><th>वाहन, Trip KM & PIN</th><th>कस्टमर बिल vs रायडर कमाई</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती (Dispatch / Delete)</th></tr></thead>
       <tbody id="adminTableBody"></tbody>
     </table>
   </div>
 
   <!-- 5. CONSENT & AGREEMENT PDF -->
   <div id="secConsents" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:6px;">📜 सर्व कस्टमर आणि रायडर संमती पत्रे (PDF, Timer व GPS लोकेशनसह)</h3>
+    <h3 style="color:#ff6600; margin-bottom:6px;">📜 सर्व कस्टमर आणि रायडर संमती पत्रे (Full Photo + ID + GPS Legal Evidence PDF)</h3>
     <table>
       <thead><tr><th>प्रकार (Role)</th><th>नाव व मोबाईल</th><th>वेळ (Timestamp)</th><th>GPS लोकेशन</th><th>तपशील</th><th>PDF डाउनलोड</th></tr></thead>
       <tbody id="consentsTableBody"></tbody>
@@ -487,7 +561,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, getDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAxfFnHbLimC3PEO5svXvn3sxH7yn9JEAw",
@@ -514,6 +588,8 @@
   };
   let allChatMsgs = [], selectedChatRoomId = null;
   let allOrdersCache = [];
+  let ridersMapByPhone = {};
+  let consentsCacheById = {};
 
   function computePorterFare(km, baseFare, perKmRate, includedFreeKm, surgeMult) {
     const billableKm = Math.max(0, km - includedFreeKm);
@@ -758,6 +834,76 @@
     pdf.save(`GoParcel_GST_Invoice_${new Date().toISOString().slice(0,10)}.pdf`);
   };
 
+  window.generateFullLegalEvidencePdf = async (consentId) => {
+    const c = consentsCacheById[consentId];
+    if (!c) return alert("Consent record not found.");
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+
+    pdf.setFillColor(20, 20, 20);
+    pdf.rect(0, 0, 210, 28, 'F');
+    pdf.setTextColor(255, 102, 0);
+    pdf.setFontSize(16);
+    pdf.text("GoParcel Logistics - Legal Consent & KYC Evidence Dossier", 14, 18);
+
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFontSize(11);
+    let y = 38;
+    pdf.text(`Role / Category: ${c.role || 'User'}`, 14, y); y += 7;
+    pdf.text(`Full Legal Name: ${c.name || '-'}`, 14, y); y += 7;
+    pdf.text(`Registered Mobile: +91 ${c.phone || '-'}`, 14, y); y += 7;
+    pdf.text(`Gender: ${c.gender || 'Specified in Record'}`, 14, y); y += 7;
+    pdf.text(`Consent Timestamp: ${c.timestampStr || new Date().toLocaleString('en-IN')}`, 14, y); y += 7;
+    pdf.text(`Live GPS Coordinates: Lat ${Number(c.lat || 0).toFixed(6)}, Lng ${Number(c.lng || 0).toFixed(6)}`, 14, y); y += 7;
+    pdf.text(`Purpose / Vehicle / Order Summary: ${c.summary || '-'}`, 14, y); y += 10;
+
+    pdf.setFontSize(12);
+    pdf.setTextColor(200, 60, 0);
+    pdf.text("Accepted Declaration & Consent Terms:", 14, y); y += 7;
+    pdf.setTextColor(30, 30, 30);
+    pdf.setFontSize(10);
+    const termsText = c.agreementText || "I hereby agree to all GoParcel platform terms, safety rules, and lawful transport regulations.";
+    const splitTerms = pdf.splitTextToSize(termsText, 180);
+    pdf.text(splitTerms, 14, y);
+    y += (splitTerms.length * 5) + 8;
+
+    const riderObj = ridersMapByPhone[c.phone] || {};
+    const photosToEmbed = [
+      { label: "Live Selfie Photo", src: c.selfiePhoto || riderObj.regSelfie || riderObj.dailySelfie },
+      { label: "ID Front Photo", src: c.docFrontPhoto || riderObj.kycPhoto },
+      { label: "ID Back Photo", src: c.docBackPhoto || riderObj.kycPhotoBack },
+      { label: "Driving License", src: c.docLicensePhoto || riderObj.kycLicensePhoto },
+      { label: "Vehicle RC / Owner Doc", src: c.docRcPhoto || riderObj.kycRcPhoto || riderObj.ownerRcPhoto }
+    ].filter(p => p.src && p.src.startsWith("data:image"));
+
+    if (photosToEmbed.length > 0) {
+      if (y > 210) { pdf.addPage(); y = 20; }
+      pdf.setFontSize(12);
+      pdf.setTextColor(0, 100, 180);
+      pdf.text("Verified Identity & Live Capture Attachments:", 14, y);
+      y += 6;
+      let x = 14;
+      photosToEmbed.forEach((p, idx) => {
+        if (x > 160) { x = 14; y += 54; }
+        if (y > 240) { pdf.addPage(); y = 20; x = 14; }
+        try {
+          pdf.addImage(p.src, 'JPEG', x, y, 42, 42);
+          pdf.setFontSize(8);
+          pdf.setTextColor(0, 0, 0);
+          pdf.text(p.label, x, y + 46);
+          x += 46;
+        } catch (e) {}
+      });
+      y += 54;
+    }
+
+    if (y > 265) { pdf.addPage(); y = 20; }
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 128, 0);
+    pdf.text("DIGITAL VERIFICATION STATUS: OTP & GPS VERIFIED LEGAL RECORD", 14, y + 6);
+    pdf.save(`GoParcel_Legal_Evidence_${c.phone || 'Record'}.pdf`);
+  };
+
   onSnapshot(query(collection(db, "supportChats"), orderBy("createdAt", "asc")), (snap) => {
     allChatMsgs = [];
     const roomsMap = {};
@@ -824,10 +970,12 @@
   onSnapshot(query(collection(db, "consentRecords"), orderBy("createdAt", "desc")), (snap) => {
     const tbody = document.getElementById('consentsTableBody');
     tbody.innerHTML = "";
+    consentsCacheById = {};
     snap.forEach(d => {
       const c = d.data();
+      consentsCacheById[d.id] = c;
       const mapUrl = `https://www.google.com/maps?q=${c.lat},${c.lng}`;
-      const pdfBtn = c.pdfDataUri ? `<a href="${c.pdfDataUri}" download="Consent_${c.phone}.pdf" class="btn-sm btn-approve">📄 PDF डाउनलोड</a>` : '-';
+      const pdfBtn = `<button onclick="generateFullLegalEvidencePdf('${d.id}')" class="btn-sm btn-approve">📄 Legal Evidence PDF</button>`;
       tbody.innerHTML += `<tr>
         <td><b>${c.role}</b></td>
         <td><b>${c.name}</b><br><small>📞 ${c.phone}</small></td>
@@ -892,6 +1040,12 @@
       adminRates.surgeActive = !!s.surgeActive;
       adminRates.surgeMultiplier = Number(s.surgeMultiplier ?? 1.2);
 
+      document.getElementById('vehActive2W').checked = s.vehActive2W ?? true;
+      document.getElementById('vehActive3W').checked = s.vehActive3W ?? true;
+      document.getElementById('vehActiveTempo').checked = s.vehActiveTempo ?? true;
+      document.getElementById('vehActiveBolero').checked = s.vehActiveBolero ?? true;
+      document.getElementById('vehActiveTruck').checked = s.vehActiveTruck ?? true;
+
       document.getElementById('setIncludedBaseKm').value = String(adminRates.includedBaseKm);
       document.getElementById('setBase2W').value = adminRates.base2W;
       document.getElementById('setRate2W').value = adminRates.rate2W;
@@ -906,6 +1060,31 @@
 
       document.getElementById('setFreePickupKm').value = s.freePickupKm ?? 1.0;
       document.getElementById('setLongPickupRatePerKm').value = s.longPickupRatePerKm ?? 5;
+      document.getElementById('setHelperCharge').value = s.helperCharge ?? 150;
+      document.getElementById('setFreeWaitingMins').value = s.freeWaitingMins ?? 10;
+      document.getElementById('setWaitingRatePerMin').value = s.waitingRatePerMin ?? 2;
+
+      document.getElementById('featCustCod').checked = s.featCustCod ?? true;
+      document.getElementById('featCustOnline').checked = s.featCustOnline ?? true;
+      document.getElementById('featCustMultiStop').checked = s.featCustMultiStop ?? true;
+      document.getElementById('featCustInsurance').checked = s.featCustInsurance ?? true;
+      document.getElementById('featCustHelper').checked = s.featCustHelper ?? true;
+      document.getElementById('featCustTip').checked = s.featCustTip ?? true;
+      document.getElementById('featCustSchedule').checked = s.featCustSchedule ?? true;
+
+      document.getElementById('featRiderGoHome').checked = s.featRiderGoHome ?? true;
+      document.getElementById('featRiderNextQueue').checked = s.featRiderNextQueue ?? true;
+      document.getElementById('featRiderBreakdown').checked = s.featRiderBreakdown ?? true;
+      document.getElementById('featRiderStrictVehMatch').checked = s.featRiderStrictVehMatch ?? true;
+      document.getElementById('featRiderPickupPhoto').checked = s.featRiderPickupPhoto ?? true;
+      document.getElementById('featRiderWalletTab').checked = s.featRiderWalletTab ?? true;
+
+      document.getElementById('customVehName').value = s.customVehName ?? "";
+      document.getElementById('customVehIcon').value = s.customVehIcon ?? "🛺";
+      document.getElementById('customVehBase').value = s.customVehBase ?? "";
+      document.getElementById('customVehRate').value = s.customVehRate ?? "";
+      document.getElementById('customShortcutLabel').value = s.customShortcutLabel ?? "";
+      document.getElementById('customShortcutUrl').value = s.customShortcutUrl ?? "";
 
       document.getElementById('setAdminWa').value = s.adminWa ?? "919999999999";
       document.getElementById('setAdminUpi').value = s.adminUpi ?? "Techesupp-2@okhdfcbank";
@@ -964,18 +1143,45 @@
       commission: Number(document.getElementById('setCommission').value),
       includedBaseKm: Number(document.getElementById('setIncludedBaseKm').value),
       minFare: b2,
+      vehActive2W: document.getElementById('vehActive2W').checked,
       base2W: b2,
       rate2W: Number(document.getElementById('setRate2W').value),
+      vehActive3W: document.getElementById('vehActive3W').checked,
       base3W: Number(document.getElementById('setBase3W').value),
       rate3W: Number(document.getElementById('setRate3W').value),
+      vehActiveTempo: document.getElementById('vehActiveTempo').checked,
       baseTempo: Number(document.getElementById('setBaseTempo').value),
       rateTempo: Number(document.getElementById('setRateTempo').value),
+      vehActiveBolero: document.getElementById('vehActiveBolero').checked,
       baseBolero: Number(document.getElementById('setBaseBolero').value),
       rateBolero: Number(document.getElementById('setRateBolero').value),
+      vehActiveTruck: document.getElementById('vehActiveTruck').checked,
       baseTruck: Number(document.getElementById('setBaseTruck').value),
       rateTruck: Number(document.getElementById('setRateTruck').value),
       freePickupKm: Number(document.getElementById('setFreePickupKm').value),
       longPickupRatePerKm: Number(document.getElementById('setLongPickupRatePerKm').value),
+      helperCharge: Number(document.getElementById('setHelperCharge').value),
+      freeWaitingMins: Number(document.getElementById('setFreeWaitingMins').value),
+      waitingRatePerMin: Number(document.getElementById('setWaitingRatePerMin').value),
+      featCustCod: document.getElementById('featCustCod').checked,
+      featCustOnline: document.getElementById('featCustOnline').checked,
+      featCustMultiStop: document.getElementById('featCustMultiStop').checked,
+      featCustInsurance: document.getElementById('featCustInsurance').checked,
+      featCustHelper: document.getElementById('featCustHelper').checked,
+      featCustTip: document.getElementById('featCustTip').checked,
+      featCustSchedule: document.getElementById('featCustSchedule').checked,
+      featRiderGoHome: document.getElementById('featRiderGoHome').checked,
+      featRiderNextQueue: document.getElementById('featRiderNextQueue').checked,
+      featRiderBreakdown: document.getElementById('featRiderBreakdown').checked,
+      featRiderStrictVehMatch: document.getElementById('featRiderStrictVehMatch').checked,
+      featRiderPickupPhoto: document.getElementById('featRiderPickupPhoto').checked,
+      featRiderWalletTab: document.getElementById('featRiderWalletTab').checked,
+      customVehName: document.getElementById('customVehName').value.trim(),
+      customVehIcon: document.getElementById('customVehIcon').value.trim() || "🛺",
+      customVehBase: Number(document.getElementById('customVehBase').value) || 0,
+      customVehRate: Number(document.getElementById('customVehRate').value) || 0,
+      customShortcutLabel: document.getElementById('customShortcutLabel').value.trim(),
+      customShortcutUrl: document.getElementById('customShortcutUrl').value.trim(),
       ratesUpdatedAt: Date.now(),
       peakIncentiveActive: document.getElementById('setPeakIncentiveActive').value === 'true',
       peakStartHour: Number(document.getElementById('setPeakStartHour').value),
@@ -1007,7 +1213,7 @@
       custBannerText: document.getElementById('custBannerText').value.trim(),
       riderBannerText: document.getElementById('riderBannerText').value.trim()
     }, { merge: true });
-    alert("✅ दर तक्ता आणि लांब पिकअप भत्ता सेव्ह झाला व कस्टमर/रायडर पॅनेलवर लाईव्ह अपडेट झाला!");
+    alert("✅ सर्व मास्टर अधिकार, दर तक्ता व UI कंट्रोल्स सेव्ह झाले व कस्टमर/रायडर पॅनेलवर लाईव्ह सिंक झाले!");
   };
 
   onSnapshot(query(collection(db, "otpRequests"), orderBy("createdAt", "desc")), (snap) => {
@@ -1072,9 +1278,11 @@
 
   onSnapshot(collection(db, "riders"), (snap) => {
     const tbody = document.getElementById('ridersTableBody'); tbody.innerHTML = "";
+    ridersMapByPhone = {};
     let approvedCount = 0;
     snap.forEach(d => {
       const r = d.data();
+      if (r.phone) ridersMapByPhone[r.phone] = r;
       if (r.approved) approvedCount++;
       if (r.lat && r.lng) {
         if (riderMarkers[d.id]) riderMarkers[d.id].setLatLng([r.lat, r.lng]);
@@ -1204,6 +1412,34 @@
     });
   }
 
+  window.adminReassignOrder = async (orderId) => {
+    const rPhone = prompt("ज्या रायडरला ही ऑर्डर द्यायची आहे त्याचा १० अंकी मोबाईल नंबर टाका (किंवा सर्व रायडर्सना पुन्हा पाठवण्यासाठी रिकामे ठेवा):");
+    if (rPhone === null) return;
+    const cleanPhone = rPhone.trim();
+    if (!cleanPhone) {
+      await updateDoc(doc(db, "orders", orderId), {
+        status: "Pending",
+        riderId: "",
+        riderEmail: "",
+        reassignedByAdmin: true
+      });
+      alert("✅ ऑर्डर पुन्हा सर्व जवळच्या रायडर्सना पाठवली आहे!");
+      return;
+    }
+    if (cleanPhone.length !== 10) return alert("कृपया अचूक १० अंकी मोबाईल नंबर टाका!");
+    const rSnap = await getDoc(doc(db, "riders", "rider_" + cleanPhone));
+    if (!rSnap.exists()) return alert("या नंबरचा रायडर सापडला नाही!");
+    const rData = rSnap.data();
+    await updateDoc(doc(db, "orders", orderId), {
+      status: "Accepted",
+      riderId: "rider_" + cleanPhone,
+      riderEmail: `${rData.name} (${cleanPhone})`,
+      reassignedByAdmin: true,
+      acceptedAt: serverTimestamp()
+    });
+    alert(`✅ ऑर्डर थेट रायडर ${rData.name} (${cleanPhone}) यांना असाइन केली गेली!`);
+  };
+
   window.deleteOrder = async (id) => { if (confirm("ऑर्डर डिलीट करायची का?")) await deleteDoc(doc(db, "orders", id)); };
   onSnapshot(collection(db, "orders"), (snap) => {
     const tbody = document.getElementById('adminTableBody'); tbody.innerHTML = "";
@@ -1228,16 +1464,20 @@
       const pickAwayInfo = o.pickupAwayKm ? `<br><small style="color:#ffaa66;">Pickup Away: ${o.pickupAwayKm} km (+₹${longPickBonus} भत्ता)</small>` : '';
       const incTag = incBonus > 0 ? `<br><small style="color:#4db8ff;">+₹${incBonus} Peak Bonus</small>` : '';
       const viaTag = o.bookedVia ? `<br><span style="font-size:10px; color:#ffaa66;">📞 ${o.bookedVia}</span>` : '';
+      const proofThumb = o.pickupProofPhoto ? `<br><img src="${o.pickupProofPhoto}" class="selfie-thumb" style="width:36px; height:36px; margin-top:4px;" onclick="openImgModal('${o.pickupProofPhoto}', 'Parcel Pickup Proof')">` : '';
 
       tbody.innerHTML += `<tr>
         <td><b>${o.customerEmail || 'Customer'}</b><br><small style="color:#4db8ff;">📞 ${o.customerPhone || '-'}</small>${viaTag}</td>
         <td><small>🟢 <b>पिकअप:</b> ${o.pickup} (${o.pickupContactName || ''}: ${o.pickupContactPhone || ''})<br>
-                   🔴 <b>ड्रॉप:</b> ${o.drop} (${o.dropContactName || ''}: ${o.dropContactPhone || ''})</small></td>
+                   🔴 <b>ड्रॉप:</b> ${o.drop} (${o.dropContactName || ''}: ${o.dropContactPhone || ''})</small>${proofThumb}</td>
         <td><b>${o.vehicle}</b> (${kmInfo})${pickAwayInfo}<br><small style="color:#2ecc71;">PIN: ${o.deliveryPin || '-'}</small></td>
         <td><b>कस्टमर बिल: ₹${fareNum}</b> (${payTag})<br><small style="color:#ff6600;">कमिशन (${currentCommPercent}%): ₹${orderComm}</small><br><small style="color:#2ecc71; font-weight:bold;">रायडर एकूण: ₹${riderNet}</small>${incTag}</td>
         <td><b>${o.riderEmail || 'प्रलंबित'}</b><br><small style="color:#888;">${o.deliveredDateStr || ''}</small></td>
         <td><b style="color:${o.status === 'Delivered' ? '#2ecc71' : '#ff6600'};">${o.status}</b></td>
-        <td><button class="btn-sm btn-block" onclick="deleteOrder('${d.id}')">Delete</button></td>
+        <td>
+          ${o.status !== 'Delivered' ? `<button class="btn-sm btn-edit" onclick="adminReassignOrder('${d.id}')">🛵 Assign Rider</button>` : ''}
+          <button class="btn-sm btn-block" onclick="deleteOrder('${d.id}')">Delete</button>
+        </td>
       </tr>`;
     });
     document.getElementById('totalOrders').innerText = count;
