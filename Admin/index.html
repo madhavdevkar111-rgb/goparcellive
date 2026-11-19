@@ -44,6 +44,8 @@
     .sub-box-green { background: #111; border: 1px solid #2ecc71; border-radius: 10px; padding: 12px; margin-bottom: 16px; }
     .sub-box-blue { background: #111; border: 1px solid #4db8ff; border-radius: 10px; padding: 12px; margin-bottom: 16px; }
     .sub-box-orange { background: #1a120b; border: 1px solid #ff6600; border-radius: 10px; padding: 12px; margin-bottom: 16px; }
+    .rate-card-table th { background: #222; color: #ff6600; border: 1px solid #333; }
+    .rate-card-table td { border: 1px solid #333; background: #111; }
     
     .chat-layout { display: grid; grid-template-columns: 260px 1fr; gap: 12px; }
     @media(max-width: 700px) { .chat-layout { grid-template-columns: 1fr; } }
@@ -65,7 +67,7 @@
 <body>
 <header>
   <h1>👑 GoParcel Master Panel</h1>
-  <span style="color:#2ecc71; font-size:13px;">● Full Master Control</span>
+  <span style="color:#2ecc71; font-size:13px;">● Live Rate Sync Active</span>
 </header>
 
 <div id="imgModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
@@ -85,166 +87,73 @@
   </div>
 
   <div class="nav-tabs">
-    <button id="tRiders" class="nav-btn active" onclick="showTab('riders')">🛵 रायडर्स KYC, Selfie & Direct Add</button>
+    <button id="tMaster" class="nav-btn active" onclick="showTab('master')">🎛️ वाहनांचे दर (Rate Card) व मास्टर कंट्रोल</button>
+    <button id="tRiders" class="nav-btn" onclick="showTab('riders')">🛵 रायडर्स KYC, Selfie & Direct Add</button>
+    <button id="tOrders" class="nav-btn" onclick="showTab('orders')">📦 ऑर्डर्स, फोन बुकिंग & GST रिपोर्ट</button>
     <button id="tChat" class="nav-btn" onclick="showTab('chat')">💬 Live Support Chat <span id="chatBadge" class="badge-req hidden">0</span></button>
     <button id="tPayouts" class="nav-btn" onclick="showTab('payouts')">💳 विथड्रॉवल, रिफंड & सेटलमेंट <span id="payoutBadge" class="badge-req hidden">0</span></button>
-    <button id="tOrders" class="nav-btn" onclick="showTab('orders')">📦 ऑर्डर्स, फोन बुकिंग & GST रिपोर्ट</button>
     <button id="tConsents" class="nav-btn" onclick="showTab('consents')">📜 कन्सेन्ट & ॲग्रीमेंट PDF</button>
     <button id="tOtpLive" class="nav-btn" onclick="showTab('otpLive')">🔔 ताज्या OTP विनंत्या <span id="otpBadge" class="badge-req hidden">0</span></button>
     <button id="tZones" class="nav-btn" onclick="showTab('zones')">🗺️ सर्विस सिटी व एरिया</button>
-    <button id="tMaster" class="nav-btn" onclick="showTab('master')">🎛️ दर, पीक अवर, रेफर & ब्रॉडकास्ट</button>
     <button id="tMap" class="nav-btn" onclick="showTab('map')">🔥 हीट मॅप & लाईव्ह GPS</button>
   </div>
 
-  <!-- 1. RIDERS KYC, SELFIE & DIRECT ADD -->
-  <div id="secRiders" class="panel-box" style="overflow-x:auto;">
+  <!-- 8. MASTER SETTINGS (PORTER-STYLE VEHICLE-WISE BASE FARE + PER KM RATE CARD) -->
+  <div id="secMaster" class="panel-box">
+    <!-- Porter-Style Vehicle Rate Card Box -->
     <div class="sub-box-green">
-      <h4 style="color:#2ecc71; margin-bottom:8px;">➕ ॲडमिनमधून थेट नवीन रायडर जोडा (Direct Add Rider)</h4>
-      <div class="form-grid" style="margin-bottom:8px;">
-        <div><label>रायडर नाव</label><input type="text" id="addRName" placeholder="पूर्ण नाव"></div>
-        <div><label>मोबाईल नंबर (१० अंकी)</label><input type="tel" id="addRPhone" maxlength="10" placeholder="9876543210"></div>
-        <div><label>Gender</label><select id="addRGender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
-        <div><label>वाहन प्रकार</label><select id="addRVehCat"><option value="2-Wheeler">2-Wheeler</option><option value="3-Wheeler">3-Wheeler</option><option value="Mini Tempo">Mini Tempo</option><option value="Bolero Pickup">Bolero Pickup</option><option value="Truck">Truck</option></select></div>
-        <div><label>गाडी नंबर</label><input type="text" id="addRVehNo" placeholder="MH12AB1234"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+        <h3 style="color:#2ecc71;">🚛 Porter-Style वाहन दर तक्ता (प्रत्येक गाडीचे बेस भाडे व प्रति KM दर)</h3>
+        <span style="font-size:11px; color:#aaa;">येथे दर बदलून सेव्ह करताच कस्टमर व रायडर पॅनेलवर लगेच अपडेट होतील!</span>
       </div>
-      <button class="save-btn" onclick="adminDirectAddRider()">✅ थेट रायडर जोडा आणि Selfie + Account Approve करा</button>
-    </div>
-
-    <h3 style="color:#ff6600; margin-bottom:6px;">रायडर कागदपत्रे, Selfie Approval व UTR पडताळणी</h3>
-    <table>
-      <thead><tr><th>रायडर व मोबाईल</th><th>सर्व अपलोड केलेले फोटो</th><th>वाहन, मालक व बँक खाते</th><th>Selfie / Fee / Status</th><th>अधिकार (Actions)</th></tr></thead>
-      <tbody id="ridersTableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- 2. LIVE SUPPORT CHAT -->
-  <div id="secChat" class="panel-box hidden">
-    <h3 style="color:#ff6600; margin-bottom:10px;">💬 कस्टमर आणि रायडर लाईव्ह चॅट सपोर्ट</h3>
-    <div class="chat-layout">
-      <div class="chat-users-list" id="chatRoomsList">
-        <div style="color:#888; font-size:12px;">कोणतेही चॅट उपलब्ध नाही...</div>
+      <div style="overflow-x:auto;">
+        <table class="rate-card-table">
+          <thead>
+            <tr>
+              <th>वाहन प्रकार (Vehicle)</th>
+              <th>किमान बेस भाडे (Base / Min Fare ₹)</th>
+              <th>प्रति किलोमीटर दर (Per KM Rate ₹/km)</th>
+              <th>उदा. 5 KM चे एकूण भाडे</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>🏍️ 2-Wheeler (बाईक)</b></td>
+              <td><input type="number" id="setBase2W" value="30" oninput="previewRateSamples()"></td>
+              <td><input type="number" id="setRate2W" value="10" oninput="previewRateSamples()"></td>
+              <td id="sample5Km2W" style="color:#2ecc71; font-weight:bold;">₹50</td>
+            </tr>
+            <tr>
+              <td><b>🛺 3-Wheeler (रिक्षा/अपे)</b></td>
+              <td><input type="number" id="setBase3W" value="70" oninput="previewRateSamples()"></td>
+              <td><input type="number" id="setRate3W" value="18" oninput="previewRateSamples()"></td>
+              <td id="sample5Km3W" style="color:#2ecc71; font-weight:bold;">₹90</td>
+            </tr>
+            <tr>
+              <td><b>🚐 Mini Tempo (टाटा एस/छोटा हत्ती)</b></td>
+              <td><input type="number" id="setBaseTempo" value="150" oninput="previewRateSamples()"></td>
+              <td><input type="number" id="setRateTempo" value="25" oninput="previewRateSamples()"></td>
+              <td id="sample5KmTempo" style="color:#2ecc71; font-weight:bold;">₹150</td>
+            </tr>
+            <tr>
+              <td><b>🛻 Bolero Pickup</b></td>
+              <td><input type="number" id="setBaseBolero" value="250" oninput="previewRateSamples()"></td>
+              <td><input type="number" id="setRateBolero" value="35" oninput="previewRateSamples()"></td>
+              <td id="sample5KmBolero" style="color:#2ecc71; font-weight:bold;">₹250</td>
+            </tr>
+            <tr>
+              <td><b>🚛 Truck (मोठा ट्रक)</b></td>
+              <td><input type="number" id="setBaseTruck" value="500" oninput="previewRateSamples()"></td>
+              <td><input type="number" id="setRateTruck" value="50" oninput="previewRateSamples()"></td>
+              <td id="sample5KmTruck" style="color:#2ecc71; font-weight:bold;">₹500</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <div class="admin-chat-window">
-        <div id="activeChatHeader" style="font-size:13px; font-weight:bold; color:#ff6600; border-bottom:1px solid #333; padding-bottom:6px; margin-bottom:6px;">
-          डाव्या बाजूने कस्टमर किंवा रायडर निवडा
-        </div>
-        <div id="adminChatMsgsBox" class="admin-chat-msgs"></div>
-        <div style="display:flex; gap:8px;">
-          <input type="text" id="adminReplyInput" placeholder="उत्तर लिहा...">
-          <button onclick="sendAdminChatReply()" style="background:#2ecc71; color:#000; font-weight:bold; border:none; border-radius:8px; padding:0 18px; cursor:pointer;">पाठवा</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 3. BANK WITHDRAWALS, DEPOSITS & REFUND / SETTLEMENT MANAGER -->
-  <div id="secPayouts" class="panel-box hidden" style="overflow-x:auto;">
-    <div class="sub-box-blue">
-      <h4 style="color:#4db8ff; margin-bottom:8px;">⚖️ रिफंड आणि सेटलमेंट मॅनेजर (Customer Refund / Rider Penalty Waiver)</h4>
-      <div class="form-grid" style="margin-bottom:8px;">
-        <div>
-          <label>व्यवहार प्रकार</label>
-          <select id="settleType">
-            <option value="Customer Refund">💸 कस्टमर रिफंड (Order Dispute Refund)</option>
-            <option value="Penalty Waiver / Bonus">🛡️ रायडर दंड माफी / सेटलमेंट क्रेडिट (Wallet +)</option>
-          </select>
-        </div>
-        <div><label>कस्टमर किंवा रायडर मोबाईल नंबर</label><input type="tel" id="settlePhone" maxlength="10" placeholder="10-Digit Mobile"></div>
-        <div><label>रक्कम (₹)</label><input type="number" id="settleAmount" placeholder="उदा. 50"></div>
-        <div><label>कारण / ऑर्डर संदर्भ</label><input type="text" id="settleReason" placeholder="उदा. ऑर्डर उशीर रिफंड / दंड माफ"></div>
-      </div>
-      <button class="save-btn" style="background:#3498db; color:#fff;" onclick="processRefundOrSettlement()">✅ रिफंड / सेटलमेंट नोंदवा आणि वॉलेट अपडेट करा</button>
+      <button class="save-btn" style="margin-top:10px;" onclick="saveMasterSettings()">✅ हे नवीन दर सेव्ह करा आणि कस्टमर/रायडर पॅनेलवर लगेच लागू करा</button>
     </div>
 
-    <h3 style="color:#ff6600; margin-bottom:6px;">💳 रायडर विथड्रॉवल, डिपॉझिट व सेटलमेंट विनंत्या</h3>
-    <table>
-      <thead><tr><th>रायडर / कस्टमर व वेळ</th><th>प्रकार</th><th>रक्कम</th><th>बँक खाते तपशील / UTR / कारण</th><th>वीकली प्रॉफिट हिशोब</th><th>स्टेटस व कृती</th></tr></thead>
-      <tbody id="payoutsTableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- 4. ALL ORDERS, MANUAL PHONE BOOKING (AUTO KM FARE) & GST/INVOICE REPORTS -->
-  <div id="secOrders" class="panel-box hidden" style="overflow-x:auto;">
-    <div class="sub-box-orange">
-      <h4 style="color:#ff6600; margin-bottom:8px;">📞 मॅन्युअल फोन बुकिंग एन्ट्री (Auto KM Fare Calculator -> Direct to Riders)</h4>
-      <div class="form-grid" style="margin-bottom:8px;">
-        <div><label>कस्टमर नाव</label><input type="text" id="manCustName" placeholder="ग्राहकाचे नाव"></div>
-        <div><label>कस्टमर मोबाईल (१० अंकी)</label><input type="tel" id="manCustPhone" maxlength="10" placeholder="9876543210"></div>
-        <div><label>पिकअप पत्ता (पुणे/शहर)</label><input type="text" id="manPickup" placeholder="उदा. स्वारगेट, पुणे"></div>
-        <div><label>ड्रॉप पत्ता</label><input type="text" id="manDrop" placeholder="उदा. हिंजवडी फेज १, पुणे"></div>
-        <div>
-          <label>वाहन प्रकार</label>
-          <select id="manVehicle" onchange="recalcManualOrderFare()">
-            <option value="2-Wheeler">2-Wheeler</option>
-            <option value="3-Wheeler">3-Wheeler</option>
-            <option value="Mini Tempo">Mini Tempo</option>
-            <option value="Bolero Pickup">Bolero Pickup</option>
-            <option value="Truck">Truck</option>
-          </select>
-        </div>
-        <div><label>अंतर (KM)</label><input type="number" id="manDistKm" value="5" min="0.5" step="0.5" oninput="recalcManualOrderFare()"></div>
-        <div><label>पार्सल प्रकार & वजन</label><input type="text" id="manParcel" value="Box / Goods (5 kg)"></div>
-        <div><label>ऑटो कॅल्क्युलेट भाडे (₹)</label><input type="number" id="manFare" placeholder="उदा. 50"></div>
-        <div><label>पेमेंट पद्धत</label><select id="manPayMode"><option value="COD">💵 Cash on Delivery (COD)</option><option value="ONLINE">📱 Online Paid</option></select></div>
-      </div>
-      <div id="manFareTallyHint" style="font-size:12px; color:#2ecc71; margin-bottom:8px;">📏 5 km × ₹10/km = ₹50</div>
-      <button class="save-btn" onclick="createManualPhoneOrder()">🚀 मॅन्युअल ऑर्डर तयार करा आणि सर्व रायडर्सना पाठवा</button>
-    </div>
-
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-      <h3 style="color:#ff6600;">📦 सर्व ऑर्डर्स (KM, भाडे टॅली व संपर्क व्यक्तींसह)</h3>
-      <div style="display:flex; gap:8px;">
-        <button class="btn-sm btn-approve" style="padding:9px 14px; font-size:12px;" onclick="downloadGstExcelCsv()">📊 Excel (CSV) GST रिपोर्ट</button>
-        <button class="btn-sm btn-edit" style="padding:9px 14px; font-size:12px;" onclick="downloadGstPdfReport()">📄 PDF इन्व्हॉइस / GST रिपोर्ट</button>
-      </div>
-    </div>
-
-    <table>
-      <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता व व्यक्ती</th><th>वाहन, KM & PIN</th><th>भाडे टॅली (KM × Rate + Add-ons)</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
-      <tbody id="adminTableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- 5. CONSENT & AGREEMENT PDF -->
-  <div id="secConsents" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:6px;">📜 सर्व कस्टमर आणि रायडर संमती पत्रे (PDF, Timer व GPS लोकेशनसह)</h3>
-    <table>
-      <thead><tr><th>प्रकार (Role)</th><th>नाव व मोबाईल</th><th>वेळ (Timestamp)</th><th>GPS लोकेशन</th><th>तपशील</th><th>PDF डाउनलोड</th></tr></thead>
-      <tbody id="consentsTableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- 6. LIVE OTP REQUESTS -->
-  <div id="secOtpLive" class="panel-box hidden" style="overflow-x:auto;">
-    <h3 style="color:#ff6600; margin-bottom:10px;">ताज्या OTP विनंत्या</h3>
-    <table>
-      <thead><tr><th>वेळ (Time)</th><th>प्रकार व भाषा</th><th>नाव व मोबाईल</th><th>नवीन OTP</th><th>स्टेटस</th><th>कृती</th></tr></thead>
-      <tbody id="otpLiveTableBody"></tbody>
-    </table>
-  </div>
-
-  <!-- 7. SERVICE CITIES -->
-  <div id="secZones" class="panel-box hidden">
-    <h3 style="color:#ff6600; margin-bottom:6px;">🗺️ नवीन शहर किंवा एरिया वाढवा</h3>
-    <div class="form-grid">
-      <div><label>नवीन शहर / एरियाचे नाव</label><input type="text" id="zoneName" placeholder="उदा. Hingoli / Pimpri-Chinchwad"></div>
-      <div><label>सर्विस रेंज (Radius in km)</label><input type="number" id="zoneRadius" value="15" min="1" max="200"></div>
-      <div><label>Latitude</label><input type="text" id="zoneLat" value="18.5204"></div>
-      <div><label>Longitude</label><input type="text" id="zoneLng" value="73.8567"></div>
-    </div>
-    <button class="save-btn" onclick="addServiceZone()">✅ नवीन शहर / एरिया जोडा व सुरू करा</button>
-    <div id="zoneMap"></div>
-    <div style="overflow-x:auto; margin-top:15px;">
-      <table><thead><tr><th>शहर / एरिया</th><th>रेंज (km)</th><th>स्टेटस</th><th>कृती</th></tr></thead><tbody id="zonesTableBody"></tbody></table>
-    </div>
-    <div style="overflow-x:auto; margin-top:20px; border-top:1px solid #333; padding-top:15px;">
-      <h4 style="color:#2ecc71; margin-bottom:6px;">🗳️ नवीन शहरांसाठी कस्टमर व्होटिंग:</h4>
-      <table><thead><tr><th>शहर / एरिया</th><th>एकूण व्होट्स</th><th>कृती</th></tr></thead><tbody id="votesTableBody"></tbody></table>
-    </div>
-  </div>
-
-  <!-- 8. MASTER SETTINGS -->
-  <div id="secMaster" class="panel-box hidden">
+    <!-- Broadcast Notification Push Alert Box -->
     <div class="sub-box-orange">
       <h4 style="color:#ff6600; margin-bottom:8px;">📣 ब्रॉडकास्ट नोटिफिकेशन (Instant Push Alert to Riders / Customers)</h4>
       <div class="form-grid" style="margin-bottom:8px;">
@@ -261,19 +170,13 @@
       <button class="save-btn" style="background:#ff6600; color:#000;" onclick="sendBroadcastPushAlert()">🚀 तात्काळ ब्रॉडकास्ट अलर्ट पाठवा</button>
     </div>
 
-    <h3 style="color:#ff6600; margin-bottom:12px;">🎛️ संपूर्ण ॲपचे मास्टर कंट्रोल</h3>
+    <h3 style="color:#ff6600; margin-bottom:12px;">🎛️ सामान्य सेटिंग्ज व कमिशन</h3>
     <div class="form-grid">
       <div><label>Admin WhatsApp नंबर (91 सह)</label><input type="tel" id="setAdminWa" value="919999999999"></div>
       <div><label>Admin UPI ID</label><input type="text" id="setAdminUpi" value="Techesupp-2@okhdfcbank"></div>
       <div><label>रायडर पिकअप रेंज (km)</label><input type="number" id="setPickupRadius" value="10"></div>
       <div><label>ऑटो-रीच व डिलिव्हरी अनलॉक रेंज (मीटर)</label><input type="number" id="setDeliveryRangeMeters" value="150"></div>
-      <div><label>किमान बेस भाडे (Min Fare ₹)</label><input type="number" id="setMinFare" value="30"></div>
       <div><label>प्लॅटफॉर्म कमिशन (%)</label><input type="number" id="setCommission" value="20"></div>
-      <div><label>2-Wheeler दर (₹/km)</label><input type="number" id="setRate2W" value="10"></div>
-      <div><label>3-Wheeler दर (₹/km)</label><input type="number" id="setRate3W" value="18"></div>
-      <div><label>Mini Tempo दर (₹/km)</label><input type="number" id="setRateTempo" value="25"></div>
-      <div><label>Bolero Pickup दर (₹/km)</label><input type="number" id="setRateBolero" value="35"></div>
-      <div><label>Truck दर (₹/km)</label><input type="number" id="setRateTruck" value="50"></div>
     </div>
 
     <div class="section-divider">
@@ -286,8 +189,8 @@
             <option value="false">बंद (Inactive)</option>
           </select>
         </div>
-        <div><label>सुरू होण्याची वेळ (0 ते 23 तास - उदा. 18 = संध्याकाळी ६)</label><input type="number" id="setPeakStartHour" value="18" min="0" max="23"></div>
-        <div><label>संपण्याची वेळ (0 ते 23 तास - उदा. 22 = रात्री १०)</label><input type="number" id="setPeakEndHour" value="22" min="0" max="23"></div>
+        <div><label>सुरू होण्याची वेळ (0 ते 23 तास - उदा. 18)</label><input type="number" id="setPeakStartHour" value="18" min="0" max="23"></div>
+        <div><label>संपण्याची वेळ (0 ते 23 तास - उदा. 22)</label><input type="number" id="setPeakEndHour" value="22" min="0" max="23"></div>
         <div><label>प्रति राईड इन्सेंटिव्ह बोनस रक्कम (₹)</label><input type="number" id="setPeakIncentiveAmount" value="25"></div>
       </div>
     </div>
@@ -391,7 +294,154 @@
       </div>
     </div>
 
-    <button class="save-btn" onclick="saveMasterSettings()">🚀 सर्व बदल सेव्ह करा व लागू करा</button>
+    <button class="save-btn" onclick="saveMasterSettings()">🚀 सर्व मास्टर बदल सेव्ह करा व लागू करा</button>
+  </div>
+
+  <!-- 1. RIDERS KYC, SELFIE & DIRECT ADD -->
+  <div id="secRiders" class="panel-box hidden" style="overflow-x:auto;">
+    <div class="sub-box-green">
+      <h4 style="color:#2ecc71; margin-bottom:8px;">➕ ॲडमिनमधून थेट नवीन रायडर जोडा (Direct Add Rider)</h4>
+      <div class="form-grid" style="margin-bottom:8px;">
+        <div><label>रायडर नाव</label><input type="text" id="addRName" placeholder="पूर्ण नाव"></div>
+        <div><label>मोबाईल नंबर (१० अंकी)</label><input type="tel" id="addRPhone" maxlength="10" placeholder="9876543210"></div>
+        <div><label>Gender</label><select id="addRGender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+        <div><label>वाहन प्रकार</label><select id="addRVehCat"><option value="2-Wheeler">2-Wheeler</option><option value="3-Wheeler">3-Wheeler</option><option value="Mini Tempo">Mini Tempo</option><option value="Bolero Pickup">Bolero Pickup</option><option value="Truck">Truck</option></select></div>
+        <div><label>गाडी नंबर</label><input type="text" id="addRVehNo" placeholder="MH12AB1234"></div>
+      </div>
+      <button class="save-btn" onclick="adminDirectAddRider()">✅ थेट रायडर जोडा आणि Selfie + Account Approve करा</button>
+    </div>
+
+    <h3 style="color:#ff6600; margin-bottom:6px;">रायडर कागदपत्रे, Selfie Approval व UTR पडताळणी</h3>
+    <table>
+      <thead><tr><th>रायडर व मोबाईल</th><th>सर्व अपलोड केलेले फोटो</th><th>वाहन, मालक व बँक खाते</th><th>Selfie / Fee / Status</th><th>अधिकार (Actions)</th></tr></thead>
+      <tbody id="ridersTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- 2. LIVE SUPPORT CHAT -->
+  <div id="secChat" class="panel-box hidden">
+    <h3 style="color:#ff6600; margin-bottom:10px;">💬 कस्टमर आणि रायडर लाईव्ह चॅट सपोर्ट</h3>
+    <div class="chat-layout">
+      <div class="chat-users-list" id="chatRoomsList">
+        <div style="color:#888; font-size:12px;">कोणतेही चॅट उपलब्ध नाही...</div>
+      </div>
+      <div class="admin-chat-window">
+        <div id="activeChatHeader" style="font-size:13px; font-weight:bold; color:#ff6600; border-bottom:1px solid #333; padding-bottom:6px; margin-bottom:6px;">
+          डाव्या बाजूने कस्टमर किंवा रायडर निवडा
+        </div>
+        <div id="adminChatMsgsBox" class="admin-chat-msgs"></div>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="adminReplyInput" placeholder="उत्तर लिहा...">
+          <button onclick="sendAdminChatReply()" style="background:#2ecc71; color:#000; font-weight:bold; border:none; border-radius:8px; padding:0 18px; cursor:pointer;">पाठवा</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. BANK WITHDRAWALS, DEPOSITS & REFUND / SETTLEMENT MANAGER -->
+  <div id="secPayouts" class="panel-box hidden" style="overflow-x:auto;">
+    <div class="sub-box-blue">
+      <h4 style="color:#4db8ff; margin-bottom:8px;">⚖️ रिफंड आणि सेटलमेंट मॅनेजर (Customer Refund / Rider Penalty Waiver)</h4>
+      <div class="form-grid" style="margin-bottom:8px;">
+        <div>
+          <label>व्यवहार प्रकार</label>
+          <select id="settleType">
+            <option value="Customer Refund">💸 कस्टमर रिफंड (Order Dispute Refund)</option>
+            <option value="Penalty Waiver / Bonus">🛡️ रायडर दंड माफी / सेटलमेंट क्रेडिट (Wallet +)</option>
+          </select>
+        </div>
+        <div><label>कस्टमर किंवा रायडर मोबाईल नंबर</label><input type="tel" id="settlePhone" maxlength="10" placeholder="10-Digit Mobile"></div>
+        <div><label>रक्कम (₹)</label><input type="number" id="settleAmount" placeholder="उदा. 50"></div>
+        <div><label>कारण / ऑर्डर संदर्भ</label><input type="text" id="settleReason" placeholder="उदा. ऑर्डर उशीर रिफंड / दंड माफ"></div>
+      </div>
+      <button class="save-btn" style="background:#3498db; color:#fff;" onclick="processRefundOrSettlement()">✅ रिफंड / सेटलमेंट नोंदवा आणि वॉलेट अपडेट करा</button>
+    </div>
+
+    <h3 style="color:#ff6600; margin-bottom:6px;">💳 रायडर विथड्रॉवल, डिपॉझिट व सेटलमेंट विनंत्या</h3>
+    <table>
+      <thead><tr><th>रायडर / कस्टमर व वेळ</th><th>प्रकार</th><th>रक्कम</th><th>बँक खाते तपशील / UTR / कारण</th><th>वीकली प्रॉफिट हिशोब</th><th>स्टेटस व कृती</th></tr></thead>
+      <tbody id="payoutsTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- 4. ALL ORDERS, MANUAL PHONE BOOKING & GST/INVOICE REPORTS -->
+  <div id="secOrders" class="panel-box hidden" style="overflow-x:auto;">
+    <div class="sub-box-orange">
+      <h4 style="color:#ff6600; margin-bottom:8px;">📞 मॅन्युअल फोन बुकिंग एन्ट्री (Auto KM Fare Calculator -> Direct to Riders)</h4>
+      <div class="form-grid" style="margin-bottom:8px;">
+        <div><label>कस्टमर नाव</label><input type="text" id="manCustName" placeholder="ग्राहकाचे नाव"></div>
+        <div><label>कस्टमर मोबाईल (१० अंकी)</label><input type="tel" id="manCustPhone" maxlength="10" placeholder="9876543210"></div>
+        <div><label>पिकअप पत्ता (पुणे/शहर)</label><input type="text" id="manPickup" placeholder="उदा. स्वारगेट, पुणे"></div>
+        <div><label>ड्रॉप पत्ता</label><input type="text" id="manDrop" placeholder="उदा. हिंजवडी फेज १, पुणे"></div>
+        <div>
+          <label>वाहन प्रकार</label>
+          <select id="manVehicle" onchange="recalcManualOrderFare()">
+            <option value="2-Wheeler">2-Wheeler</option>
+            <option value="3-Wheeler">3-Wheeler</option>
+            <option value="Mini Tempo">Mini Tempo</option>
+            <option value="Bolero Pickup">Bolero Pickup</option>
+            <option value="Truck">Truck</option>
+          </select>
+        </div>
+        <div><label>अंतर (KM)</label><input type="number" id="manDistKm" value="5" min="0.5" step="0.5" oninput="recalcManualOrderFare()"></div>
+        <div><label>पार्सल प्रकार & वजन</label><input type="text" id="manParcel" value="Box / Goods (5 kg)"></div>
+        <div><label>ऑटो कॅल्क्युलेट भाडे (₹)</label><input type="number" id="manFare" placeholder="उदा. 50"></div>
+        <div><label>पेमेंट पद्धत</label><select id="manPayMode"><option value="COD">💵 Cash on Delivery (COD)</option><option value="ONLINE">📱 Online Paid</option></select></div>
+      </div>
+      <div id="manFareTallyHint" style="font-size:12px; color:#2ecc71; margin-bottom:8px;">📏 5 km × ₹10/km = ₹50</div>
+      <button class="save-btn" onclick="createManualPhoneOrder()">🚀 मॅन्युअल ऑर्डर तयार करा आणि सर्व रायडर्सना पाठवा</button>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+      <h3 style="color:#ff6600;">📦 सर्व ऑर्डर्स (KM, भाडे टॅली व संपर्क व्यक्तींसह)</h3>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-sm btn-approve" style="padding:9px 14px; font-size:12px;" onclick="downloadGstExcelCsv()">📊 Excel (CSV) GST रिपोर्ट</button>
+        <button class="btn-sm btn-edit" style="padding:9px 14px; font-size:12px;" onclick="downloadGstPdfReport()">📄 PDF इन्व्हॉइस / GST रिपोर्ट</button>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता व व्यक्ती</th><th>वाहन, KM & PIN</th><th>भाडे टॅली (कस्टमर = रायडर)</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
+      <tbody id="adminTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- 5. CONSENT & AGREEMENT PDF -->
+  <div id="secConsents" class="panel-box hidden" style="overflow-x:auto;">
+    <h3 style="color:#ff6600; margin-bottom:6px;">📜 सर्व कस्टमर आणि रायडर संमती पत्रे (PDF, Timer व GPS लोकेशनसह)</h3>
+    <table>
+      <thead><tr><th>प्रकार (Role)</th><th>नाव व मोबाईल</th><th>वेळ (Timestamp)</th><th>GPS लोकेशन</th><th>तपशील</th><th>PDF डाउनलोड</th></tr></thead>
+      <tbody id="consentsTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- 6. LIVE OTP REQUESTS -->
+  <div id="secOtpLive" class="panel-box hidden" style="overflow-x:auto;">
+    <h3 style="color:#ff6600; margin-bottom:10px;">ताज्या OTP विनंत्या</h3>
+    <table>
+      <thead><tr><th>वेळ (Time)</th><th>प्रकार व भाषा</th><th>नाव व मोबाईल</th><th>नवीन OTP</th><th>स्टेटस</th><th>कृती</th></tr></thead>
+      <tbody id="otpLiveTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- 7. SERVICE CITIES -->
+  <div id="secZones" class="panel-box hidden">
+    <h3 style="color:#ff6600; margin-bottom:6px;">🗺️ नवीन शहर किंवा एरिया वाढवा</h3>
+    <div class="form-grid">
+      <div><label>नवीन शहर / एरियाचे नाव</label><input type="text" id="zoneName" placeholder="उदा. Hingoli / Pimpri-Chinchwad"></div>
+      <div><label>सर्विस रेंज (Radius in km)</label><input type="number" id="zoneRadius" value="15" min="1" max="200"></div>
+      <div><label>Latitude</label><input type="text" id="zoneLat" value="18.5204"></div>
+      <div><label>Longitude</label><input type="text" id="zoneLng" value="73.8567"></div>
+    </div>
+    <button class="save-btn" onclick="addServiceZone()">✅ नवीन शहर / एरिया जोडा व सुरू करा</button>
+    <div id="zoneMap"></div>
+    <div style="overflow-x:auto; margin-top:15px;">
+      <table><thead><tr><th>शहर / एरिया</th><th>रेंज (km)</th><th>स्टेटस</th><th>कृती</th></tr></thead><tbody id="zonesTableBody"></tbody></table>
+    </div>
+    <div style="overflow-x:auto; margin-top:20px; border-top:1px solid #333; padding-top:15px;">
+      <h4 style="color:#2ecc71; margin-bottom:6px;">🗳️ नवीन शहरांसाठी कस्टमर व्होटिंग:</h4>
+      <table><thead><tr><th>शहर / एरिया</th><th>एकूण व्होट्स</th><th>कृती</th></tr></thead><tbody id="votesTableBody"></tbody></table>
+    </div>
   </div>
 
   <!-- 9. PUNE DEMAND HEAT MAP & LIVE GPS -->
@@ -423,7 +473,14 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   let currentCommPercent = 20;
-  let adminRates = { minFare: 30, rate2W: 10, rate3W: 18, rateTempo: 25, rateBolero: 35, rateTruck: 50, surgeActive: false, surgeMultiplier: 1.2 };
+  let adminRates = {
+    base2W: 30, rate2W: 10,
+    base3W: 70, rate3W: 18,
+    baseTempo: 150, rateTempo: 25,
+    baseBolero: 250, rateBolero: 35,
+    baseTruck: 500, rateTruck: 50,
+    surgeActive: false, surgeMultiplier: 1.2
+  };
   let allChatMsgs = [], selectedChatRoomId = null;
   let allOrdersCache = [];
 
@@ -459,6 +516,19 @@
     if (tab === 'map') setTimeout(() => adminMap.invalidateSize(), 200);
   };
 
+  window.previewRateSamples = () => {
+    const calc5 = (bId, rId) => {
+      const b = Number(document.getElementById(bId).value || 0);
+      const r = Number(document.getElementById(rId).value || 0);
+      return Math.max(b, Math.round(5 * r));
+    };
+    document.getElementById('sample5Km2W').innerText = "₹" + calc5('setBase2W', 'setRate2W');
+    document.getElementById('sample5Km3W').innerText = "₹" + calc5('setBase3W', 'setRate3W');
+    document.getElementById('sample5KmTempo').innerText = "₹" + calc5('setBaseTempo', 'setRateTempo');
+    document.getElementById('sample5KmBolero').innerText = "₹" + calc5('setBaseBolero', 'setRateBolero');
+    document.getElementById('sample5KmTruck').innerText = "₹" + calc5('setBaseTruck', 'setRateTruck');
+  };
+
   window.adminDirectAddRider = async () => {
     const name = document.getElementById('addRName').value.trim();
     const phone = document.getElementById('addRPhone').value.trim();
@@ -482,20 +552,19 @@
     alert(`✅ नवीन रायडर '${name}' थेट जोडला गेला आणि Selfie + Account मंजूर झाले!`);
   };
 
-  // Auto KM-Based Fare Calculator for Manual Phone Orders
   window.recalcManualOrderFare = () => {
     const veh = document.getElementById('manVehicle').value;
     const km = Math.max(0.5, Number(document.getElementById('manDistKm').value) || 1);
-    let rate = adminRates.rate2W;
-    if (veh === "3-Wheeler") rate = adminRates.rate3W;
-    if (veh === "Mini Tempo") rate = adminRates.rateTempo;
-    if (veh === "Bolero Pickup") rate = adminRates.rateBolero;
-    if (veh === "Truck") rate = adminRates.rateTruck;
+    let base = adminRates.base2W, rate = adminRates.rate2W;
+    if (veh === "3-Wheeler") { base = adminRates.base3W; rate = adminRates.rate3W; }
+    if (veh === "Mini Tempo") { base = adminRates.baseTempo; rate = adminRates.rateTempo; }
+    if (veh === "Bolero Pickup") { base = adminRates.baseBolero; rate = adminRates.rateBolero; }
+    if (veh === "Truck") { base = adminRates.baseTruck; rate = adminRates.rateTruck; }
 
     const mult = adminRates.surgeActive ? adminRates.surgeMultiplier : 1;
-    const calcFare = Math.max(adminRates.minFare, Math.round(km * rate * mult));
+    const calcFare = Math.max(base, Math.round(km * rate * mult));
     document.getElementById('manFare').value = calcFare;
-    document.getElementById('manFareTallyHint').innerText = `📏 ${veh}: ${km} km × ₹${rate}/km (Min ₹${adminRates.minFare}) = ₹${calcFare}`;
+    document.getElementById('manFareTallyHint').innerText = `📏 ${veh}: ${km} km × ₹${rate}/km (Min/Base ₹${base}) = ₹${calcFare}`;
   };
 
   window.createManualPhoneOrder = async () => {
@@ -633,12 +702,12 @@
     pdf.text(`Total Orders Count: ${allOrdersCache.length}`, 15, 40);
     pdf.text(`Total Gross Billing: INR ${totalGross.toFixed(2)}`, 15, 48);
     pdf.text(`Estimated GST (18%): INR ${totalGst.toFixed(2)}`, 15, 56);
-    pdf.text(`Total Platform Commission (${currentCommPercent}%): INR ${totalComm.toFixed(2)}`, 15, 64);
+    pdf.text(`Total Platform Commission (${currentCommPercent}%): INR${totalComm.toFixed(2)}`, 15, 64);
 
     let y = 78;
     pdf.setFontSize(9);
     allOrdersCache.slice(0, 28).forEach((o, idx) => {
-      pdf.text(`${idx + 1}. [${o.status}] ${o.vehicle} (${o.distanceKm || '-'} km) | INR ${o.fare} | ${String(o.pickup).slice(0, 20)} -> ${String(o.drop).slice(0, 20)}`, 15, y);
+      pdf.text(`${idx + 1}. [${o.status}] ${o.vehicle} (${o.distanceKm || '-'} km) | INR ${o.fare} |${String(o.pickup).slice(0, 20)} -> ${String(o.drop).slice(0, 20)}`, 15, y);
       y += 6;
     });
     pdf.save(`GoParcel_GST_Invoice_${new Date().toISOString().slice(0,10)}.pdf`);
@@ -718,7 +787,7 @@
         <td><b>${c.role}</b></td>
         <td><b>${c.name}</b><br><small>📞 ${c.phone}</small></td>
         <td>🕒 ${c.timestampStr}</td>
-        <td><a href="${mapUrl}" target="_blank" style="color:#4db8ff;">📍 ${Number(c.lat).toFixed(4)}, ${Number(c.lng).toFixed(4)}</a></td>
+        <td><a href="${mapUrl}" target="_blank" style="color:#4db8ff;">📍 ${Number(c.lat).toFixed(4)},${Number(c.lng).toFixed(4)}</a></td>
         <td><small>${c.summary || '-'}</small></td>
         <td>${pdfBtn}</td>
       </tr>`;
@@ -748,7 +817,7 @@
       const z = d.data();
       if (z.active) { activeCount++; L.circle([z.lat, z.lng], { radius: z.radiusKm * 1000, color: '#2ecc71', fillOpacity: 0.18 }).addTo(zoneLayers); }
       tbody.innerHTML += `<tr><td><b>${z.name}</b></td><td><b>${z.radiusKm} km</b></td><td>${z.active ? '● चालू' : '● बंद'}</td><td>
-        <button class="btn-sm btn-approve" onclick="updateZoneRadius('${d.id}', ${z.radiusKm})">📏 रेंज बदला</button>
+        <button class="btn-sm btn-approve" onclick="updateZoneRadius('${d.id}',${z.radiusKm})">📏 रेंज बदला</button>
         <button class="btn-sm" style="background:#333;color:#fff;" onclick="toggleZoneActive('${d.id}', ${!z.active})">${z.active ? 'बंद' : 'चालू'}</button>
         <button class="btn-sm btn-block" onclick="deleteZone('${d.id}')">🗑️</button></td></tr>`;
     });
@@ -764,14 +833,29 @@
   onSnapshot(settingsRef, (snap) => {
     if (snap.exists()) {
       const s = snap.data();
-      adminRates.minFare = Number(s.minFare ?? 30);
+      adminRates.base2W = Number(s.base2W ?? s.minFare ?? 30);
       adminRates.rate2W = Number(s.rate2W ?? 10);
+      adminRates.base3W = Number(s.base3W ?? 70);
       adminRates.rate3W = Number(s.rate3W ?? 18);
+      adminRates.baseTempo = Number(s.baseTempo ?? 150);
       adminRates.rateTempo = Number(s.rateTempo ?? 25);
+      adminRates.baseBolero = Number(s.baseBolero ?? 250);
       adminRates.rateBolero = Number(s.rateBolero ?? 35);
+      adminRates.baseTruck = Number(s.baseTruck ?? 500);
       adminRates.rateTruck = Number(s.rateTruck ?? 50);
       adminRates.surgeActive = !!s.surgeActive;
       adminRates.surgeMultiplier = Number(s.surgeMultiplier ?? 1.2);
+
+      document.getElementById('setBase2W').value = adminRates.base2W;
+      document.getElementById('setRate2W').value = adminRates.rate2W;
+      document.getElementById('setBase3W').value = adminRates.base3W;
+      document.getElementById('setRate3W').value = adminRates.rate3W;
+      document.getElementById('setBaseTempo').value = adminRates.baseTempo;
+      document.getElementById('setRateTempo').value = adminRates.rateTempo;
+      document.getElementById('setBaseBolero').value = adminRates.baseBolero;
+      document.getElementById('setRateBolero').value = adminRates.rateBolero;
+      document.getElementById('setBaseTruck').value = adminRates.baseTruck;
+      document.getElementById('setRateTruck').value = adminRates.rateTruck;
 
       document.getElementById('setAdminWa').value = s.adminWa ?? "919999999999";
       document.getElementById('setAdminUpi').value = s.adminUpi ?? "Techesupp-2@okhdfcbank";
@@ -779,12 +863,6 @@
       document.getElementById('setDeliveryRangeMeters').value = s.deliveryRangeMeters ?? 150;
       document.getElementById('setOnboardingFee').value = s.onboardingFee ?? 1000;
       document.getElementById('setCommission').value = s.commission ?? 20;
-      document.getElementById('setMinFare').value = adminRates.minFare;
-      document.getElementById('setRate2W').value = adminRates.rate2W;
-      document.getElementById('setRate3W').value = adminRates.rate3W;
-      document.getElementById('setRateTempo').value = adminRates.rateTempo;
-      document.getElementById('setRateBolero').value = adminRates.rateBolero;
-      document.getElementById('setRateTruck').value = adminRates.rateTruck;
 
       document.getElementById('setPeakIncentiveActive').value = String(s.peakIncentiveActive ?? true);
       document.getElementById('setPeakStartHour').value = s.peakStartHour ?? 18;
@@ -820,11 +898,13 @@
       document.getElementById('custBannerText').value = s.custBannerText ?? "";
       document.getElementById('riderBannerText').value = s.riderBannerText ?? "";
       currentCommPercent = Number(s.commission ?? 20);
+      previewRateSamples();
       recalcManualOrderFare();
     }
   });
 
   window.saveMasterSettings = async () => {
+    const b2 = Number(document.getElementById('setBase2W').value) || 30;
     await setDoc(settingsRef, {
       adminWa: document.getElementById('setAdminWa').value.trim(),
       adminUpi: document.getElementById('setAdminUpi').value.trim(),
@@ -832,12 +912,18 @@
       deliveryRangeMeters: Number(document.getElementById('setDeliveryRangeMeters').value),
       onboardingFee: Number(document.getElementById('setOnboardingFee').value),
       commission: Number(document.getElementById('setCommission').value),
-      minFare: Number(document.getElementById('setMinFare').value),
+      minFare: b2,
+      base2W: b2,
       rate2W: Number(document.getElementById('setRate2W').value),
+      base3W: Number(document.getElementById('setBase3W').value),
       rate3W: Number(document.getElementById('setRate3W').value),
+      baseTempo: Number(document.getElementById('setBaseTempo').value),
       rateTempo: Number(document.getElementById('setRateTempo').value),
+      baseBolero: Number(document.getElementById('setBaseBolero').value),
       rateBolero: Number(document.getElementById('setRateBolero').value),
+      baseTruck: Number(document.getElementById('setBaseTruck').value),
       rateTruck: Number(document.getElementById('setRateTruck').value),
+      ratesUpdatedAt: Date.now(),
       peakIncentiveActive: document.getElementById('setPeakIncentiveActive').value === 'true',
       peakStartHour: Number(document.getElementById('setPeakStartHour').value),
       peakEndHour: Number(document.getElementById('setPeakEndHour').value),
@@ -868,7 +954,7 @@
       custBannerText: document.getElementById('custBannerText').value.trim(),
       riderBannerText: document.getElementById('riderBannerText').value.trim()
     }, { merge: true });
-    alert("✅ सर्व मास्टर बदल यशस्वीरित्या लागू झाले!");
+    alert("✅ सर्व वाहनांचे नवीन Base Fare व प्रति-KM दर सेव्ह झाले आणि कस्टमर/रायडर पॅनेलवर लाईव्ह अपडेट झाले!");
   };
 
   onSnapshot(query(collection(db, "otpRequests"), orderBy("createdAt", "desc")), (snap) => {
@@ -882,7 +968,7 @@
 
       let replyText = `नमस्कार ${r.name}, तुमचा GoParcel OTP कोड आहे: ${r.otp} (१० मिनिटांसाठी वैध)`;
       if (lang === "hi") replyText = `नमस्ते ${r.name}, आपका GoParcel OTP कोड है: ${r.otp} (१० मिनट के लिए वैध)`;
-      if (lang === "en") replyText = `Hello ${r.name}, your GoParcel OTP code is: ${r.otp} (Valid for 10 mins)`;
+      if (lang === "en") replyText = `Hello ${r.name}, your GoParcel OTP code is:${r.otp} (Valid for 10 mins)`;
 
       const waUrl = `https://wa.me/91${r.phone}?text=${encodeURIComponent(replyText)}`;
       tbody.innerHTML += `<tr style="${isPending ? 'background:#291a10;' : ''}">
@@ -979,8 +1065,7 @@
           A/C: ${r.approved ? '<b style="color:#2ecc71;">Approved</b>' : '<b style="color:#ff6600;">Pending</b>'}
         </td>
         <td>
-          ${selfieBtn}
-          ${feeVerifyBtn}
+          ${selfieBtn}${feeVerifyBtn}
           <button class="btn-sm btn-approve" onclick="toggleRiderApproval('${d.id}', true)">Approve Rider</button>
           <button class="btn-sm btn-edit" onclick="rejectRiderKyc('${d.id}')">Reject KYC</button>
           <button class="btn-sm btn-block" onclick="toggleRiderApproval('${d.id}', false)">Block</button>
@@ -1092,8 +1177,8 @@
 
       tbody.innerHTML += `<tr>
         <td><b>${o.customerEmail || 'Customer'}</b><br><small style="color:#4db8ff;">📞 ${o.customerPhone || '-'}</small>${viaTag}</td>
-        <td><small>🟢 <b>पिकअप:</b> ${o.pickup} (${o.pickupContactName || ''}: ${o.pickupContactPhone || ''})<br>
-                   🔴 <b>ड्रॉप:</b> ${o.drop} (${o.dropContactName || ''}: ${o.dropContactPhone || ''})</small></td>
+        <td><small>🟢 <b>पिकअप:</b> ${o.pickup} (${o.pickupContactName || ''}:${o.pickupContactPhone || ''})<br>
+                   🔴 <b>ड्रॉप:</b> ${o.drop} (${o.dropContactName || ''}:${o.dropContactPhone || ''})</small></td>
         <td><b>${o.vehicle}</b> (${kmInfo})<br><small style="color:#2ecc71;">PIN: ${o.deliveryPin || '-'}</small></td>
         <td><b>₹${fareNum}</b> (${payTag})${breakdownLine}<small style="color:#ff6600;">कमिशन (${currentCommPercent}%): ₹${orderComm} | रायडर: ₹${riderNet}</small>${incTag}</td>
         <td><b>${o.riderEmail || 'प्रलंबित'}</b><br><small style="color:#888;">${o.deliveredDateStr || ''}</small></td>
