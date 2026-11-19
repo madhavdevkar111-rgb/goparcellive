@@ -39,7 +39,6 @@
     table.order-tbl th, table.order-tbl td { border: 1px solid #333; padding: 8px; text-align: left; }
     table.order-tbl th { background: #222; color: #ff6600; }
 
-    /* Saved Places (Home / Office) & Search Bar */
     .saved-places-bar { display: flex; gap: 5px; flex-wrap: wrap; margin: 4px 0 6px; }
     .place-chip { background: #1e1e1e; border: 1px solid #444; color: #ddd; padding: 5px 9px; border-radius: 14px; font-size: 11px; font-weight: bold; cursor: pointer; width: auto; margin: 0; }
     .place-chip:hover { border-color: #ff6600; color: #ff6600; }
@@ -48,7 +47,6 @@
     .addr-search-btn { width: auto; padding: 11px 12px; margin: 6px 0; background: #262626; color: #ffaa66; border: 1px solid #444; font-size: 13px; white-space: nowrap; }
     .fare-breakdown-box { background: #0c0c0c; border: 1px dashed #333; border-radius: 8px; padding: 8px 10px; margin-top: 8px; font-size: 11px; color: #bbb; line-height: 1.6; }
 
-    /* New Customer Features Styling */
     .extra-stop-item { background: #18140e; border: 1px dashed #ff9800; border-radius: 8px; padding: 8px; margin: 6px 0; display: flex; gap: 6px; align-items: center; }
     .addon-card { background: #111; border: 1px solid #333; border-radius: 10px; padding: 10px; margin: 8px 0; }
     .tip-pills { display: flex; gap: 6px; margin-top: 6px; }
@@ -100,7 +98,6 @@
 </header>
 
 <div class="container">
-  <!-- Offline / Low Network Alert Bar -->
   <div id="custOfflineBar" class="offline-bar hidden">
     📡 नेटवर्क कमी आहे (Offline Mode) — नेटवर्क येताच तुमची ऑर्डर माहिती आपोआप अपडेट होईल.
   </div>
@@ -403,14 +400,12 @@
         <label id="txtLblProfPhone" style="font-size:12px; color:#aaa;">मोबाईल नंबर:</label>
         <input type="text" id="profCustPhone" disabled style="opacity:0.7;">
 
-        <!-- Saved Home Address -->
         <div style="background:#111; border:1px solid #2ecc71; border-radius:8px; padding:8px; margin:8px 0;">
           <label style="font-size:12px; color:#2ecc71; font-weight:bold;">🏠 घरचा पत्ता (Saved Home Address):</label>
           <input type="text" id="profHomeAddr" placeholder="घरचा पूर्ण पत्ता टाका">
           <button type="button" onclick="useCurrentGpsForProfilePlace('home')" style="background:#1c2e3d; color:#4db8ff; border:1px solid #4db8ff; padding:7px; font-size:12px;">📍 सध्याचे GPS लोकेशन Home म्हणून सेव्ह करा</button>
         </div>
 
-        <!-- Saved Office Address -->
         <div style="background:#111; border:1px solid #4db8ff; border-radius:8px; padding:8px; margin:8px 0;">
           <label style="font-size:12px; color:#4db8ff; font-weight:bold;">🏢 ऑफिसचा पत्ता (Saved Office Address):</label>
           <input type="text" id="profOfficeAddr" placeholder="ऑफिस / दुकानाचा पत्ता टाका">
@@ -424,7 +419,6 @@
           <option value="en">English</option>
         </select>
 
-        <!-- Refer & Earn Card (Controlled by Admin) -->
         <div id="custReferBox" style="background:#000; border:1px dashed #ff6600; padding:10px; border-radius:8px; text-align:center; margin:10px 0;">
           <div style="font-size:12px; color:#ffaa66;">🎁 मित्राला जोडा आणि बोनस मिळवा!</div>
           Refer Code: <strong style="color:#ff6600; font-size:17px;" id="myCustReferCode">GPC0000</strong><br>
@@ -685,9 +679,6 @@
   let map, pMarker, dMarker, routeLine;
   let pLat = 18.5204, pLng = 73.8567, dLat = 18.5314, dLng = 73.8446;
 
-  // ==========================================
-  // 1. SAVED HOME / OFFICE ADDRESSES (PORTER-STYLE)
-  // ==========================================
   window.promptSaveCurrentPlace = async (side) => {
     if (!custUser) return;
     const addr = document.getElementById(side === 'pickup' ? 'pickupInput' : 'dropInput').value.trim();
@@ -762,11 +753,7 @@
     }, () => alert("कृपया GPS परवानगी (Allow Location) द्या!"), { enableHighAccuracy: true });
   };
 
-  // ==========================================
-  // 2. DUAL FAST REVERSE & FORWARD GEOCODING
-  // ==========================================
   async function reverseGeocodeFast(lat, lng) {
-    // Primary: Photon Komoot API (Fast, CORS-friendly, no rate-limit block)
     try {
       const res1 = await fetch(`https://photon.komoot.io/reverse?lat=${lat}&lon=${lng}`);
       const data1 = await res1.json();
@@ -777,7 +764,6 @@
       }
     } catch (e) {}
 
-    // Fallback: OpenStreetMap Nominatim
     try {
       const res2 = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=en`);
       const data2 = await res2.json();
@@ -796,7 +782,6 @@
     inp.value = addr || `GPS Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
   }
 
-  // Forward Geocoding: Typed address -> Map Pin + Actual Road KM
   window.geocodeTypedAddress = async (side) => {
     const inp = document.getElementById(side === 'pickup' ? 'pickupInput' : 'dropInput');
     const queryText = inp.value.trim();
@@ -823,7 +808,6 @@
     } catch (e) {}
   };
 
-  // Multi-Stop Delivery Functions
   window.addExtraDeliveryStop = () => {
     if (extraStopsList.length >= 3) return alert("जास्तीत जास्त ३ मधले स्टॉप्स जोडता येतात!");
     extraStopsList.push({ address: "", lat: (pLat + dLat) / 2, lng: (pLng + dLng) / 2 });
@@ -841,19 +825,36 @@
     if (extraStopsList[idx]) extraStopsList[idx].address = val;
   };
 
+  window.geocodeExtraStop = async (idx) => {
+    const st = extraStopsList[idx];
+    if (!st || !st.address.trim()) return;
+    const cityContext = document.getElementById('activeCitySelect')?.value || "Pune";
+    const fullQuery = st.address.toLowerCase().includes(cityContext.toLowerCase()) ? st.address : `${st.address}, ${cityContext}, Maharashtra`;
+    try {
+      const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(fullQuery)}&limit=1`);
+      const data = await res.json();
+      if (data && data.features && data.features.length > 0) {
+        const [lng, lat] = data.features[0].geometry.coordinates;
+        extraStopsList[idx].lat = lat;
+        extraStopsList[idx].lng = lng;
+        await updateDistanceAndLine();
+      }
+    } catch (e) {}
+  };
+
   function renderExtraStopsUi() {
     const box = document.getElementById('extraStopsContainer');
     box.innerHTML = "";
     extraStopsList.forEach((st, idx) => {
       box.innerHTML += `<div class="extra-stop-item">
         <span style="color:#ff9800; font-weight:bold; font-size:12px;">🛑 Stop ${idx + 1}:</span>
-        <input type="text" value="${st.address}" placeholder="मधल्या स्टॉपचा पत्ता टाका" oninput="updateExtraStopText(${idx}, this.value)" style="margin:0; padding:8px; font-size:13px;">
+        <input type="text" value="${st.address}" placeholder="मधल्या स्टॉपचा पत्ता टाका" oninput="updateExtraStopText(${idx}, this.value)" onchange="geocodeExtraStop(${idx})" style="margin:0; padding:8px; font-size:13px;">
+        <button type="button" onclick="geocodeExtraStop(${idx})" style="width:auto; padding:6px 8px; margin:0; background:#262626; color:#ffaa66; font-size:12px;">🔍</button>
         <button type="button" onclick="removeExtraDeliveryStop(${idx})" style="width:auto; padding:6px 10px; margin:0; background:#e74c3c; color:#fff; font-size:12px;">✕</button>
       </div>`;
     });
   }
 
-  // Package Photo Upload Compression
   window.handlePackagePhotoUpload = (input) => {
     if (input.files && input.files[0]) {
       const reader = new FileReader();
@@ -1111,19 +1112,29 @@
   }
 
   // ==========================================
-  // 3. ACTUAL ROAD KM CALCULATION VIA OSRM
+  // 3. ACTUAL ROAD KM CALCULATION (WITH MULTI-STOPS) VIA OSRM
   // ==========================================
   async function updateDistanceAndLine() {
     if (!map) return;
 
-    // Fallback straight-line * 1.25 road factor
-    const straightKm = map.distance([pLat, pLng], [dLat, dLng]) / 1000;
-    const estRoadKm = Math.max(1, (straightKm * 1.25)).toFixed(1);
+    // Build Waypoints: Pickup -> Extra Stops -> Drop
+    const waypoints = [[pLat, pLng]];
+    extraStopsList.forEach(st => {
+      if (st.lat && st.lng) waypoints.push([Number(st.lat), Number(st.lng)]);
+    });
+    waypoints.push([dLat, dLng]);
+
+    let straightTotalKm = 0;
+    for (let i = 0; i < waypoints.length - 1; i++) {
+      straightTotalKm += map.distance(waypoints[i], waypoints[i + 1]) / 1000;
+    }
+    const estRoadKm = Math.max(1, (straightTotalKm * 1.25)).toFixed(1);
     document.getElementById('distKmInput').value = estRoadKm;
     recalcPrices();
 
     try {
-      const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${pLng},${pLat};${dLng},${dLat}?overview=full&geometries=geojson`);
+      const coordStr = waypoints.map(w => `${w[1]},${w[0]}`).join(';');
+      const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`);
       const data = await res.json();
       if (data.routes && data.routes.length > 0) {
         const route = data.routes[0];
@@ -1142,7 +1153,7 @@
     } catch (e) {}
 
     if (routeLine) map.removeLayer(routeLine);
-    routeLine = L.polyline([[pLat, pLng], [dLat, dLng]], { color: '#ff6600', weight: 4, dashArray: '6, 6' }).addTo(map);
+    routeLine = L.polyline(waypoints, { color: '#ff6600', weight: 4, dashArray: '6, 6' }).addTo(map);
   }
 
   window.useCurrentGpsLocation = (target, silent = false) => {
@@ -1153,7 +1164,6 @@
       custGpsLat = pos.coords.latitude; custGpsLng = pos.coords.longitude;
       if (target === 'pickup') {
         pLat = custGpsLat; pLng = custGpsLng;
-        // Set drop offset only if drop address is still empty
         if (!document.getElementById('dropInput').value.trim()) {
           dLat = pLat + 0.015; dLng = pLng + 0.015;
         }
@@ -1221,7 +1231,7 @@
     document.getElementById('payAnyUpiLink').href = upiUri;
   }
 
-  window.recalcPrices = () => {
+  function getFareBreakdownDetails() {
     const km = Math.max(0.5, Number(document.getElementById('distKmInput').value) || 1);
     const mult = appCfg.surgeActive ? appCfg.surgeMultiplier : 1;
 
@@ -1237,39 +1247,43 @@
     const baseb = Math.max(appCfg.minFare, Math.round(km * appCfg.rateBolero * mult));
     const basetr = Math.max(appCfg.minFare, Math.round(km * appCfg.rateTruck * mult));
 
-    const f2 = base2 + addOnsTotal;
-    const f3 = base3 + addOnsTotal;
-    const ft = baset + addOnsTotal;
-    const fb = baseb + addOnsTotal;
-    const ftr = basetr + addOnsTotal;
+    let activeBase = base2, activeRate = appCfg.rate2W;
+    if (chosenVehicle === "3-Wheeler") { activeBase = base3; activeRate = appCfg.rate3W; }
+    if (chosenVehicle === "Mini Tempo") { activeBase = baset; activeRate = appCfg.rateTempo; }
+    if (chosenVehicle === "Bolero Pickup") { activeBase = baseb; activeRate = appCfg.rateBolero; }
+    if (chosenVehicle === "Truck") { activeBase = basetr; activeRate = appCfg.rateTruck; }
 
-    document.getElementById('fare2W').innerText = "₹" + f2;
-    document.getElementById('fare3W').innerText = "₹" + f3;
-    document.getElementById('fareTempo').innerText = "₹" + ft;
-    document.getElementById('fareBolero').innerText = "₹" + fb;
-    document.getElementById('fareTruck').innerText = "₹" + ftr;
+    return {
+      km, mult, activeBase, activeRate,
+      stopsFee, floorFee: pickFloorFee + dropFloorFee, insuranceFee, tipAmount: selectedTipAmount,
+      addOnsTotal, finalFare: activeBase + addOnsTotal,
+      f2: base2 + addOnsTotal, f3: base3 + addOnsTotal, ft: baset + addOnsTotal, fb: baseb + addOnsTotal, ftr: basetr + addOnsTotal
+    };
+  }
 
-    let final = f2, activeBase = base2, activeRate = appCfg.rate2W;
-    if (chosenVehicle === "3-Wheeler") { final = f3; activeBase = base3; activeRate = appCfg.rate3W; }
-    if (chosenVehicle === "Mini Tempo") { final = ft; activeBase = baset; activeRate = appCfg.rateTempo; }
-    if (chosenVehicle === "Bolero Pickup") { final = fb; activeBase = baseb; activeRate = appCfg.rateBolero; }
-    if (chosenVehicle === "Truck") { final = ftr; activeBase = basetr; activeRate = appCfg.rateTruck; }
+  window.recalcPrices = () => {
+    const bd = getFareBreakdownDetails();
 
-    // Transparent KM & Add-ons Fare Tally Breakdown
+    document.getElementById('fare2W').innerText = "₹" + bd.f2;
+    document.getElementById('fare3W').innerText = "₹" + bd.f3;
+    document.getElementById('fareTempo').innerText = "₹" + bd.ft;
+    document.getElementById('fareBolero').innerText = "₹" + bd.fb;
+    document.getElementById('fareTruck').innerText = "₹" + bd.ftr;
+
     const bdBox = document.getElementById('fareBreakdownBox');
     if (bdBox) {
       bdBox.innerHTML = `
-        <div style="display:flex; justify-content:space-between;"><span>📏 ${chosenVehicle} (${km} km × ₹${activeRate}/km, Min ₹${appCfg.minFare}):</span><strong>₹${activeBase}</strong></div>
-        ${stopsFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#ff9800;"><span>🛑 एक्स्ट्रा स्टॉप्स (${extraStopsList.length} × ₹25):</span><strong>+₹${stopsFee}</strong></div>` : ''}
-        ${(pickFloorFee + dropFloorFee) > 0 ? `<div style="display:flex; justify-content:space-between; color:#ffaa66;"><span>🪜 मजला लिफ्ट नसल्याचा चार्ज:</span><strong>+₹${pickFloorFee + dropFloorFee}</strong></div>` : ''}
-        ${insuranceFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🛡️ वस्तू विमा संरक्षण:</span><strong>+₹${insuranceFee}</strong></div>` : ''}
-        ${selectedTipAmount > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🎁 रायडर टीप (100% रायडरला):</span><strong>+₹${selectedTipAmount}</strong></div>` : ''}
+        <div style="display:flex; justify-content:space-between;"><span>📏 ${chosenVehicle} (${bd.km} km × ₹${bd.activeRate}/km, Min ₹${appCfg.minFare}):</span><strong>₹${bd.activeBase}</strong></div>
+        ${bd.stopsFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#ff9800;"><span>🛑 एक्स्ट्रा स्टॉप्स (${extraStopsList.length} × ₹25):</span><strong>+₹${bd.stopsFee}</strong></div>` : ''}
+        ${bd.floorFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#ffaa66;"><span>🪜 मजला लिफ्ट नसल्याचा चार्ज:</span><strong>+₹${bd.floorFee}</strong></div>` : ''}
+        ${bd.insuranceFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🛡️ वस्तू विमा संरक्षण:</span><strong>+₹${bd.insuranceFee}</strong></div>` : ''}
+        ${bd.tipAmount > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🎁 रायडर टीप (100% रायडरला):</span><strong>+₹${bd.tipAmount}</strong></div>` : ''}
       `;
     }
 
-    document.getElementById('finalFareDisplay').innerText = "₹" + final;
-    if (chosenPaymentMode === 'ONLINE') generateDynamicUpiQrAndApps(final);
-    return final;
+    document.getElementById('finalFareDisplay').innerText = "₹" + bd.finalFare;
+    if (chosenPaymentMode === 'ONLINE') generateDynamicUpiQrAndApps(bd.finalFare);
+    return bd.finalFare;
   };
 
   function createConsentPdfDataUri(record) {
@@ -1316,16 +1330,14 @@
 
     const pickupFloor = document.getElementById('pickupFloorSelect').value.split('|')[0];
     const dropFloor = document.getElementById('dropFloorSelect').value.split('|')[0];
-    const insuranceFee = Number(document.getElementById('goodsInsuranceSelect').value || 0);
-
-    const fare = recalcPrices();
+    const bd = getFareBreakdownDetails();
     const weight = document.getElementById('weightSelect').value;
     const pin = Math.floor(1000 + Math.random() * 9000).toString();
     const nowTime = new Date().toLocaleString('en-IN');
 
     const consentRec = {
       role: "Customer (Order Booking)", name: custUser.name, phone: custUser.phone, timestampStr: nowTime,
-      lat: pLat, lng: pLng, summary: `Order: ${pickup} -> ${drop} (${chosenVehicle}, ${weight}, ${chosenPaymentMode}, Rs.${fare})`,
+      lat: pLat, lng: pLng, summary: `Order: ${pickup} -> ${drop} (${bd.km} km, ${chosenVehicle}, ${weight}, ${chosenPaymentMode}, Rs.${bd.finalFare})`,
       agreementText: appCfg.consentText, createdAt: Date.now()
     };
     consentRec.pdfDataUri = createConsentPdfDataUri(consentRec);
@@ -1339,24 +1351,28 @@
       pickup, drop,
       extraStops: extraStopsList,
       pickupFloor, dropFloor,
-      insuranceFee,
-      tipAmount: selectedTipAmount,
+      insuranceFee: bd.insuranceFee,
+      tipAmount: bd.tipAmount,
       packagePhoto: packagePhotoBase64,
       scheduledTime,
       pickupContactName, pickupContactPhone,
       dropContactName, dropContactPhone,
       pickupLat: Number(pLat), pickupLng: Number(pLng),
       dropLat: Number(dLat), dropLng: Number(dLng),
-      distanceKm: Number(document.getElementById('distKmInput').value),
+      distanceKm: bd.km,
+      ratePerKmApplied: bd.activeRate,
+      baseFare: bd.activeBase,
+      addOnsTotal: bd.addOnsTotal,
       parcel: document.getElementById('parcelSelect').value,
       parcelWeight: weight,
       vehicle: chosenVehicle,
       paymentMode: chosenPaymentMode,
-      fare, deliveryPin: pin, consentAccepted: true, consentTime: nowTime,
+      fare: bd.finalFare,
+      deliveryPin: pin, consentAccepted: true, consentTime: nowTime,
       status: "Pending", createdAt: serverTimestamp()
     });
 
-    alert(`✅ Order Booked! Delivery PIN: ${pin}`);
+    alert(`✅ Order Booked! (${bd.km} km • Total: ₹${bd.finalFare}) Delivery PIN: ${pin}`);
     switchCustTab('Orders', document.querySelectorAll('.b-nav')[1]);
   };
 
@@ -1436,6 +1452,7 @@
           : '';
 
         const addonsInfo = [
+          o.distanceKm ? `📏 ${o.distanceKm} km` : '',
           o.insuranceFee > 0 ? `🛡️ विमा ₹${o.insuranceFee}` : '',
           o.tipAmount > 0 ? `🎁 टीप ₹${o.tipAmount}` : '',
           o.scheduledTime ? `⏰ ${o.scheduledTime}` : ''
@@ -1444,7 +1461,7 @@
         tbody.innerHTML += `<tr>
           <td>🟢 ${o.pickup} <br><small style="color:#4db8ff;">(${o.pickupContactName || ''}: ${o.pickupContactPhone || ''})</small><br>
               🔴 ${o.drop} <br><small style="color:#ffaa66;">(${o.dropContactName || ''}: ${o.dropContactPhone || ''})</small></td>
-          <td><b>${o.vehicle}</b> (${o.parcelWeight || '1-5 kg'})<br><span style="color:#2ecc71;">₹${o.fare}</span> • <small>${o.paymentMode || 'COD'}</small></td>
+          <td><b>${o.vehicle}</b> (${o.distanceKm || '-'} km)<br><span style="color:#2ecc71;">₹${o.fare}</span> • <small>${o.paymentMode || 'COD'}</small></td>
           <td style="color:#ff6600; font-weight:bold;">${o.status}</td>
           <td><span class="pin-badge">${o.deliveryPin}</span></td>
         </tr>`;
@@ -1461,7 +1478,7 @@
             🔴 ${o.drop} (${o.dropContactName || ''} - ${o.dropContactPhone || ''})
           </p>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
-            <span style="font-size:12px; color:#aaa;">Rider: <b>${riderCleanName}</b> | <b>${o.paymentMode || 'COD'}</b></span>
+            <span style="font-size:12px; color:#aaa;">Rider: <b>${riderCleanName}</b> | <b>₹${o.fare}</b> (${o.paymentMode || 'COD'})</span>
             <span>PIN: <span class="pin-badge">${o.deliveryPin}</span></span>
           </div>
           ${cancelBtnHtml}
