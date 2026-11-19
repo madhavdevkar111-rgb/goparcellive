@@ -67,7 +67,7 @@
 <body>
 <header>
   <h1>👑 GoParcel Master Panel</h1>
-  <span style="color:#2ecc71; font-size:13px;">● Live Rate Sync Active</span>
+  <span style="color:#2ecc71; font-size:13px;">● Porter Fare & Pickup Payout Engine</span>
 </header>
 
 <div id="imgModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
@@ -87,7 +87,7 @@
   </div>
 
   <div class="nav-tabs">
-    <button id="tMaster" class="nav-btn active" onclick="showTab('master')">🎛️ वाहनांचे दर (Rate Card) व मास्टर कंट्रोल</button>
+    <button id="tMaster" class="nav-btn active" onclick="showTab('master')">🎛️ दर तक्ता (Rate Card) व लांब पिकअप भत्ता</button>
     <button id="tRiders" class="nav-btn" onclick="showTab('riders')">🛵 रायडर्स KYC, Selfie & Direct Add</button>
     <button id="tOrders" class="nav-btn" onclick="showTab('orders')">📦 ऑर्डर्स, फोन बुकिंग & GST रिपोर्ट</button>
     <button id="tChat" class="nav-btn" onclick="showTab('chat')">💬 Live Support Chat <span id="chatBadge" class="badge-req hidden">0</span></button>
@@ -98,13 +98,12 @@
     <button id="tMap" class="nav-btn" onclick="showTab('map')">🔥 हीट मॅप & लाईव्ह GPS</button>
   </div>
 
-  <!-- 8. MASTER SETTINGS (PORTER-STYLE VEHICLE-WISE BASE FARE + PER KM RATE CARD) -->
+  <!-- 8. MASTER SETTINGS (PORTER-STYLE VEHICLE-WISE BASE FARE + PER KM RATE + LONG PICKUP PAYOUT) -->
   <div id="secMaster" class="panel-box">
-    <!-- Porter-Style Vehicle Rate Card Box -->
     <div class="sub-box-green">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-        <h3 style="color:#2ecc71;">🚛 Porter-Style वाहन दर तक्ता (प्रत्येक गाडीचे बेस भाडे व प्रति KM दर)</h3>
-        <span style="font-size:11px; color:#aaa;">येथे दर बदलून सेव्ह करताच कस्टमर व रायडर पॅनेलवर लगेच अपडेट होतील!</span>
+        <h3 style="color:#2ecc71;">🚛 Porter-Style वाहन दर तक्ता (कस्टमरचे बेस भाडे व प्रति KM दर)</h3>
+        <span style="font-size:11px; color:#aaa;">येथे दर सेव्ह करताच कस्टमर व रायडर पॅनेलवर लगेच लागू होतील!</span>
       </div>
       <div style="overflow-x:auto;">
         <table class="rate-card-table">
@@ -113,7 +112,7 @@
               <th>वाहन प्रकार (Vehicle)</th>
               <th>किमान बेस भाडे (Base / Min Fare ₹)</th>
               <th>प्रति किलोमीटर दर (Per KM Rate ₹/km)</th>
-              <th>उदा. 5 KM चे एकूण भाडे</th>
+              <th>उदा. 5 KM चे भाडे</th>
             </tr>
           </thead>
           <tbody>
@@ -150,7 +149,24 @@
           </tbody>
         </table>
       </div>
-      <button class="save-btn" style="margin-top:10px;" onclick="saveMasterSettings()">✅ हे नवीन दर सेव्ह करा आणि कस्टमर/रायडर पॅनेलवर लगेच लागू करा</button>
+
+      <!-- Long Pickup Distance Payout (Porter Model for Riders) -->
+      <div style="background:#0f1d14; border:1px dashed #2ecc71; border-radius:8px; padding:10px; margin-top:12px;">
+        <strong style="color:#4db8ff; font-size:13px;">🛵 रायडर लांबच्या पिकअप अंतराचा भत्ता (Long Pickup Distance Payout - Porter Model):</strong>
+        <p style="font-size:11px; color:#ccc; margin:3px 0 8px;">जर रायडर कस्टमरच्या पिकअप लोकेशनपासून लांब असेल, तर फ्री रेंज नंतर प्रत्येक जादा किलोमीटरसाठी रायडरला हा एक्स्ट्रा भत्ता मिळेल:</p>
+        <div class="form-grid" style="margin-bottom:0;">
+          <div>
+            <label>फ्री पिकअप अंतर (Free Pickup KM)</label>
+            <input type="number" step="0.5" id="setFreePickupKm" value="1.0" min="0" max="10">
+          </div>
+          <div>
+            <label>१ किमी नंतर प्रति KM एक्स्ट्रा भत्ता (₹/km)</label>
+            <input type="number" id="setLongPickupRatePerKm" value="5" min="0" max="50">
+          </div>
+        </div>
+      </div>
+
+      <button class="save-btn" style="margin-top:10px;" onclick="saveMasterSettings()">✅ दर तक्ता आणि पिकअप भत्ता सेव्ह करा</button>
     </div>
 
     <!-- Broadcast Notification Push Alert Box -->
@@ -393,7 +409,7 @@
     </div>
 
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-      <h3 style="color:#ff6600;">📦 सर्व ऑर्डर्स (KM, भाडे टॅली व संपर्क व्यक्तींसह)</h3>
+      <h3 style="color:#ff6600;">📦 सर्व ऑर्डर्स (KM, भाडे टॅली व पिकअप भत्त्यासह)</h3>
       <div style="display:flex; gap:8px;">
         <button class="btn-sm btn-approve" style="padding:9px 14px; font-size:12px;" onclick="downloadGstExcelCsv()">📊 Excel (CSV) GST रिपोर्ट</button>
         <button class="btn-sm btn-edit" style="padding:9px 14px; font-size:12px;" onclick="downloadGstPdfReport()">📄 PDF इन्व्हॉइस / GST रिपोर्ट</button>
@@ -401,7 +417,7 @@
     </div>
 
     <table>
-      <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता व व्यक्ती</th><th>वाहन, KM & PIN</th><th>भाडे टॅली (कस्टमर = रायडर)</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
+      <thead><tr><th>कस्टमर तपशील</th><th>पिकअप ➔ ड्रॉप पत्ता व व्यक्ती</th><th>वाहन, Trip KM & PIN</th><th>कस्टमर बिल vs रायडर कमाई (Pickup Bonus सह)</th><th>डिलिव्हरी रायडर</th><th>स्टेटस</th><th>कृती</th></tr></thead>
       <tbody id="adminTableBody"></tbody>
     </table>
   </div>
@@ -564,7 +580,7 @@
     const mult = adminRates.surgeActive ? adminRates.surgeMultiplier : 1;
     const calcFare = Math.max(base, Math.round(km * rate * mult));
     document.getElementById('manFare').value = calcFare;
-    document.getElementById('manFareTallyHint').innerText = `📏 ${veh}: ${km} km × ₹${rate}/km (Min/Base ₹${base}) = ₹${calcFare}`;
+    document.getElementById('manFareTallyHint').innerText = `📏 ${veh}: ${km} km × ₹${rate}/km (Base ₹${base}) = ₹${calcFare}`;
   };
 
   window.createManualPhoneOrder = async () => {
@@ -667,14 +683,15 @@
 
   window.downloadGstExcelCsv = () => {
     if (allOrdersCache.length === 0) return alert("डाऊनलोड करण्यासाठी ऑर्डर्स उपलब्ध नाहीत.");
-    let csv = "Order ID,Date,Customer,Phone,Pickup,Drop,Distance (KM),Vehicle,Status,Payment Mode,Gross Fare (INR),GST 18% Included (INR),Platform Commission (INR),Rider Payout (INR)\n";
+    let csv = "Order ID,Date,Customer,Phone,Pickup,Drop,Trip KM,Rider Pickup Away KM,Vehicle,Status,Payment Mode,Customer Fare (INR),Long Pickup Bonus (INR),GST 18% (INR),Platform Commission (INR),Total Rider Earning (INR)\n";
     allOrdersCache.forEach(o => {
       const fare = Number(o.fare || 0);
+      const longPickBonus = Number(o.longPickupBonus || 0);
       const gst = (fare * 0.18).toFixed(2);
-      const comm = Math.round(fare * (currentCommPercent / 100));
-      const riderNet = fare - comm;
+      const comm = Math.round(Math.max(0, fare - Number(o.tipAmount || 0)) * (currentCommPercent / 100));
+      const riderNet = (fare - comm) + longPickBonus + Number(o.incentiveBonus || 0);
       const clean = (s) => `"${String(s || '').replace(/"/g, '""')}"`;
-      csv += `${clean(o.id)},${clean(o.deliveredDateStr || 'Recent')},${clean(o.customerEmail)},${clean(o.customerPhone)},${clean(o.pickup)},${clean(o.drop)},${o.distanceKm || '-'},${clean(o.vehicle)},${clean(o.status)},${clean(o.paymentMode || 'COD')},${fare},${gst},${comm},${riderNet}\n`;
+      csv += `${clean(o.id)},${clean(o.deliveredDateStr || 'Recent')},${clean(o.customerEmail)},${clean(o.customerPhone)},${clean(o.pickup)},${clean(o.drop)},${o.distanceKm || '-'},${o.pickupAwayKm || 0},${clean(o.vehicle)},${clean(o.status)},${clean(o.paymentMode || 'COD')},${fare},${longPickBonus},${gst},${comm},${riderNet}\n`;
     });
     const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
@@ -691,7 +708,7 @@
     allOrdersCache.forEach(o => {
       const f = Number(o.fare || 0);
       totalGross += f;
-      totalComm += Math.round(f * (currentCommPercent / 100));
+      totalComm += Math.round(Math.max(0, f - Number(o.tipAmount || 0)) * (currentCommPercent / 100));
       totalGst += (f * 0.18);
     });
 
@@ -700,14 +717,14 @@
     pdf.setFontSize(11);
     pdf.text(`Generated Date: ${new Date().toLocaleString('en-IN')}`, 15, 30);
     pdf.text(`Total Orders Count: ${allOrdersCache.length}`, 15, 40);
-    pdf.text(`Total Gross Billing: INR ${totalGross.toFixed(2)}`, 15, 48);
+    pdf.text(`Total Customer Billing: INR ${totalGross.toFixed(2)}`, 15, 48);
     pdf.text(`Estimated GST (18%): INR ${totalGst.toFixed(2)}`, 15, 56);
-    pdf.text(`Total Platform Commission (${currentCommPercent}%): INR${totalComm.toFixed(2)}`, 15, 64);
+    pdf.text(`Total Platform Commission (${currentCommPercent}%): INR ${totalComm.toFixed(2)}`, 15, 64);
 
     let y = 78;
     pdf.setFontSize(9);
     allOrdersCache.slice(0, 28).forEach((o, idx) => {
-      pdf.text(`${idx + 1}. [${o.status}] ${o.vehicle} (${o.distanceKm || '-'} km) | INR ${o.fare} |${String(o.pickup).slice(0, 20)} -> ${String(o.drop).slice(0, 20)}`, 15, y);
+      pdf.text(`${idx + 1}. [${o.status}] ${o.vehicle} (${o.distanceKm || '-'} km) | INR ${o.fare} | ${String(o.pickup).slice(0, 20)} -> ${String(o.drop).slice(0, 20)}`, 15, y);
       y += 6;
     });
     pdf.save(`GoParcel_GST_Invoice_${new Date().toISOString().slice(0,10)}.pdf`);
@@ -787,7 +804,7 @@
         <td><b>${c.role}</b></td>
         <td><b>${c.name}</b><br><small>📞 ${c.phone}</small></td>
         <td>🕒 ${c.timestampStr}</td>
-        <td><a href="${mapUrl}" target="_blank" style="color:#4db8ff;">📍 ${Number(c.lat).toFixed(4)},${Number(c.lng).toFixed(4)}</a></td>
+        <td><a href="${mapUrl}" target="_blank" style="color:#4db8ff;">📍 ${Number(c.lat).toFixed(4)}, ${Number(c.lng).toFixed(4)}</a></td>
         <td><small>${c.summary || '-'}</small></td>
         <td>${pdfBtn}</td>
       </tr>`;
@@ -817,7 +834,7 @@
       const z = d.data();
       if (z.active) { activeCount++; L.circle([z.lat, z.lng], { radius: z.radiusKm * 1000, color: '#2ecc71', fillOpacity: 0.18 }).addTo(zoneLayers); }
       tbody.innerHTML += `<tr><td><b>${z.name}</b></td><td><b>${z.radiusKm} km</b></td><td>${z.active ? '● चालू' : '● बंद'}</td><td>
-        <button class="btn-sm btn-approve" onclick="updateZoneRadius('${d.id}',${z.radiusKm})">📏 रेंज बदला</button>
+        <button class="btn-sm btn-approve" onclick="updateZoneRadius('${d.id}', ${z.radiusKm})">📏 रेंज बदला</button>
         <button class="btn-sm" style="background:#333;color:#fff;" onclick="toggleZoneActive('${d.id}', ${!z.active})">${z.active ? 'बंद' : 'चालू'}</button>
         <button class="btn-sm btn-block" onclick="deleteZone('${d.id}')">🗑️</button></td></tr>`;
     });
@@ -856,6 +873,9 @@
       document.getElementById('setRateBolero').value = adminRates.rateBolero;
       document.getElementById('setBaseTruck').value = adminRates.baseTruck;
       document.getElementById('setRateTruck').value = adminRates.rateTruck;
+
+      document.getElementById('setFreePickupKm').value = s.freePickupKm ?? 1.0;
+      document.getElementById('setLongPickupRatePerKm').value = s.longPickupRatePerKm ?? 5;
 
       document.getElementById('setAdminWa').value = s.adminWa ?? "919999999999";
       document.getElementById('setAdminUpi').value = s.adminUpi ?? "Techesupp-2@okhdfcbank";
@@ -923,6 +943,8 @@
       rateBolero: Number(document.getElementById('setRateBolero').value),
       baseTruck: Number(document.getElementById('setBaseTruck').value),
       rateTruck: Number(document.getElementById('setRateTruck').value),
+      freePickupKm: Number(document.getElementById('setFreePickupKm').value),
+      longPickupRatePerKm: Number(document.getElementById('setLongPickupRatePerKm').value),
       ratesUpdatedAt: Date.now(),
       peakIncentiveActive: document.getElementById('setPeakIncentiveActive').value === 'true',
       peakStartHour: Number(document.getElementById('setPeakStartHour').value),
@@ -954,7 +976,7 @@
       custBannerText: document.getElementById('custBannerText').value.trim(),
       riderBannerText: document.getElementById('riderBannerText').value.trim()
     }, { merge: true });
-    alert("✅ सर्व वाहनांचे नवीन Base Fare व प्रति-KM दर सेव्ह झाले आणि कस्टमर/रायडर पॅनेलवर लाईव्ह अपडेट झाले!");
+    alert("✅ दर तक्ता आणि लांब पिकअप भत्ता सेव्ह झाला व कस्टमर/रायडर पॅनेलवर लाईव्ह अपडेट झाला!");
   };
 
   onSnapshot(query(collection(db, "otpRequests"), orderBy("createdAt", "desc")), (snap) => {
@@ -968,7 +990,7 @@
 
       let replyText = `नमस्कार ${r.name}, तुमचा GoParcel OTP कोड आहे: ${r.otp} (१० मिनिटांसाठी वैध)`;
       if (lang === "hi") replyText = `नमस्ते ${r.name}, आपका GoParcel OTP कोड है: ${r.otp} (१० मिनट के लिए वैध)`;
-      if (lang === "en") replyText = `Hello ${r.name}, your GoParcel OTP code is:${r.otp} (Valid for 10 mins)`;
+      if (lang === "en") replyText = `Hello ${r.name}, your GoParcel OTP code is: ${r.otp} (Valid for 10 mins)`;
 
       const waUrl = `https://wa.me/91${r.phone}?text=${encodeURIComponent(replyText)}`;
       tbody.innerHTML += `<tr style="${isPending ? 'background:#291a10;' : ''}">
@@ -1065,7 +1087,8 @@
           A/C: ${r.approved ? '<b style="color:#2ecc71;">Approved</b>' : '<b style="color:#ff6600;">Pending</b>'}
         </td>
         <td>
-          ${selfieBtn}${feeVerifyBtn}
+          ${selfieBtn}
+          ${feeVerifyBtn}
           <button class="btn-sm btn-approve" onclick="toggleRiderApproval('${d.id}', true)">Approve Rider</button>
           <button class="btn-sm btn-edit" onclick="rejectRiderKyc('${d.id}')">Reject KYC</button>
           <button class="btn-sm btn-block" onclick="toggleRiderApproval('${d.id}', false)">Block</button>
@@ -1160,27 +1183,27 @@
       allOrdersCache.push({ id: d.id, ...o });
       const fareNum = Number(o.fare || 0);
       const tipNum = Number(o.tipAmount || 0);
+      const longPickBonus = Number(o.longPickupBonus || 0);
+      const incBonus = Number(o.incentiveBonus || 0);
       const commissionableFare = Math.max(0, fareNum - tipNum);
       const orderComm = Math.round(commissionableFare * (currentCommPercent / 100));
-      const riderNet = fareNum - orderComm;
+      const riderNet = (fareNum - orderComm) + longPickBonus + incBonus;
       comm += orderComm;
 
       const payTag = o.paymentMode === "ONLINE"
         ? `<span style="color:#2ecc71; font-weight:bold;">📱 ONLINE</span>`
         : `<span style="color:#ff6600; font-weight:bold;">💵 COD</span>`;
-      const kmInfo = o.distanceKm ? `<span style="color:#4db8ff; font-weight:bold;">${o.distanceKm} km</span>` : '-';
-      const breakdownLine = (o.baseFare !== undefined)
-        ? `<div style="font-size:10px; color:#aaa;">Base: ₹${o.baseFare} + Add-ons: ₹${o.addOnsTotal || 0}</div>`
-        : '';
-      const incTag = o.incentiveBonus ? `<br><small style="color:#4db8ff;">+₹${o.incentiveBonus} Bonus</small>` : '';
+      const kmInfo = o.distanceKm ? `<span style="color:#4db8ff; font-weight:bold;">Trip: ${o.distanceKm} km</span>` : '-';
+      const pickAwayInfo = o.pickupAwayKm ? `<br><small style="color:#ffaa66;">Pickup Away: ${o.pickupAwayKm} km (+₹${longPickBonus} भत्ता)</small>` : '';
+      const incTag = incBonus > 0 ? `<br><small style="color:#4db8ff;">+₹${incBonus} Peak Bonus</small>` : '';
       const viaTag = o.bookedVia ? `<br><span style="font-size:10px; color:#ffaa66;">📞 ${o.bookedVia}</span>` : '';
 
       tbody.innerHTML += `<tr>
         <td><b>${o.customerEmail || 'Customer'}</b><br><small style="color:#4db8ff;">📞 ${o.customerPhone || '-'}</small>${viaTag}</td>
-        <td><small>🟢 <b>पिकअप:</b> ${o.pickup} (${o.pickupContactName || ''}:${o.pickupContactPhone || ''})<br>
-                   🔴 <b>ड्रॉप:</b> ${o.drop} (${o.dropContactName || ''}:${o.dropContactPhone || ''})</small></td>
-        <td><b>${o.vehicle}</b> (${kmInfo})<br><small style="color:#2ecc71;">PIN: ${o.deliveryPin || '-'}</small></td>
-        <td><b>₹${fareNum}</b> (${payTag})${breakdownLine}<small style="color:#ff6600;">कमिशन (${currentCommPercent}%): ₹${orderComm} | रायडर: ₹${riderNet}</small>${incTag}</td>
+        <td><small>🟢 <b>पिकअप:</b> ${o.pickup} (${o.pickupContactName || ''}: ${o.pickupContactPhone || ''})<br>
+                   🔴 <b>ड्रॉप:</b> ${o.drop} (${o.dropContactName || ''}: ${o.dropContactPhone || ''})</small></td>
+        <td><b>${o.vehicle}</b> (${kmInfo})${pickAwayInfo}<br><small style="color:#2ecc71;">PIN: ${o.deliveryPin || '-'}</small></td>
+        <td><b>कस्टमर बिल: ₹${fareNum}</b> (${payTag})<br><small style="color:#ff6600;">कमिशन (${currentCommPercent}%): ₹${orderComm}</small><br><small style="color:#2ecc71; font-weight:bold;">रायडर एकूण: ₹${riderNet}</small>${incTag}</td>
         <td><b>${o.riderEmail || 'प्रलंबित'}</b><br><small style="color:#888;">${o.deliveredDateStr || ''}</small></td>
         <td><b style="color:${o.status === 'Delivered' ? '#2ecc71' : '#ff6600'};">${o.status}</b></td>
         <td><button class="btn-sm btn-block" onclick="deleteOrder('${d.id}')">Delete</button></td>
