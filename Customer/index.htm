@@ -45,7 +45,7 @@
     .place-chip.save-btn-chip { background: #16291d; border-color: #2ecc71; color: #2ecc71; }
     .addr-input-row { display: flex; gap: 5px; align-items: center; }
     .addr-search-btn { width: auto; padding: 11px 12px; margin: 6px 0; background: #262626; color: #ffaa66; border: 1px solid #444; font-size: 13px; white-space: nowrap; }
-    .fare-breakdown-box { background: #0c0c0c; border: 1px dashed #333; border-radius: 8px; padding: 8px 10px; margin-top: 8px; font-size: 11px; color: #bbb; line-height: 1.6; }
+    .fare-breakdown-box { background: #0c0c0c; border: 1px solid #2ecc71; border-radius: 8px; padding: 10px; margin-top: 8px; font-size: 12px; color: #ddd; line-height: 1.7; }
 
     .extra-stop-item { background: #18140e; border: 1px dashed #ff9800; border-radius: 8px; padding: 8px; margin: 6px 0; display: flex; gap: 6px; align-items: center; }
     .addon-card { background: #111; border: 1px solid #333; border-radius: 10px; padding: 10px; margin: 8px 0; }
@@ -126,7 +126,7 @@
     <div id="cTabBook">
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-          <span id="liveRateSyncStatus" style="font-size:11px; color:#2ecc71; font-weight:bold;">● Live Admin Rate Card Synced</span>
+          <span id="liveRateSyncStatus" style="font-size:11px; color:#2ecc71; font-weight:bold;">● Live Porter Rate Card Synced</span>
         </div>
         <div style="display:flex; gap:6px;">
           <button type="button" id="txtBtnCurrLoc" class="btn-gps" onclick="useCurrentGpsLocation('pickup')">📍 Use My Current Location (ऑटो पत्ता)</button>
@@ -192,10 +192,10 @@
         <div id="custMap"></div>
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#aaa; background:#111; padding:8px 10px; border-radius:8px; border:1px solid #2b2b2b;">
           <div>
-            <span id="txtLblDist" style="color:#ffaa66; font-weight:bold;">🛣️ रोड अंतर (KM):</span>
-            <div id="routeTimeEstTag" style="font-size:10px; color:#2ecc71;">OSRM Road Distance Auto-Calculated</div>
+            <span id="txtLblDist" style="color:#ffaa66; font-weight:bold;">🛣️ अंतर (KM):</span>
+            <div id="routeTimeEstTag" style="font-size:10px; color:#2ecc71;">रस्त्याचे अंतर (हवे तसे एडिटही करू शकता)</div>
           </div>
-          <input type="number" id="distKmInput" value="3" min="0.5" step="0.1" style="width:95px; padding:6px 8px; margin:0; text-align:center; font-weight:bold; color:#2ecc71; border-color:#2ecc71;" oninput="recalcPrices()">
+          <input type="number" id="distKmInput" value="1.2" min="0.1" step="0.1" style="width:95px; padding:6px 8px; margin:0; text-align:center; font-weight:bold; color:#2ecc71; border-color:#2ecc71;" oninput="recalcPrices()">
         </div>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:6px;">
@@ -266,32 +266,32 @@
           <div class="veh-box active" onclick="pickVeh('2-Wheeler', this)">
             <div>🏍️</div>
             <div style="font-size:11px; font-weight:bold;">2-Wheeler</div>
-            <div id="fare2W" style="color:#ff6600; font-weight:bold; font-size:15px;">₹30</div>
-            <div style="font-size:9px; color:#aaa;">Base ₹<span id="lblBase2W">30</span> | ₹<span id="lblRate2W">10</span>/km</div>
+            <div id="fare2W" style="color:#ff6600; font-weight:bold; font-size:15px;">₹33</div>
+            <div style="font-size:9px; color:#aaa;">Base ₹<span id="lblBase2W">15</span> + ₹<span id="lblRate2W">15</span>/km</div>
           </div>
           <div class="veh-box" onclick="pickVeh('3-Wheeler', this)">
             <div>🛺</div>
             <div style="font-size:11px; font-weight:bold;">3-Wheeler</div>
-            <div id="fare3W" style="color:#ff6600; font-weight:bold; font-size:15px;">₹70</div>
-            <div style="font-size:9px; color:#aaa;">Base ₹<span id="lblBase3W">70</span> | ₹<span id="lblRate3W">18</span>/km</div>
+            <div id="fare3W" style="color:#ff6600; font-weight:bold; font-size:15px;">₹74</div>
+            <div style="font-size:9px; color:#aaa;">Base ₹<span id="lblBase3W">50</span> + ₹<span id="lblRate3W">20</span>/km</div>
           </div>
           <div class="veh-box" onclick="pickVeh('Mini Tempo', this)">
             <div>🚐</div>
             <div style="font-size:11px; font-weight:bold;">Mini Tempo</div>
-            <div id="fareTempo" style="color:#ff6600; font-weight:bold; font-size:15px;">₹150</div>
-            <div style="font-size:9px; color:#aaa;">Base ₹<span id="lblBaseTempo">150</span> | ₹<span id="lblRateTempo">25</span>/km</div>
+            <div id="fareTempo" style="color:#ff6600; font-weight:bold; font-size:15px;">₹154</div>
+            <div style="font-size:9px; color:#aaa;">Base ₹<span id="lblBaseTempo">120</span> + ₹<span id="lblRateTempo">28</span>/km</div>
           </div>
           <div class="veh-box" onclick="pickVeh('Bolero Pickup', this)">
             <div>🛻</div>
             <div style="font-size:11px; font-weight:bold;">Bolero</div>
-            <div id="fareBolero" style="color:#ff6600; font-weight:bold; font-size:15px;">₹250</div>
-            <div style="font-size:9px; color:#aaa;">Base ₹<span id="lblBaseBolero">250</span> | ₹<span id="lblRateBolero">35</span>/km</div>
+            <div id="fareBolero" style="color:#ff6600; font-weight:bold; font-size:15px;">₹246</div>
+            <div style="font-size:9px; color:#aaa;">Base ₹<span id="lblBaseBolero">200</span> + ₹<span id="lblRateBolero">38</span>/km</div>
           </div>
           <div class="veh-box" onclick="pickVeh('Truck', this)">
             <div>🚛</div>
             <div style="font-size:11px; font-weight:bold;">Truck</div>
-            <div id="fareTruck" style="color:#ff6600; font-weight:bold; font-size:15px;">₹500</div>
-            <div style="font-size:9px; color:#aaa;">Base ₹<span id="lblBaseTruck">500</span> | ₹<span id="lblRateTruck">50</span>/km</div>
+            <div id="fareTruck" style="color:#ff6600; font-weight:bold; font-size:15px;">₹516</div>
+            <div style="font-size:9px; color:#aaa;">Base ₹<span id="lblBaseTruck">450</span> + ₹<span id="lblRateTruck">55</span>/km</div>
           </div>
         </div>
 
@@ -311,7 +311,7 @@
 
         <div id="onlineQrBox" class="qr-card hidden">
           <strong id="txtQrHead" style="font-size:14px; color:#000;">📲 QR स्कॅन करा किंवा थेट UPI ॲपने पेमेंट करा</strong>
-          <div style="font-size:12px; color:#333; margin-top:2px;"><span id="txtQrAmt">रक्कम:</span> <strong id="qrAmountText" style="color:#e65c00; font-size:16px;">₹30</strong></div>
+          <div style="font-size:12px; color:#333; margin-top:2px;"><span id="txtQrAmt">रक्कम:</span> <strong id="qrAmountText" style="color:#e65c00; font-size:16px;">₹33</strong></div>
           <img id="dynamicUpiQrImg" src="" alt="UPI Payment QR">
           <div style="font-size:11px; color:#444;">UPI ID: <strong id="qrUpiIdLabel">Techesupp-2@okhdfcbank</strong></div>
           <div class="upi-apps-grid">
@@ -337,14 +337,14 @@
           </label>
         </div>
 
-        <!-- Live KM & Add-ons Fare Breakdown -->
+        <!-- Clear Porter Formula Breakdown -->
         <div id="fareBreakdownBox" class="fare-breakdown-box">
           भाडे तपशील लोड होत आहे...
         </div>
 
         <div style="background:#111; padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
           <span><span id="txtTotalFareLbl">एकूण भाडे</span> (<span id="selectedPayBadge" style="color:#ff6600;">COD</span>):</span>
-          <strong id="finalFareDisplay" style="font-size:20px; color:#2ecc71;">₹30</strong>
+          <strong id="finalFareDisplay" style="font-size:20px; color:#2ecc71;">₹33</strong>
         </div>
 
         <button id="btnBookOrder" onclick="placeOrder()">📦 पार्सल बुक करा</button>
@@ -528,7 +528,7 @@
       currLoc: "📍 Use My Current Location (ऑटो पत्ता)", bigMap: "🔍 मोठा नकाशा",
       lblPickup: "🟢 पिकअप पत्ता, मजला व व्यक्तीची माहिती:", phPickup: "पिकअप पत्ता टाका किंवा GPS दाबा", phPickName: "पिकअप व्यक्तीचे नाव", phPickPhone: "पिकअप मोबाईल नंबर",
       lblDrop: "🔴 ड्रॉप पत्ता, मजला व व्यक्तीची माहिती:", phDrop: "ड्रॉप पत्ता टाका (उदा. स्वारगेट, पुणे)", phDropName: "ड्रॉप व्यक्तीचे नाव", phDropPhone: "ड्रॉप मोबाईल नंबर",
-      lblDist: "🛣️ रोड अंतर (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
+      lblDist: "🛣️ अंतर (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
       lblPay: "💳 पेमेंट पद्धत निवडा:", subCod: "रोख पेमेंट (COD)", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 QR स्कॅन करा किंवा थेट UPI ॲपने पेमेंट करा", qrAmt: "रक्कम:", qrNote: "✅ पेमेंट पूर्ण झाल्यावर खालील बटन दाबा",
       conHead: "📜 ऑर्डर संमती पत्र:", conAgree: "मला वरील अटी मान्य आहेत (I Agree)",
@@ -548,7 +548,7 @@
       currLoc: "📍 Use My Current Location (ऑटो पता)", bigMap: "🔍 बड़ा मैप",
       lblPickup: "🟢 पिकअप पता, मंजिल और व्यक्ति की जानकारी:", phPickup: "पिकअप पता दर्ज करें", phPickName: "पिकअप व्यक्ति का नाम", phPickPhone: "पिकअप मोबाइल नंबर",
       lblDrop: "🔴 ड्रॉप पता, मंजिल और व्यक्ति की जानकारी:", phDrop: "ड्रॉप पता दर्ज करें", phDropName: "ड्रॉप व्यक्ति का नाम", phDropPhone: "ड्रॉप मोबाइल नंबर",
-      lblDist: "🛣️ रोड दूरी (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
+      lblDist: "🛣️ दूरी (KM):", lblParcel: "📦 पार्सल प्रकार:", lblWeight: "⚖️ पार्सल वजन:",
       lblPay: "💳 पेमेंट का तरीका चुनें:", subCod: "नकद भुगतान (COD)", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 QR स्कैन करें या सीधे UPI ऐप से पेमेंट करें", qrAmt: "राशि:", qrNote: "✅ पेमेंट पूरा होने के बाद नीचे बटन दबाएं",
       conHead: "📜 ऑर्डर सहमति पत्र:", conAgree: "मुझे उपरोक्त सभी शर्तें मान्य हैं (I Agree)",
@@ -568,7 +568,7 @@
       currLoc: "📍 Use My Current Location (Auto Address)", bigMap: "🔍 Expand Map",
       lblPickup: "🟢 Pickup Address, Floor & Contact Person:", phPickup: "Enter Pickup Address or Tap GPS", phPickName: "Pickup Person Name", phPickPhone: "Pickup Mobile Number",
       lblDrop: "🔴 Drop Address, Floor & Contact Person:", phDrop: "Enter Drop Address", phDropName: "Drop Person Name", phDropPhone: "Drop Mobile Number",
-      lblDist: "🛣️ Road Distance (KM):", lblParcel: "📦 Parcel Type:", lblWeight: "⚖️ Parcel Weight:",
+      lblDist: "🛣️ Distance (KM):", lblParcel: "📦 Parcel Type:", lblWeight: "⚖️ Parcel Weight:",
       lblPay: "💳 Select Payment Method:", subCod: "Cash on Delivery", subOnl: "QR / GPay / PhonePe",
       qrHead: "📲 Scan QR or Pay Directly via UPI App", qrAmt: "Amount:", qrNote: "✅ Click Book button below after completing payment",
       conHead: "📜 Order Consent Agreement:", conAgree: "I agree to all Terms & Conditions",
@@ -671,11 +671,12 @@
   }, 1000);
 
   let appCfg = {
-    base2W: 30, rate2W: 10,
-    base3W: 70, rate3W: 18,
-    baseTempo: 150, rateTempo: 25,
-    baseBolero: 250, rateBolero: 35,
-    baseTruck: 500, rateTruck: 50,
+    includedBaseKm: 0,
+    base2W: 15, rate2W: 15,
+    base3W: 50, rate3W: 20,
+    baseTempo: 120, rateTempo: 28,
+    baseBolero: 200, rateBolero: 38,
+    baseTruck: 450, rateTruck: 55,
     surgeActive: false, surgeMultiplier: 1.2, timingAlertText: "",
     custBannerText: "", consentText: "मी GoParcel च्या सर्व अटी व नियमांशी सहमत आहे. पार्सलमध्ये कोणतीही बेकायदेशीर वस्तू नाही.",
     adminWa: "919999999999", adminUpi: "Techesupp-2@okhdfcbank",
@@ -685,7 +686,14 @@
   let custUser = JSON.parse(localStorage.getItem("gp_cust_user") || "null");
   let chosenVehicle = "2-Wheeler", chosenPaymentMode = "COD";
   let map, pMarker, dMarker, routeLine;
-  let pLat = 18.5204, pLng = 73.8567, dLat = 18.5314, dLng = 73.8446;
+  let pLat = 18.5204, pLng = 73.8567, dLat = 18.5284, dLng = 73.8496;
+
+  // Exact Porter / Rapido Fare Formula: Base Fare + (Billable KM * Per-KM Rate)
+  function computePorterFare(km, baseFare, perKmRate, includedFreeKm, surgeMult) {
+    const billableKm = Math.max(0, km - includedFreeKm);
+    const raw = baseFare + (billableKm * perKmRate);
+    return Math.round(raw * surgeMult);
+  }
 
   window.promptSaveCurrentPlace = async (side) => {
     if (!custUser) return;
@@ -933,21 +941,21 @@
     }
   });
 
-  // REAL-TIME LISTENER FOR ADMIN RATE CARD & SETTINGS
+  // REAL-TIME LISTENER FOR ADMIN PORTER RATE CARD & SETTINGS
   onSnapshot(doc(db, "config", "appSettings"), (snap) => {
     if (snap.exists()) {
       const s = snap.data();
-      const fallbackMin = Number(s.minFare ?? 30);
-      appCfg.base2W = Number(s.base2W ?? fallbackMin);
-      appCfg.rate2W = Number(s.rate2W ?? 10);
-      appCfg.base3W = Number(s.base3W ?? 70);
-      appCfg.rate3W = Number(s.rate3W ?? 18);
-      appCfg.baseTempo = Number(s.baseTempo ?? 150);
-      appCfg.rateTempo = Number(s.rateTempo ?? 25);
-      appCfg.baseBolero = Number(s.baseBolero ?? 250);
-      appCfg.rateBolero = Number(s.rateBolero ?? 35);
-      appCfg.baseTruck = Number(s.baseTruck ?? 500);
-      appCfg.rateTruck = Number(s.rateTruck ?? 50);
+      appCfg.includedBaseKm = Number(s.includedBaseKm ?? 0);
+      appCfg.base2W = Number(s.base2W ?? 15);
+      appCfg.rate2W = Number(s.rate2W ?? 15);
+      appCfg.base3W = Number(s.base3W ?? 50);
+      appCfg.rate3W = Number(s.rate3W ?? 20);
+      appCfg.baseTempo = Number(s.baseTempo ?? 120);
+      appCfg.rateTempo = Number(s.rateTempo ?? 28);
+      appCfg.baseBolero = Number(s.baseBolero ?? 200);
+      appCfg.rateBolero = Number(s.rateBolero ?? 38);
+      appCfg.baseTruck = Number(s.baseTruck ?? 450);
+      appCfg.rateTruck = Number(s.rateTruck ?? 55);
 
       appCfg.surgeActive = !!s.surgeActive;
       appCfg.surgeMultiplier = Number(s.surgeMultiplier ?? 1.2);
@@ -977,7 +985,7 @@
       document.getElementById('lblRateTruck').innerText = appCfg.rateTruck;
 
       const syncBadge = document.getElementById('liveRateSyncStatus');
-      if (syncBadge) syncBadge.innerText = `● Live Admin Rates Updated (${new Date().toLocaleTimeString('en-IN')})`;
+      if (syncBadge) syncBadge.innerText = `● Live Porter Rate Card Synced (${new Date().toLocaleTimeString('en-IN')})`;
 
       const cb = document.getElementById('custBanner');
       if (appCfg.custBannerText) { cb.innerText = "🎉 " + appCfg.custBannerText; cb.classList.remove('hidden'); }
@@ -1148,7 +1156,7 @@
     for (let i = 0; i < waypoints.length - 1; i++) {
       straightTotalKm += map.distance(waypoints[i], waypoints[i + 1]) / 1000;
     }
-    const estRoadKm = Math.max(1, (straightTotalKm * 1.25)).toFixed(1);
+    const estRoadKm = Math.max(0.5, Number((straightTotalKm * 1.2).toFixed(1)));
     document.getElementById('distKmInput').value = estRoadKm;
     recalcPrices();
 
@@ -1158,7 +1166,7 @@
       const data = await res.json();
       if (data.routes && data.routes.length > 0) {
         const route = data.routes[0];
-        const actualRoadKm = Math.max(1, (route.distance / 1000)).toFixed(1);
+        const actualRoadKm = Math.max(0.5, Number((route.distance / 1000).toFixed(1)));
         const estMinutes = Math.max(3, Math.round(route.duration / 60));
 
         document.getElementById('distKmInput').value = actualRoadKm;
@@ -1185,7 +1193,7 @@
       if (target === 'pickup') {
         pLat = custGpsLat; pLng = custGpsLng;
         if (!document.getElementById('dropInput').value.trim()) {
-          dLat = pLat + 0.015; dLng = pLng + 0.015;
+          dLat = pLat + 0.008; dLng = pLng + 0.008;
         }
         if (map && pMarker && dMarker) {
           pMarker.setLatLng([pLat, pLng]).openPopup();
@@ -1251,10 +1259,12 @@
     document.getElementById('payAnyUpiLink').href = upiUri;
   }
 
-  // PORTER-STYLE VEHICLE-WISE BASE FARE + PER-KM CALCULATION
+  // EXACT PORTER / RAPIDO FARE CALCULATION: Base Fare + (Billable KM * Per-KM Rate) + Add-ons
   function getFareBreakdownDetails() {
-    const km = Math.max(0.5, Number(document.getElementById('distKmInput').value) || 1);
+    const km = Math.max(0.1, Number(document.getElementById('distKmInput').value) || 1);
     const mult = appCfg.surgeActive ? appCfg.surgeMultiplier : 1;
+    const incKm = Number(appCfg.includedBaseKm || 0);
+    const billableKm = Math.max(0, Number((km - incKm).toFixed(2)));
 
     const stopsFee = extraStopsList.length * 25;
     const pickFloorFee = Number((document.getElementById('pickupFloorSelect')?.value || "Ground|0").split('|')[1] || 0);
@@ -1262,23 +1272,25 @@
     const insuranceFee = Number(document.getElementById('goodsInsuranceSelect')?.value || 0);
     const addOnsTotal = stopsFee + pickFloorFee + dropFloorFee + insuranceFee + selectedTipAmount;
 
-    const base2 = Math.max(appCfg.base2W, Math.round(km * appCfg.rate2W * mult));
-    const base3 = Math.max(appCfg.base3W, Math.round(km * appCfg.rate3W * mult));
-    const baset = Math.max(appCfg.baseTempo, Math.round(km * appCfg.rateTempo * mult));
-    const baseb = Math.max(appCfg.baseBolero, Math.round(km * appCfg.rateBolero * mult));
-    const basetr = Math.max(appCfg.baseTruck, Math.round(km * appCfg.rateTruck * mult));
+    const trip2 = computePorterFare(km, appCfg.base2W, appCfg.rate2W, incKm, mult);
+    const trip3 = computePorterFare(km, appCfg.base3W, appCfg.rate3W, incKm, mult);
+    const tript = computePorterFare(km, appCfg.baseTempo, appCfg.rateTempo, incKm, mult);
+    const tripb = computePorterFare(km, appCfg.baseBolero, appCfg.rateBolero, incKm, mult);
+    const triptr = computePorterFare(km, appCfg.baseTruck, appCfg.rateTruck, incKm, mult);
 
-    let activeBase = base2, activeMinBase = appCfg.base2W, activeRate = appCfg.rate2W;
-    if (chosenVehicle === "3-Wheeler") { activeBase = base3; activeMinBase = appCfg.base3W; activeRate = appCfg.rate3W; }
-    if (chosenVehicle === "Mini Tempo") { activeBase = baset; activeMinBase = appCfg.baseTempo; activeRate = appCfg.rateTempo; }
-    if (chosenVehicle === "Bolero Pickup") { activeBase = baseb; activeMinBase = appCfg.baseBolero; activeRate = appCfg.rateBolero; }
-    if (chosenVehicle === "Truck") { activeBase = basetr; activeMinBase = appCfg.baseTruck; activeRate = appCfg.rateTruck; }
+    let activeTripFare = trip2, activeBase = appCfg.base2W, activeRate = appCfg.rate2W;
+    if (chosenVehicle === "3-Wheeler") { activeTripFare = trip3; activeBase = appCfg.base3W; activeRate = appCfg.rate3W; }
+    if (chosenVehicle === "Mini Tempo") { activeTripFare = tript; activeBase = appCfg.baseTempo; activeRate = appCfg.rateTempo; }
+    if (chosenVehicle === "Bolero Pickup") { activeTripFare = tripb; activeBase = appCfg.baseBolero; activeRate = appCfg.rateBolero; }
+    if (chosenVehicle === "Truck") { activeTripFare = triptr; activeBase = appCfg.baseTruck; activeRate = appCfg.rateTruck; }
+
+    const distCharge = Math.round(billableKm * activeRate * mult);
 
     return {
-      km, mult, activeBase, activeMinBase, activeRate,
+      km, billableKm, incKm, mult, activeTripFare, activeBase, activeRate, distCharge,
       stopsFee, floorFee: pickFloorFee + dropFloorFee, insuranceFee, tipAmount: selectedTipAmount,
-      addOnsTotal, finalFare: activeBase + addOnsTotal,
-      f2: base2 + addOnsTotal, f3: base3 + addOnsTotal, ft: baset + addOnsTotal, fb: baseb + addOnsTotal, ftr: basetr + addOnsTotal
+      addOnsTotal, finalFare: activeTripFare + addOnsTotal,
+      f2: trip2 + addOnsTotal, f3: trip3 + addOnsTotal, ft: tript + addOnsTotal, fb: tripb + addOnsTotal, ftr: triptr + addOnsTotal
     };
   }
 
@@ -1294,7 +1306,9 @@
     const bdBox = document.getElementById('fareBreakdownBox');
     if (bdBox) {
       bdBox.innerHTML = `
-        <div style="display:flex; justify-content:space-between;"><span>📏 ${chosenVehicle} (${bd.km} km × ₹${bd.activeRate}/km, Base ₹${bd.activeMinBase}):</span><strong>₹${bd.activeBase}</strong></div>
+        <div style="color:#2ecc71; font-weight:bold; margin-bottom:3px;">🧾 Porter / Rapido भाडे हिशोब (${chosenVehicle}):</div>
+        <div style="display:flex; justify-content:space-between;"><span>1️⃣ बेस भाडे (Base Fare ${bd.incKm > 0 ? `[${bd.incKm} km मोफत]` : ''}):</span><strong>₹${bd.activeBase}</strong></div>
+        <div style="display:flex; justify-content:space-between;"><span>2️⃣ अंतर भाडे (${bd.billableKm} km × ₹${bd.activeRate}/km):</span><strong>+₹${bd.distCharge}</strong></div>
         ${bd.stopsFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#ff9800;"><span>🛑 एक्स्ट्रा स्टॉप्स (${extraStopsList.length} × ₹25):</span><strong>+₹${bd.stopsFee}</strong></div>` : ''}
         ${bd.floorFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#ffaa66;"><span>🪜 मजला लिफ्ट नसल्याचा चार्ज:</span><strong>+₹${bd.floorFee}</strong></div>` : ''}
         ${bd.insuranceFee > 0 ? `<div style="display:flex; justify-content:space-between; color:#2ecc71;"><span>🛡️ वस्तू विमा संरक्षण:</span><strong>+₹${bd.insuranceFee}</strong></div>` : ''}
@@ -1382,7 +1396,7 @@
       dropLat: Number(dLat), dropLng: Number(dLng),
       distanceKm: bd.km,
       ratePerKmApplied: bd.activeRate,
-      baseFare: bd.activeBase,
+      baseFare: bd.activeTripFare,
       addOnsTotal: bd.addOnsTotal,
       parcel: document.getElementById('parcelSelect').value,
       parcelWeight: weight,
