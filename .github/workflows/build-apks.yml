@@ -1,50 +1,65 @@
-
 name: Build GoParcel APKs
 
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
-      - 'Customer/**'
-      - 'Rider/**'
-      - 'Admin/**'
-      - 'shared/**'
-      - '.github/workflows/build-apks.yml'
-
-permissions:
-  contents: read
+      - ".github/workflows/build-apks.yml"
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
-        
+
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
+        uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'
+          gradle-version: "8.9"
 
       - name: Create Android project
+        shell: bash
         run: |
-          mkdir -p app/src/main/java/com/goparcel/mobile
+          mkdir -p app/src/main/java/com/goparcel/app
+          mkdir -p app/src/main/res/drawable-nodpi
+
           cat > settings.gradle <<'EOF'
-          pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
-          dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
-          rootProject.name = 'GoParcelMobile'
-          include ':app'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = "GoParcel"
+          include(":app")
           EOF
-          echo "plugins { id 'com.android.application' version '8.7.3' apply false }" > build.gradle
+
+          cat > build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.7.3' apply false
+          }
+          EOF
 
           cat > app/build.gradle <<'EOF'
           plugins {
@@ -52,109 +67,347 @@ jobs:
           }
 
           android {
-              namespace 'com.goparcel.mobile'
+              namespace 'com.goparcel.app'
               compileSdk 35
 
               defaultConfig {
-                  applicationId 'com.goparcel.mobile'
+                  applicationId 'com.goparcel.app'
                   minSdk 23
                   targetSdk 35
                   versionCode 1
                   versionName '1.0'
               }
 
-              flavorDimensions 'panel'
+              flavorDimensions += 'role'
 
               productFlavors {
                   customer {
-                      dimension 'panel'
+                      dimension 'role'
                       applicationIdSuffix '.customer'
-                      resValue 'string', 'app_name', 'GoParcel Customer'
-                      buildConfigField 'String', 'START_URL', '"https://madhavdevkar111-rgb.github.io/goparcellive/Customer/"'
+                      versionNameSuffix '-customer'
+                      manifestPlaceholders = [
+                          appLabel: 'GoParcel Customer',
+                          appIcon: '@drawable/ic_customer'
+                      ]
                   }
+
                   rider {
-                      dimension 'panel'
+                      dimension 'role'
                       applicationIdSuffix '.rider'
-                      resValue 'string', 'app_name', 'GoParcel Rider'
-                      buildConfigField 'String', 'START_URL', '"https://madhavdevkar111-rgb.github.io/goparcellive/Rider/"'
+                      versionNameSuffix '-rider'
+                      manifestPlaceholders = [
+                          appLabel: 'GoParcel Rider',
+                          appIcon: '@drawable/ic_rider'
+                      ]
                   }
+
                   admin {
-                      dimension 'panel'
+                      dimension 'role'
                       applicationIdSuffix '.admin'
-                      resValue 'string', 'app_name', 'GoParcel Admin'
-                      buildConfigField 'String', 'START_URL', '"https://madhavdevkar111-rgb.github.io/goparcellive/Admin/"'
+                      versionNameSuffix '-admin'
+                      manifestPlaceholders = [
+                          appLabel: 'GoParcel Admin',
+                          appIcon: '@android:drawable/sym_def_app_icon'
+                      ]
                   }
               }
 
-              buildFeatures {
-                  buildConfig true
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
               }
           }
           EOF
 
+          # Copy optional app icons. If absent, use Android default icons.
+          if [ -f app-icons/ic_customer.png ]; then
+            cp app-icons/ic_customer.png app/src/main/res/drawable-nodpi/ic_customer.png
+          else
+            echo "Customer icon not found; creating fallback."
+            cp "$ANDROID_HOME/platforms/android-35/data/res/drawable-xxxhdpi/ic_launcher.png" app/src/main/res/drawable-nodpi/ic_customer.png 2>/dev/null || true
+          fi
+
+          if [ -f app-icons/ic_rider.png ]; then
+            cp app-icons/ic_rider.png app/src/main/res/drawable-nodpi/ic_rider.png
+          else
+            echo "Rider icon not found; creating fallback."
+            cp "$ANDROID_HOME/platforms/android-35/data/res/drawable-xxxhdpi/ic_launcher.png" app/src/main/res/drawable-nodpi/ic_rider.png 2>/dev/null || true
+          fi
+
+          # If the optional icons are missing, use a built-in Android icon.
+          if [ ! -f app/src/main/res/drawable-nodpi/ic_customer.png ]; then
+            sed -i "s#@drawable/ic_customer#@android:drawable/sym_def_app_icon#" app/build.gradle
+          fi
+          if [ ! -f app/src/main/res/drawable-nodpi/ic_rider.png ]; then
+            sed -i "s#@drawable/ic_rider#@android:drawable/sym_def_app_icon#" app/build.gradle
+          fi
+
           cat > app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              <uses-permission android:name="android.permission.INTERNET"/>
-              <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-              <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-              <uses-permission android:name="android.permission.CAMERA"/>
+              <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+              <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+              <uses-permission android:name="android.permission.CAMERA" />
+              <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
               <application
-                  android:label="@string/app_name"
-                  android:theme="@android:style/Theme.Material.Light.NoActionBar"
-                  android:hardwareAccelerated="true">
+                  android:allowBackup="false"
+                  android:label="${appLabel}"
+                  android:icon="${appIcon}"
+                  android:usesCleartextTraffic="false"
+                  android:theme="@android:style/Theme.Material.Light.NoActionBar">
+
                   <activity
                       android:name=".MainActivity"
                       android:exported="true"
                       android:configChanges="orientation|screenSize|keyboardHidden">
                       <intent-filter>
-                          <action android:name="android.intent.action.MAIN"/>
-                          <category android:name="android.intent.category.LAUNCHER"/>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
                       </intent-filter>
                   </activity>
               </application>
           </manifest>
           EOF
 
-          cat > app/src/main/java/com/goparcel/mobile/MainActivity.java <<'EOF'
-          package com.goparcel.mobile;
+          cat > app/src/main/java/com/goparcel/app/MainActivity.java <<'EOF'
+          package com.goparcel.app;
 
+          import android.Manifest;
           import android.app.Activity;
+          import android.content.Intent;
+          import android.content.pm.PackageManager;
+          import android.net.Uri;
+          import android.os.Build;
           import android.os.Bundle;
+          import android.webkit.GeolocationPermissions;
+          import android.webkit.PermissionRequest;
+          import android.webkit.ValueCallback;
           import android.webkit.WebChromeClient;
           import android.webkit.WebSettings;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
 
           public class MainActivity extends Activity {
-              WebView webView;
+              private WebView webView;
+              private ValueCallback<Uri[]> fileCallback;
+              private PermissionRequest pendingWebPermission;
+              private GeolocationPermissions.Callback pendingGeoCallback;
+              private String pendingGeoOrigin;
+
+              private static final int FILE_PICKER = 101;
+              private static final int APP_PERMISSIONS = 102;
+              private static final int WEB_CAMERA_PERMISSION = 103;
+              private static final int WEB_LOCATION_PERMISSION = 104;
+
+              private String appUrl() {
+                  String id = getPackageName();
+                  if (id.endsWith(".customer")) {
+                      return "https://madhavdevkar111-rgb.github.io/goparcellive/Customer/";
+                  } else if (id.endsWith(".rider")) {
+                      return "https://madhavdevkar111-rgb.github.io/goparcellive/Rider/";
+                  } else {
+                      return "https://madhavdevkar111-rgb.github.io/goparcellive/Admin/";
+                  }
+              }
 
               @Override
               protected void onCreate(Bundle savedInstanceState) {
                   super.onCreate(savedInstanceState);
+
                   webView = new WebView(this);
                   setContentView(webView);
-                  WebSettings s = webView.getSettings();
-                  s.setJavaScriptEnabled(true);
-                  s.setDomStorageEnabled(true);
-                  s.setDatabaseEnabled(true);
-                  s.setGeolocationEnabled(true);
+
+                  WebSettings settings = webView.getSettings();
+                  settings.setJavaScriptEnabled(true);
+                  settings.setDomStorageEnabled(true);
+                  settings.setDatabaseEnabled(true);
+                  settings.setGeolocationEnabled(true);
+                  settings.setAllowFileAccess(false);
+                  settings.setAllowContentAccess(true);
+
                   webView.setWebViewClient(new WebViewClient());
-                  webView.setWebChromeClient(new WebChromeClient());
-                  webView.loadUrl(BuildConfig.START_URL);
+
+                  webView.setWebChromeClient(new WebChromeClient() {
+                      @Override
+                      public void onGeolocationPermissionsShowPrompt(
+                              String origin,
+                              GeolocationPermissions.Callback callback) {
+                          if (hasLocationPermission()) {
+                              callback.invoke(origin, true, false);
+                          } else {
+                              pendingGeoOrigin = origin;
+                              pendingGeoCallback = callback;
+                              requestPermissions(
+                                  new String[]{
+                                      Manifest.permission.ACCESS_FINE_LOCATION,
+                                      Manifest.permission.ACCESS_COARSE_LOCATION
+                                  },
+                                  WEB_LOCATION_PERMISSION
+                              );
+                          }
+                      }
+
+                      @Override
+                      public void onPermissionRequest(PermissionRequest request) {
+                          // Only allow camera requests from this app's own HTTPS site.
+                          String host = request.getOrigin().getHost();
+                          if (host == null ||
+                              !host.equals("madhavdevkar111-rgb.github.io")) {
+                              request.deny();
+                              return;
+                          }
+
+                          boolean asksCamera = false;
+                          for (String resource : request.getResources()) {
+                              if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)) {
+                                  asksCamera = true;
+                              }
+                          }
+
+                          if (asksCamera && checkSelfPermission(Manifest.permission.CAMERA)
+                                  != PackageManager.PERMISSION_GRANTED) {
+                              pendingWebPermission = request;
+                              requestPermissions(
+                                  new String[]{Manifest.permission.CAMERA},
+                                  WEB_CAMERA_PERMISSION
+                              );
+                          } else if (asksCamera) {
+                              request.grant(new String[]{
+                                  PermissionRequest.RESOURCE_VIDEO_CAPTURE
+                              });
+                          } else {
+                              request.deny();
+                          }
+                      }
+
+                      @Override
+                      public boolean onShowFileChooser(
+                              WebView view,
+                              ValueCallback<Uri[]> callback,
+                              FileChooserParams params) {
+                          if (fileCallback != null) {
+                              fileCallback.onReceiveValue(null);
+                          }
+                          fileCallback = callback;
+
+                          Intent intent = params.createIntent();
+                          try {
+                              startActivityForResult(intent, FILE_PICKER);
+                          } catch (Exception e) {
+                              fileCallback = null;
+                              callback.onReceiveValue(null);
+                              return false;
+                          }
+                          return true;
+                      }
+                  });
+
+                  requestInitialPermissions();
+
+                  if (savedInstanceState == null) {
+                      webView.loadUrl(appUrl());
+                  } else {
+                      webView.restoreState(savedInstanceState);
+                  }
+              }
+
+              private boolean hasLocationPermission() {
+                  return checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                              == PackageManager.PERMISSION_GRANTED ||
+                         checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                              == PackageManager.PERMISSION_GRANTED;
+              }
+
+              private void requestInitialPermissions() {
+                  java.util.ArrayList<String> list = new java.util.ArrayList<>();
+                  if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                          != PackageManager.PERMISSION_GRANTED) {
+                      list.add(Manifest.permission.ACCESS_FINE_LOCATION);
+                  }
+                  if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                          != PackageManager.PERMISSION_GRANTED) {
+                      list.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+                  }
+                  if (checkSelfPermission(Manifest.permission.CAMERA)
+                          != PackageManager.PERMISSION_GRANTED) {
+                      list.add(Manifest.permission.CAMERA);
+                  }
+                  if (Build.VERSION.SDK_INT >= 33 &&
+                      checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                          != PackageManager.PERMISSION_GRANTED) {
+                      list.add(Manifest.permission.POST_NOTIFICATIONS);
+                  }
+                  if (!list.isEmpty()) {
+                      requestPermissions(list.toArray(new String[0]), APP_PERMISSIONS);
+                  }
+              }
+
+              @Override
+              public void onRequestPermissionsResult(
+                      int requestCode, String[] permissions, int[] results) {
+                  super.onRequestPermissionsResult(requestCode, permissions, results);
+
+                  if (requestCode == WEB_LOCATION_PERMISSION && pendingGeoCallback != null) {
+                      boolean granted = hasLocationPermission();
+                      pendingGeoCallback.invoke(pendingGeoOrigin, granted, false);
+                      pendingGeoCallback = null;
+                      pendingGeoOrigin = null;
+                  }
+
+                  if (requestCode == WEB_CAMERA_PERMISSION && pendingWebPermission != null) {
+                      if (checkSelfPermission(Manifest.permission.CAMERA)
+                              == PackageManager.PERMISSION_GRANTED) {
+                          pendingWebPermission.grant(new String[]{
+                              PermissionRequest.RESOURCE_VIDEO_CAPTURE
+                          });
+                      } else {
+                          pendingWebPermission.deny();
+                      }
+                      pendingWebPermission = null;
+                  }
+              }
+
+              @Override
+              protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+                  super.onActivityResult(requestCode, resultCode, data);
+                  if (requestCode == FILE_PICKER && fileCallback != null) {
+                      Uri[] result = WebChromeClient.FileChooserParams.parseResult(
+                              resultCode, data);
+                      fileCallback.onReceiveValue(result);
+                      fileCallback = null;
+                  }
+              }
+
+              @Override
+              protected void onSaveInstanceState(Bundle outState) {
+                  super.onSaveInstanceState(outState);
+                  webView.saveState(outState);
               }
 
               @Override
               public void onBackPressed() {
-                  if (webView.canGoBack()) webView.goBack();
-                  else super.onBackPressed();
+                  if (webView != null && webView.canGoBack()) {
+                      webView.goBack();
+                  } else {
+                      super.onBackPressed();
+                  }
+              }
+
+              @Override
+              protected void onDestroy() {
+                  if (webView != null) {
+                      webView.destroy();
+                  }
+                  super.onDestroy();
               }
           }
           EOF
 
-      - name: Build APKs
-        run: gradle assembleCustomerDebug assembleRiderDebug assembleAdminDebug --no-daemon
+      - name: Build Customer, Rider and Admin APKs
+        run: gradle --no-daemon assembleCustomerDebug assembleRiderDebug assembleAdminDebug
 
-      - name: Upload APKs
+      - name: Upload APK files
         uses: actions/upload-artifact@v4
         with:
           name: GoParcel-Android-APKs
