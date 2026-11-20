@@ -105,8 +105,9 @@
     .b-nav-item.active svg { stroke: #000; }
     .hidden { display: none !important; }
   </style>
+  <link rel="stylesheet" href="../shared/goparcel-pro.css">
 </head>
-<body>
+<body class="gp-rider">
 <header>
   <h1>GoParcel Rider</h1>
   <div style="display:flex; align-items:center; gap:6px;">
@@ -118,6 +119,11 @@
     <button id="dutyToggleBtn" class="duty-btn duty-offline hidden" onclick="toggleRiderDuty()">● OFFLINE</button>
   </div>
 </header>
+<section class="gp-hero"><div class="gp-hero-row"><div><h2>Your deliveries. Your earnings.</h2><p>तुमची डिलिव्हरी, तुमचे उत्पन्न. उपलब्ध ऑर्डर्स स्वीकारा, रूट फॉलो करा आणि प्रत्येक डिलिव्हरी पूर्ण करा.</p><div class="gp-pillrow"><span class="gp-pill">Nearby Jobs</span><span class="gp-pill">Earnings & Wallet</span><span class="gp-pill">Delivery Proof</span></div></div></div></section>
+<div class="gp-shortcuts"><a class="gp-shortcut" onclick="switchBottomTab('Orders',document.querySelectorAll('.b-nav-item')[0])"><span class="gp-ico">🛵</span><span><strong>Available Orders</strong><small>Accept & manage jobs</small></span></a><a class="gp-shortcut" onclick="switchBottomTab('Wallet',document.querySelectorAll('.b-nav-item')[1])"><span class="gp-ico">💰</span><span><strong>My Earnings</strong><small>Wallet & withdrawal</small></span></a><a class="gp-shortcut" onclick="switchBottomTab('History',document.querySelectorAll('.b-nav-item')[2])"><span class="gp-ico">🧾</span><span><strong>Delivery History</strong><small>Completed jobs</small></span></a><a class="gp-shortcut" onclick="switchBottomTab('Settings',document.querySelectorAll('.b-nav-item')[3])"><span class="gp-ico">⚙️</span><span><strong>Rider Settings</strong><small>Profile & preferences</small></span></a></div>
+
+
+
 
 <div id="fakeGpsBlockModal" class="fake-gps-modal hidden">
   <div style="font-size:48px; margin-bottom:10px;">🚨🚫</div>
