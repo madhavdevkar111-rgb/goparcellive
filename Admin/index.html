@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="mr">
 <head>
   <meta charset="UTF-8">
@@ -62,18 +62,24 @@
     .modal-box img { max-width: 100%; max-height: 360px; border-radius: 8px; margin-bottom: 10px; }
     .section-divider { border-top: 1px solid #333; margin: 16px 0 12px; padding-top: 12px; }
     .hidden { display: none; }
+  
+    .gp-analytics{margin:0 0 18px;padding:20px;border:1px solid #293548;border-radius:20px;background:radial-gradient(circle at 90% 0%,rgba(249,115,22,.13),transparent 28%),linear-gradient(145deg,#151e2b,#101722);box-shadow:0 18px 42px rgba(0,0,0,.22)}
+    .gp-analytics-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px}.gp-eyebrow{font-size:9px;letter-spacing:.17em;color:#fb923c;font-weight:900}.gp-analytics-head h2{font-size:22px;margin:5px 0;color:#fff;letter-spacing:-.04em}.gp-analytics-head p{font-size:11px;color:#9aa8ba}.gp-live{font-size:10px;font-weight:900;color:#86efac;background:#123123;border:1px solid #23583c;padding:8px 11px;border-radius:99px;white-space:nowrap}.gp-live i{display:inline-block;width:7px;height:7px;background:#4ade80;border-radius:50%;margin-right:6px;box-shadow:0 0 0 4px rgba(74,222,128,.12)}
+    .gp-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.gp-kpi{padding:14px;border:1px solid #2b394b;border-radius:14px;background:rgba(255,255,255,.035);min-width:0}.gp-kpi span{display:block;color:#aab7c7;font-size:10px;font-weight:700}.gp-kpi strong{display:block;color:#fff;font-size:clamp(20px,2.5vw,28px);margin:7px 0 3px;letter-spacing:-.04em;overflow-wrap:anywhere}.gp-kpi small{color:#8291a4;font-size:10px}.gp-analytics-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:10px;margin-top:10px}.gp-panel{border:1px solid #2b394b;border-radius:14px;background:rgba(255,255,255,.025);padding:15px;min-width:0}.gp-panel-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}.gp-panel-title b{display:block;color:#f8fafc;font-size:13px}.gp-panel-title small{display:block;color:#8492a5;font-size:10px;margin-top:3px}.gp-panel-title>strong{color:#86efac;font-size:20px}.gp-mini-tag{font-size:9px;color:#fdba74;border:1px solid #70401e;border-radius:6px;padding:4px 7px}.gp-health-track{height:7px;background:#293548;border-radius:99px;overflow:hidden;margin-bottom:14px}.gp-health-track span{display:block;height:100%;width:0;background:linear-gradient(90deg,#f97316,#4ade80);border-radius:99px;transition:width .35s}.gp-status-bars{display:grid;gap:9px}.gp-status-line{display:grid;grid-template-columns:100px 1fr 28px;gap:8px;align-items:center;font-size:10px;color:#b7c2d0}.gp-status-line .track{height:6px;background:#293548;border-radius:99px;overflow:hidden}.gp-status-line .track i{display:block;height:100%;border-radius:99px;background:#f97316}.gp-status-line b{text-align:right;color:#fff}.gp-revenue-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #293548;font-size:11px;color:#aab7c7}.gp-revenue-row b{color:#f8fafc;font-size:13px}.gp-revenue-row:nth-of-type(3) b{color:#86efac}.gp-revenue-foot{font-size:9px;color:#77879b;margin-top:10px;line-height:1.5}
+    @media(max-width:760px){.gp-analytics{padding:14px;margin-left:0;margin-right:0}.gp-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.gp-analytics-grid{grid-template-columns:1fr}.gp-analytics-head{align-items:flex-start}.gp-analytics-head h2{font-size:19px}.gp-status-line{grid-template-columns:85px 1fr 24px}}
+
   </style>
   <link rel="stylesheet" href="../shared/goparcel-pro.css">
 </head>
 <body class="gp-admin">
 <header>
   <h1>👑 GoParcel Master Panel</h1>
-  <span style="color:#2ecc71; font-size:13px;">● Porter / Rapido No-Code Master Sync</span>
+  <span style="color:#2ecc71; font-size:13px;">● Operations Dashboard</span>
 </header>
-<section class="gp-hero"><div class="gp-hero-row"><div><h2>GoParcel Command Center</h2><p>एकाच ठिकाणी Orders, Rider Network, Settlements, Service Zones आणि Live Operations नियंत्रित करा. तुमचे विद्यमान Admin लॉजिक आणि Firebase collections कायम आहेत.</p><div class="gp-pillrow"><span class="gp-pill">● <b>Unified Operations</b></span><span class="gp-pill">Firebase Live Sync</span><span class="gp-pill">Zero Paid API Add-ons</span></div></div></div></section>
+<section class="gp-hero"><div class="gp-hero-row"><div><h2>GoParcel Command Center</h2><p>ऑर्डर्स, रायडर्स, पेमेंट्स आणि डिलिव्हरी ऑपरेशन्स एका ठिकाणाहून व्यवस्थापित करा.</p><div class="gp-pillrow"><span class="gp-pill">● <b>Unified Operations</b></span><span class="gp-pill">Order Management</span><span class="gp-pill">Rider Management</span></div></div></div></section>
 <div class="gp-shortcuts"><a class="gp-shortcut" onclick="showTab('orders')"><span class="gp-ico">📦</span><span><strong>Order Control</strong><small>Booking, status & history</small></span></a><a class="gp-shortcut" onclick="showTab('riders')"><span class="gp-ico">🛵</span><span><strong>Rider Network</strong><small>KYC, approvals & duty</small></span></a><a class="gp-shortcut" onclick="showTab('payouts')"><span class="gp-ico">💳</span><span><strong>Wallet & Settlement</strong><small>UTR, payouts & refunds</small></span></a><a class="gp-shortcut" onclick="showTab('map')"><span class="gp-ico">🗺️</span><span><strong>Live Operations Map</strong><small>Zones & rider locations</small></span></a></div>
-<div class="gp-note"><strong>Payment / OTP policy:</strong> सध्याचे Server OTP, WhatsApp OTP आणि UPI-UTR manual verification बदललेले नाही. Paid Firebase SMS किंवा payment gateway आपोआप जोडलेले नाहीत.</div>
-<div class="gp-feature-grid"><div class="gp-feature"><b>🧭 Serviceability Control</b><span>Service zones, pickup radius, delivery range आणि vehicle activation एकाच Admin panel मधून सांभाळा.</span><em>✓ Existing settings</em></div><div class="gp-feature"><b>🧾 Dispute & Refund Desk</b><span>Order issue, cancellation reason, UTR review आणि refund/settlement विनंत्या तपासा.</span><em>✓ Existing admin workflow</em></div><div class="gp-feature"><b>📊 Business Operations</b><span>Order volume, rider approvals, commission आणि payout स्थितीवर लक्ष ठेवा.</span><em>✓ Existing dashboard metrics</em></div></div>
+
+
 
 
 <div id="imgModal" class="modal-bg hidden" onclick="this.classList.add('hidden')">
@@ -91,6 +97,20 @@
     <div class="stat-card"><h3>सक्रिय सर्विस शहरे/एरिया</h3><p id="activeZonesCount" style="color:#4db8ff;">0</p></div>
     <div class="stat-card"><h3>प्लॅटफॉर्म कमिशन</h3><p style="color:#ff6600;">₹<span id="platformComm">0</span></p></div>
   </div>
+
+  <section class="gp-analytics" aria-label="Live business analytics">
+    <div class="gp-analytics-head"><div><span class="gp-eyebrow">LIVE BUSINESS INTELLIGENCE</span><h2>Operations Overview</h2><p>ऑर्डर, महसूल, पूर्णता आणि सेवा गुणवत्ता — Firestore मधील लाईव्ह डेटावर आधारित</p></div><span class="gp-live"><i></i> LIVE SYNC</span></div>
+    <div class="gp-kpi-grid">
+      <article class="gp-kpi"><span>Gross Booking Value</span><strong id="gpGrossValue">₹0</strong><small id="gpGrossHint">एकूण बुकिंग मूल्य</small></article>
+      <article class="gp-kpi"><span>Delivered Orders</span><strong id="gpDelivered">0</strong><small id="gpDeliveryRate">0% completion rate</small></article>
+      <article class="gp-kpi"><span>Active Pipeline</span><strong id="gpPipeline">0</strong><small id="gpPipelineRate">0% of all orders</small></article>
+      <article class="gp-kpi"><span>Average Order Value</span><strong id="gpAov">₹0</strong><small>प्रति ऑर्डर सरासरी बिल</small></article>
+    </div>
+    <div class="gp-analytics-grid">
+      <article class="gp-panel"><div class="gp-panel-title"><div><b>Order Health</b><small>सध्याची ऑर्डर स्थिती</small></div><strong id="gpHealthScore">0%</strong></div><div class="gp-health-track"><span id="gpHealthBar"></span></div><div id="gpStatusBars" class="gp-status-bars"></div></article>
+      <article class="gp-panel"><div class="gp-panel-title"><div><b>Revenue & Platform Share</b><small>ऑर्डर बिलिंग व अंदाजित कमिशन</small></div><span class="gp-mini-tag">INR</span></div><div class="gp-revenue-row"><span>Customer billing</span><b id="gpRevenue">₹0</b></div><div class="gp-revenue-row"><span>Platform commission</span><b id="gpCommission">₹0</b></div><div class="gp-revenue-row"><span>Rider payout estimate</span><b id="gpRiderPayout">₹0</b></div><div class="gp-revenue-foot">कमिशन सध्याच्या Admin commission rate वर आधारित आहे.</div></article>
+    </div>
+  </section>
 
   <div class="nav-tabs">
     <button id="tMaster" class="nav-btn active" onclick="showTab('master')">🎛️ दर तक्ता & No-Code Master Control</button>
@@ -1446,6 +1466,30 @@
     alert(`✅ ऑर्डर थेट रायडर ${rData.name} (${cleanPhone}) यांना असाइन केली गेली!`);
   };
 
+
+  function updateProAnalytics() {
+    const orders = allOrdersCache || [];
+    const total = orders.length;
+    const delivered = orders.filter(o => String(o.status || '').toLowerCase() === 'delivered').length;
+    const cancelled = orders.filter(o => /cancel|reject|failed/i.test(String(o.status || ''))).length;
+    const pipeline = Math.max(0, total - delivered - cancelled);
+    const gross = orders.reduce((sum,o) => sum + Math.max(0, Number(o.fare || 0)), 0);
+    const commission = orders.reduce((sum,o) => sum + Math.round(Math.max(0, Number(o.fare || 0) - Number(o.tipAmount || 0)) * (Number(currentCommPercent || 0) / 100)), 0);
+    const payout = orders.reduce((sum,o) => { const fare=Number(o.fare||0); const cut=Math.round(Math.max(0,fare-Number(o.tipAmount||0))*(Number(currentCommPercent||0)/100)); return sum + (fare-cut) + Number(o.longPickupBonus||0) + Number(o.incentiveBonus||0); },0);
+    const pct = n => total ? Math.round(n/total*100) : 0;
+    const money = n => '₹' + Math.round(n).toLocaleString('en-IN');
+    const put = (id,value) => { const el=document.getElementById(id); if(el) el.textContent=value; };
+    put('gpGrossValue',money(gross)); put('gpGrossHint',`${total.toLocaleString('en-IN')} total bookings`);
+    put('gpDelivered',delivered.toLocaleString('en-IN')); put('gpDeliveryRate',`${pct(delivered)}% completion rate`);
+    put('gpPipeline',pipeline.toLocaleString('en-IN')); put('gpPipelineRate',`${pct(pipeline)}% of all orders`);
+    put('gpAov',money(total?gross/total:0)); put('gpRevenue',money(gross)); put('gpCommission',money(commission)); put('gpRiderPayout',money(payout));
+    put('gpHealthScore',`${pct(delivered)}%`);
+    const health=document.getElementById('gpHealthBar'); if(health) health.style.width=`${pct(delivered)}%`;
+    const groups=[['Delivered',delivered,'#22c55e'],['In progress',pipeline,'#38bdf8'],['Cancelled / failed',cancelled,'#ef4444']];
+    const bars=document.getElementById('gpStatusBars');
+    if(bars) bars.innerHTML=groups.map(([label,value,color])=>`<div class="gp-status-line"><span>${label}</span><div class="track"><i style="width:${pct(value)}%;background:${color}"></i></div><b>${value}</b></div>`).join('');
+  }
+
   window.deleteOrder = async (id) => { if (confirm("ऑर्डर डिलीट करायची का?")) await deleteDoc(doc(db, "orders", id)); };
   onSnapshot(collection(db, "orders"), (snap) => {
     const tbody = document.getElementById('adminTableBody'); tbody.innerHTML = "";
@@ -1488,6 +1532,7 @@
     });
     document.getElementById('totalOrders').innerText = count;
     document.getElementById('platformComm').innerText = comm;
+    updateProAnalytics();
     renderDemandHeatMap(allOrdersCache);
   });
 </script>
